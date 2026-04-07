@@ -3,10 +3,10 @@
     <!-- Header -->
     <header class="border-b border-slate-200 bg-white">
       <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
-        <NuxtLink to="/" class="font-display text-2xl font-bold text-brand">Frula Homes</NuxtLink>
+        <NuxtLink to="/" class="font-display text-brand text-2xl font-bold">Frula Homes</NuxtLink>
         <NuxtLink
           to="/sell"
-          class="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-600"
+          class="bg-brand hover:bg-brand-600 rounded-full px-5 py-2 text-sm font-semibold text-white"
         >
           List Your Home
         </NuxtLink>
@@ -16,9 +16,7 @@
     <div class="mx-auto max-w-7xl px-4 py-6 md:px-8">
       <!-- Title + count -->
       <div class="mb-4 flex items-baseline justify-between">
-        <h1 class="font-display text-2xl font-bold md:text-3xl">
-          Browse listings
-        </h1>
+        <h1 class="font-display text-2xl font-bold md:text-3xl">Browse listings</h1>
         <p class="text-sm text-slate-500">
           <span v-if="pending">Loading…</span>
           <span v-else>{{ data?.length ?? 0 }} home{{ (data?.length ?? 0) === 1 ? '' : 's' }}</span>
@@ -54,17 +52,18 @@
             />
           </div>
 
-          <div v-else-if="!data?.length" class="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
+          <div
+            v-else-if="!data?.length"
+            class="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center"
+          >
             <p class="font-semibold text-slate-700">No listings match your filters</p>
-            <p class="mt-1 text-sm text-slate-500">Try adjusting your price range or removing a filter.</p>
+            <p class="mt-1 text-sm text-slate-500">
+              Try adjusting your price range or removing a filter.
+            </p>
           </div>
 
           <div v-else class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            <ListingCard
-              v-for="listing in data"
-              :key="listing.id"
-              :listing="listing"
-            />
+            <ListingCard v-for="listing in data" :key="listing.id" :listing="listing" />
           </div>
         </section>
       </div>

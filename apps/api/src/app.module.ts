@@ -1,13 +1,13 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { ScheduleModule } from '@nestjs/schedule';
-import { SupabaseModule } from './supabase/supabase.module';
-import { ListingsModule } from './listings/listings.module';
-import { CmaModule } from './cma/cma.module';
-import { TransactionsModule } from './transactions/transactions.module';
-import { ChecklistsModule } from './checklists/checklists.module';
-import { MessagesModule } from './messages/messages.module';
-import { ParcelsModule } from './parcels/parcels.module';
+import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { ScheduleModule } from '@nestjs/schedule'
+import { SupabaseModule } from './supabase/supabase.module'
+import { ListingsModule } from './listings/listings.module'
+import { CmaModule } from './cma/cma.module'
+import { TransactionsModule } from './transactions/transactions.module'
+import { ChecklistsModule } from './checklists/checklists.module'
+import { MessagesModule } from './messages/messages.module'
+import { ParcelsModule } from './parcels/parcels.module'
 
 @Module({
   imports: [

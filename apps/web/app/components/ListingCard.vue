@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
     :to="`/listing/${listing.id}`"
-    class="group block overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-brand hover:shadow-lg"
+    class="hover:border-brand group block overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:shadow-lg"
   >
     <div class="relative aspect-[4/3] overflow-hidden bg-slate-100">
       <img
@@ -11,10 +11,10 @@
         loading="lazy"
         class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
       />
-      <div v-else class="flex h-full items-center justify-center text-slate-300">
-        No photo
-      </div>
-      <div class="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-brand shadow-sm">
+      <div v-else class="flex h-full items-center justify-center text-slate-300">No photo</div>
+      <div
+        class="text-brand absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold shadow-sm"
+      >
         FSBO
       </div>
     </div>
@@ -24,14 +24,16 @@
         <div class="font-display text-2xl font-bold text-slate-900">
           {{ formatPrice(listing.price) }}
         </div>
-        <div v-if="listing.sqft" class="text-xs text-slate-500">
-          {{ pricePerSqft }}/sqft
-        </div>
+        <div v-if="listing.sqft" class="text-xs text-slate-500">{{ pricePerSqft }}/sqft</div>
       </div>
 
       <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-700">
-        <span v-if="listing.beds"><strong>{{ listing.beds }}</strong> bd</span>
-        <span v-if="totalBaths"><strong>{{ totalBaths }}</strong> ba</span>
+        <span v-if="listing.beds"
+          ><strong>{{ listing.beds }}</strong> bd</span
+        >
+        <span v-if="totalBaths"
+          ><strong>{{ totalBaths }}</strong> ba</span
+        >
         <span v-if="listing.sqft">{{ formatSqft(listing.sqft) }}</span>
       </div>
 
@@ -53,7 +55,7 @@ const props = defineProps<{ listing: Listing }>()
 
 const primaryPhoto = computed(() => {
   const photos = props.listing.listing_photos ?? []
-  const primary = photos.find(p => p.is_primary)
+  const primary = photos.find((p) => p.is_primary)
   return (primary ?? photos[0])?.url
 })
 

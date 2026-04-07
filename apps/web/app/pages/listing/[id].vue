@@ -3,8 +3,8 @@
     <!-- Header -->
     <header class="border-b border-slate-200 bg-white">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-8">
-        <NuxtLink to="/" class="font-display text-2xl font-bold text-brand">Frula Homes</NuxtLink>
-        <NuxtLink to="/browse" class="text-sm font-medium text-slate-600 hover:text-brand">
+        <NuxtLink to="/" class="font-display text-brand text-2xl font-bold">Frula Homes</NuxtLink>
+        <NuxtLink to="/browse" class="hover:text-brand text-sm font-medium text-slate-600">
           ← Back to browse
         </NuxtLink>
       </div>
@@ -17,7 +17,9 @@
     <div v-else-if="error || !listing" class="mx-auto max-w-6xl p-8">
       <div class="rounded-lg border border-red-200 bg-red-50 p-6 text-red-800">
         <p class="font-semibold">Listing not found</p>
-        <p class="mt-1 text-sm">{{ error?.message || 'This listing may have been removed or is no longer active.' }}</p>
+        <p class="mt-1 text-sm">
+          {{ error?.message || 'This listing may have been removed or is no longer active.' }}
+        </p>
       </div>
     </div>
 
@@ -60,7 +62,7 @@
               <span
                 v-for="h in listing.highlights"
                 :key="h"
-                class="rounded-full bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-700"
+                class="bg-brand-50 text-brand-700 rounded-full px-3 py-1.5 text-sm font-medium"
               >
                 {{ h }}
               </span>
@@ -74,11 +76,17 @@
               <Fact label="Property type" :value="capitalize(listing.property_type)" />
               <Fact label="Year built" :value="listing.year_built" />
               <Fact label="Square feet" :value="listing.sqft ? formatNumber(listing.sqft) : null" />
-              <Fact label="Lot size" :value="listing.lot_size ? `${listing.lot_size} acres` : null" />
+              <Fact
+                label="Lot size"
+                :value="listing.lot_size ? `${listing.lot_size} acres` : null"
+              />
               <Fact label="Bedrooms" :value="listing.beds" />
               <Fact label="Full baths" :value="listing.full_baths" />
               <Fact label="Half baths" :value="listing.half_baths" />
-              <Fact label="Garage" :value="listing.garage_stalls ? `${listing.garage_stalls}-car` : 'No'" />
+              <Fact
+                label="Garage"
+                :value="listing.garage_stalls ? `${listing.garage_stalls}-car` : 'No'"
+              />
               <Fact label="County" :value="listing.county" />
             </dl>
           </div>
@@ -94,21 +102,23 @@
               {{ formatPrice(Math.round(listing.price / listing.sqft)) }}/sqft
             </p>
 
-            <div class="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
-              <span class="h-2 w-2 rounded-full bg-brand"></span>
+            <div
+              class="bg-brand-50 text-brand-700 mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
+            >
+              <span class="bg-brand h-2 w-2 rounded-full"></span>
               For Sale By Owner
             </div>
 
             <button
               type="button"
-              class="mt-6 w-full rounded-full bg-brand px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600"
+              class="bg-brand hover:bg-brand-600 mt-6 w-full rounded-full px-4 py-3 text-sm font-semibold text-white shadow-sm transition"
               @click="contactSeller"
             >
               Contact seller
             </button>
             <button
               type="button"
-              class="mt-2 w-full rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand"
+              class="hover:border-brand hover:text-brand mt-2 w-full rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition"
             >
               Save listing
             </button>
@@ -130,25 +140,28 @@ import { formatPrice } from '~/composables/useListings'
 const route = useRoute()
 const supabase = useSupabaseClient()
 
-const { data: listing, pending, error } = await useAsyncData(
-  `listing-${route.params.id}`,
-  async () => {
-    const { data, error } = await supabase
-      .from('listings')
-      .select(`
+const {
+  data: listing,
+  pending,
+  error,
+} = await useAsyncData(`listing-${route.params.id}`, async () => {
+  const { data, error } = await supabase
+    .from('listings')
+    .select(
+      `
         id, status, address, city, state, zip, county, lat, lng,
         property_type, price, sqft, lot_size, beds, full_baths, half_baths,
         year_built, garage, garage_stalls, title, description, highlights,
         listed_at,
         listing_photos ( url, is_primary, sort_order )
-      `)
-      .eq('id', route.params.id as string)
-      .eq('status', 'active')
-      .maybeSingle()
-    if (error) throw error
-    return data as unknown as Listing | null
-  },
-)
+      `,
+    )
+    .eq('id', route.params.id as string)
+    .eq('status', 'active')
+    .maybeSingle()
+  if (error) throw error
+  return data as unknown as Listing | null
+})
 
 const photos = computed(() => {
   const list = listing.value?.listing_photos ?? []
@@ -187,9 +200,10 @@ function contactSeller() {
 }
 
 useSeoMeta({
-  title: () => listing.value
-    ? `${listing.value.title || listing.value.address} — Frula Homes`
-    : 'Listing — Frula Homes',
+  title: () =>
+    listing.value
+      ? `${listing.value.title || listing.value.address} — Frula Homes`
+      : 'Listing — Frula Homes',
   description: () => listing.value?.description ?? '',
 })
 </script>

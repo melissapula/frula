@@ -8,19 +8,33 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@vueuse/nuxt',
     '@nuxt/image',
+    '@nuxt/eslint',
   ],
+
+  eslint: {
+    config: {
+      stylistic: false, // let prettier handle style
+    },
+  },
 
   app: {
     head: {
       title: 'Frula Homes — Sell it yourself',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'For Sale By Owner platform for Minnesota. Sell your home without paying agent commissions.' },
+        {
+          name: 'description',
+          content:
+            'For Sale By Owner platform for Minnesota. Sell your home without paying agent commissions.',
+        },
       ],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap' },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap',
+        },
       ],
     },
   },

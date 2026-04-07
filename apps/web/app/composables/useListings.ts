@@ -8,13 +8,15 @@ export function useListings(filters: Ref<ListingFilters>) {
     async () => {
       let query = supabase
         .from('listings')
-        .select(`
+        .select(
+          `
           id, status, address, city, state, zip, county, lat, lng,
           property_type, price, sqft, lot_size, beds, full_baths, half_baths,
           year_built, garage, garage_stalls, title, description, highlights,
           listed_at,
           listing_photos ( url, is_primary, sort_order )
-        `)
+        `,
+        )
         .eq('status', 'active')
         .order('listed_at', { ascending: false })
 

@@ -11,14 +11,12 @@
 
     <div v-else class="mt-6">
       <p class="rounded-lg border border-green-200 bg-green-50 p-4 text-green-800">
-        ✅ Connected. Found <strong>{{ data?.length ?? 0 }}</strong> checklist template{{ (data?.length ?? 0) === 1 ? '' : 's' }}.
+        ✅ Connected. Found <strong>{{ data?.length ?? 0 }}</strong> checklist template{{
+          (data?.length ?? 0) === 1 ? '' : 's'
+        }}.
       </p>
       <ul class="mt-6 space-y-3">
-        <li
-          v-for="t in data"
-          :key="t.id"
-          class="rounded-xl border border-slate-200 p-4"
-        >
+        <li v-for="t in data" :key="t.id" class="rounded-xl border border-slate-200 p-4">
           <div class="font-semibold">{{ t.name }}</div>
           <div class="text-sm text-slate-500">
             {{ t.role }} · {{ t.property_type }} · {{ t.state }}
