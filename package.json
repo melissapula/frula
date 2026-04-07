@@ -1,37 +1,37 @@
 {
-  "name": "fsbo-platform",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "scripts": {
-    "dev:web": "npm run dev --workspace=web",
-    "dev:api": "npm run start:dev --workspace=api",
-    "dev": "concurrently \"npm:dev:api\" \"npm:dev:web\"",
-    "build:web": "npm run build --workspace=web",
-    "build:api": "npm run build --workspace=api",
-    "format": "prettier --write \"**/*.{ts,vue,js,json,md,css}\"",
-    "format:check": "prettier --check \"**/*.{ts,vue,js,json,md,css}\"",
-    "lint": "npm run lint --workspace=web",
-    "prepare": "husky"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.2.10",
-    "prettier": "^3.4.2",
-    "prettier-plugin-tailwindcss": "^0.6.9"
-  },
-  "lint-staged": {
-    "apps/web/**/*.{ts,vue,js}": [
-      "prettier --write"
+    "name": "fsbo-platform",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*"
     ],
-    "apps/api/**/*.{ts,js}": [
-      "prettier --write"
-    ],
-    "*.{json,md,css,yml,yaml}": [
-      "prettier --write"
-    ]
-  }
+    "scripts": {
+        "dev:web": "npm run dev --workspace=web",
+        "dev:api": "npm run start:dev --workspace=api",
+        "dev": "concurrently \"npm:dev:api\" \"npm:dev:web\"",
+        "build:web": "npm run build --workspace=web",
+        "build:api": "npm run build --workspace=api",
+        "format": "prettier --write \"**/*.{ts,vue,js,json,md,css}\"",
+        "format:check": "prettier --check \"**/*.{ts,vue,js,json,md,css}\"",
+        "lint": "npm run lint --workspace=web",
+        "prepare": "husky"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.0",
+        "husky": "^9.1.7",
+        "lint-staged": "^15.2.10",
+        "prettier": "^3.4.2",
+        "prettier-plugin-tailwindcss": "^0.6.9"
+    },
+    "lint-staged": {
+        "apps/web/**/*.{ts,vue,js}": [
+            "prettier --write"
+        ],
+        "apps/api/**/*.{ts,js}": [
+            "prettier --write"
+        ],
+        "*.{json,md,css,yml,yaml}": [
+            "prettier --write"
+        ]
+    }
 }

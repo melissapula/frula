@@ -2,23 +2,23 @@
 
 > For Sale By Owner — built for real people, not real estate agents.
 
-A full-stack FSBO listing platform with built-in CMA (Comparable Market Analysis), 
+A full-stack FSBO listing platform with built-in CMA (Comparable Market Analysis),
 smart transaction checklists, and optional paperwork support.
 
 ---
 
 ## Stack
 
-| Layer | Tech |
-|---|---|
-| Frontend | Nuxt 3 + TypeScript |
-| Backend | NestJS + TypeScript |
+| Layer    | Tech                          |
+| -------- | ----------------------------- |
+| Frontend | Nuxt 3 + TypeScript           |
+| Backend  | NestJS + TypeScript           |
 | Database | Supabase (Postgres + PostGIS) |
-| Auth | Supabase Auth |
-| Storage | Cloudinary |
-| Maps | Mapbox GL JS |
-| Email | Resend |
-| Payments | Stripe (Phase 2) |
+| Auth     | Supabase Auth                 |
+| Storage  | Cloudinary                    |
+| Maps     | Mapbox GL JS                  |
+| Email    | Resend                        |
+| Payments | Stripe (Phase 2)              |
 
 ---
 
@@ -43,25 +43,29 @@ fsbo-platform/
 ## Getting Started
 
 ### 1. Supabase Setup
+
 1. Create a free project at [supabase.com](https://supabase.com)
 2. Go to SQL Editor and run in order:
-   - `supabase/schema.sql`
-   - `supabase/functions.sql`
-   - `supabase/seed.sql`
+    - `supabase/schema.sql`
+    - `supabase/functions.sql`
+    - `supabase/seed.sql`
 3. Copy your `SUPABASE_URL` and keys from Project Settings → API
 
 ### 2. Environment Variables
+
 ```bash
 cp .env.example .env
 # Fill in your Supabase, Cloudinary, Mapbox, etc. keys
 ```
 
 ### 3. Install Dependencies
+
 ```bash
 yarn install
 ```
 
 ### 4. Start Development
+
 ```bash
 # Start both API and web simultaneously
 yarn dev
@@ -72,6 +76,7 @@ yarn dev:web   # Nuxt on :3000
 ```
 
 ### 5. API Docs
+
 Visit `http://localhost:3001/docs` for Swagger UI
 
 ---
@@ -82,10 +87,10 @@ Visit `http://localhost:3001/docs` for Swagger UI
 2. Go to: Layers → Cadastral → MN Statewide Parcel Dataset
 3. Download the CSV for your target counties
 4. Use the admin import endpoint:
-   ```
-   POST /api/parcels/import
-   Content-Type: multipart/form-data
-   ```
+    ```
+    POST /api/parcels/import
+    Content-Type: multipart/form-data
+    ```
 
 ---
 
@@ -108,4 +113,5 @@ Visit `http://localhost:3001/docs` for Swagger UI
 ---
 
 ## License
+
 Private — not open source (yet 😄)

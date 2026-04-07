@@ -13,6 +13,7 @@ Think Zillow — except Zillow no longer lets sellers manage their own listings,
 and traditional agents charge 5-6% commission.
 
 Frula Homes replaces the agent with:
+
 - A smart listing builder with photo uploads
 - A free CMA (Comparable Market Analysis) tool built on MN public parcel data
 - Smart transaction checklists for buyer and seller (MN-specific)
@@ -47,6 +48,7 @@ considered but chrissa.com was taken.
 ## Key Decisions Already Made
 
 ### Name & Brand
+
 - **Company name:** Frula Homes
 - **Domain:** frulahomes.com (registered on Cloudflare)
 - **Instagram:** @frulahomes
@@ -54,6 +56,7 @@ considered but chrissa.com was taken.
 - **Logo/brand:** Not yet designed
 
 ### Tech Stack
+
 - **Frontend:** Nuxt 3 + TypeScript (mobile-first)
 - **Backend:** NestJS + TypeScript
 - **Database:** Supabase (Postgres + PostGIS + Auth)
@@ -66,6 +69,7 @@ considered but chrissa.com was taken.
 - **Repo:** Private GitHub repo (not yet created — next step)
 
 ### CMA Strategy
+
 - Build our own CMA engine using FREE MN public parcel data
 - Data source: MN Geospatial Commons (gisdata.mn.gov)
 - Start with Beltrami + neighboring counties (Hubbard, Clearwater, Cass, Koochiching)
@@ -78,19 +82,22 @@ considered but chrissa.com was taken.
 - Label output clearly: "Seller Market Estimate — not a licensed appraisal"
 
 ### Monetization
-| Tier | Price | Includes |
-|---|---|---|
-| Basic | $49 | 30-day listing, 15 photos, CMA |
-| Standard | $99 | 90-day listing, 40 photos, CMA + refresh, featured |
-| Premium | $199 | 6-month listing, unlimited photos, top placement |
+
+| Tier     | Price | Includes                                           |
+| -------- | ----- | -------------------------------------------------- |
+| Basic    | $49   | 30-day listing, 15 photos, CMA                     |
+| Standard | $99   | 90-day listing, 40 photos, CMA + refresh, featured |
+| Premium  | $199  | 6-month listing, unlimited photos, top placement   |
 
 **Missa's licensed services (once licensed):**
+
 - Document review: $149 flat
 - Transaction coordination: $399 flat
 - Full representation: TBD (commission or flat fee)
 - Market rate for TC is $300-$600 — local Bemidji agent quoted $2,000 (way over market)
 
 ### Legal / Business Notes
+
 - Missa signed Edina Realty LaunchER agreement (March 20, 2026)
 - Agreement only covers tuition reimbursement + 5 conditions
 - NO outside business restrictions, NO non-compete, NO IP assignment
@@ -105,7 +112,9 @@ considered but chrissa.com was taken.
 ## What's Already Built
 
 ### Database (supabase/schema.sql)
+
 All 12 tables created with RLS policies:
+
 - profiles, listings, listing_photos, listing_documents
 - parcels (MN public data), cma_reports
 - messages, saved_listings, transactions
@@ -115,21 +124,25 @@ All 12 tables created with RLS policies:
 PostGIS enabled for geo radius queries.
 
 ### Database Functions (supabase/functions.sql)
+
 - `find_comps()` — PostGIS function that finds comparable sales within radius
 - Auto-syncs lat/lng → geography column on insert/update
 
 ### Seed Data (supabase/seed.sql)
+
 - MN Residential Seller Checklist — 20 items across 5 phases
 - MN Residential Buyer Checklist — 17 items across 5 phases
 - All items have: phase, description, due_offset_days, guide_key
 
 ### NestJS API (apps/api/src/)
+
 - main.ts — bootstrap with validation, CORS, Swagger docs
 - app.module.ts — all modules wired up
 - cma/cma.service.ts — full CMA algorithm (comp finding, scoring, calculation, narrative)
 - parcels/parcel-sync.service.ts — weekly/monthly cron jobs for data freshness
 
 ### Landing Page
+
 - Designed and built (shown in Claude conversation)
 - Shows: hero, stats, 6 feature cards, 3 pricing tiers, Missa's TC services card
 - Uses Playfair Display + DM Sans fonts
@@ -157,6 +170,7 @@ PostGIS enabled for geo radius queries.
 ---
 
 ## Mobile-First Rules (Non-Negotiable)
+
 - 74% of homebuyers search on mobile
 - Design 375px wide first, enhance for desktop
 - Bottom nav on mobile, top nav on desktop
@@ -169,6 +183,7 @@ PostGIS enabled for geo radius queries.
 ---
 
 ## File Structure
+
 ```
 frula-homes/  (rename from fsbo-platform)
 ├── apps/
@@ -193,7 +208,9 @@ frula-homes/  (rename from fsbo-platform)
 ---
 
 ## Environment Variables Needed
+
 All documented in .env.example:
+
 - SUPABASE_URL + keys (get from supabase.com project settings)
 - ANTHROPIC_API_KEY (for CMA narratives)
 - CLOUDINARY credentials (for photo uploads)
@@ -204,6 +221,7 @@ All documented in .env.example:
 ---
 
 ## Vibe / Tone Notes
+
 - Missa is direct, excited, technically strong
 - She does not want over-hedged answers — be direct and confident
 - This is a real business, not a toy project — treat it that way
@@ -216,6 +234,7 @@ All documented in .env.example:
 ## Session Log
 
 ### Session 1 (April 2026)
+
 - Conceived the idea
 - Researched CMA data providers (ATTOM $500/mo, Estated $179/mo, BatchData $0.01/call)
 - Decided to build our own CMA on free MN public data

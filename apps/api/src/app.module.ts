@@ -10,23 +10,23 @@ import { MessagesModule } from './messages/messages.module'
 import { ParcelsModule } from './parcels/parcels.module'
 
 @Module({
-  imports: [
-    // Config — loads .env
-    ConfigModule.forRoot({ isGlobal: true }),
+    imports: [
+        // Config — loads .env
+        ConfigModule.forRoot({ isGlobal: true }),
 
-    // Cron jobs (parcel data sync)
-    ScheduleModule.forRoot(),
+        // Cron jobs (parcel data sync)
+        ScheduleModule.forRoot(),
 
-    // Core services
-    SupabaseModule,
+        // Core services
+        SupabaseModule,
 
-    // Feature modules
-    ListingsModule,
-    CmaModule,
-    TransactionsModule,
-    ChecklistsModule,
-    MessagesModule,
-    ParcelsModule,
-  ],
+        // Feature modules
+        ListingsModule,
+        CmaModule,
+        TransactionsModule,
+        ChecklistsModule,
+        MessagesModule,
+        ParcelsModule,
+    ],
 })
 export class AppModule {}
