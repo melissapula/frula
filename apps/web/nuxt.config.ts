@@ -3,19 +3,7 @@ export default defineNuxtConfig({
     compatibilityDate: '2025-07-15',
     devtools: { enabled: true },
 
-    modules: [
-        '@nuxtjs/tailwindcss',
-        '@nuxtjs/supabase',
-        '@vueuse/nuxt',
-        '@nuxt/image',
-        '@nuxt/eslint',
-    ],
-
-    eslint: {
-        config: {
-            stylistic: false, // let prettier handle style
-        },
-    },
+    modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@vueuse/nuxt', '@nuxt/image'],
 
     app: {
         head: {
