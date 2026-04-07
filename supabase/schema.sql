@@ -275,6 +275,14 @@ CREATE TABLE public.checklist_templates (
   created_at    TIMESTAMPTZ DEFAULT NOW()
 );
 
+ALTER TABLE public.checklist_templates ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Checklist templates are public read"
+  ON public.checklist_templates
+  FOR SELECT
+  TO anon, authenticated
+  USING (true);
+
 CREATE TABLE public.transaction_checklists (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   transaction_id  UUID NOT NULL REFERENCES public.transactions(id) ON DELETE CASCADE,
