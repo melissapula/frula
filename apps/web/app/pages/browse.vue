@@ -6,12 +6,7 @@
                 <NuxtLink to="/" class="font-display text-brand text-2xl font-bold"
                     >Frula Homes</NuxtLink
                 >
-                <NuxtLink
-                    to="/sell"
-                    class="bg-brand hover:bg-brand-600 rounded-full px-5 py-2 text-sm font-semibold text-white"
-                >
-                    List Your Home
-                </NuxtLink>
+                <AuthNav />
             </div>
         </header>
 

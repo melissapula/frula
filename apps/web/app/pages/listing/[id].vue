@@ -3,12 +3,18 @@
         <!-- Header -->
         <header class="border-b border-slate-200 bg-white">
             <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-8">
-                <NuxtLink to="/" class="font-display text-brand text-2xl font-bold"
-                    >Frula Homes</NuxtLink
-                >
-                <NuxtLink to="/browse" class="hover:text-brand text-sm font-medium text-slate-600">
-                    ← Back to browse
-                </NuxtLink>
+                <div class="flex items-center gap-6">
+                    <NuxtLink to="/" class="font-display text-brand text-2xl font-bold"
+                        >Frula Homes</NuxtLink
+                    >
+                    <NuxtLink
+                        to="/browse"
+                        class="hover:text-brand hidden text-sm font-medium text-slate-600 sm:block"
+                    >
+                        ← Back to browse
+                    </NuxtLink>
+                </div>
+                <AuthNav />
             </div>
         </header>
 
