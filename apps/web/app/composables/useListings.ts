@@ -27,6 +27,7 @@ export function useListings(filters: Ref<ListingFilters>) {
             if (f.baths) query = query.gte('full_baths', f.baths)
             if (f.propertyType) query = query.eq('property_type', f.propertyType)
             if (f.city) query = query.ilike('city', `%${f.city}%`)
+            if (f.state) query = query.eq('state', f.state)
 
             const { data, error } = await query
             if (error) throw error

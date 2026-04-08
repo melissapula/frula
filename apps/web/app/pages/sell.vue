@@ -25,7 +25,7 @@
                             v-model="form.address"
                             type="text"
                             required
-                            placeholder="1842 Birchmont Beach Rd NE"
+                            placeholder="123 Main St"
                             class="input"
                         />
                     </Field>
@@ -35,19 +35,24 @@
                                 v-model="form.city"
                                 type="text"
                                 required
-                                placeholder="Bemidji"
+                                placeholder="City"
                                 class="input"
                             />
                         </Field>
-                        <Field label="State">
-                            <input v-model="form.state" type="text" required class="input" />
+                        <Field label="State" required>
+                            <select v-model="form.state" required class="input">
+                                <option value="">Select…</option>
+                                <option v-for="s in US_STATES" :key="s.code" :value="s.code">
+                                    {{ s.name }}
+                                </option>
+                            </select>
                         </Field>
                         <Field label="ZIP" required>
                             <input
                                 v-model="form.zip"
                                 type="text"
                                 required
-                                placeholder="56601"
+                                placeholder="12345"
                                 class="input"
                             />
                         </Field>
@@ -56,7 +61,7 @@
                         <input
                             v-model="form.county"
                             type="text"
-                            placeholder="Beltrami"
+                            placeholder="County (optional)"
                             class="input"
                         />
                     </Field>
@@ -230,6 +235,8 @@
 </template>
 
 <script setup lang="ts">
+import { US_STATES } from '~/composables/useStates'
+
 definePageMeta({ layout: false })
 
 const supabase = useSupabaseClient()
@@ -243,7 +250,7 @@ watchEffect(() => {
 const form = reactive({
     address: '',
     city: '',
-    state: 'MN',
+    state: '',
     zip: '',
     county: '',
     property_type: 'residential',

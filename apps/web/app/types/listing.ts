@@ -33,4 +33,5 @@ export interface ListingFilters {
     baths?: number
     propertyType?: string
     city?: string
+    state?: string
 }

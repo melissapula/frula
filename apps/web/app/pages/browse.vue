@@ -85,6 +85,6 @@ const { data, pending, error } = useListings(filters)
 
 useSeoMeta({
     title: 'Browse Listings — Frula Homes',
-    description: 'Browse for-sale-by-owner homes in Minnesota.',
+    description: 'Browse for-sale-by-owner homes nationwide.',
 })
 </script>

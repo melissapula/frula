@@ -4,7 +4,7 @@
         <section class="from-brand-50 bg-gradient-to-b to-white px-6 pb-20 pt-16 md:pb-28 md:pt-24">
             <div class="mx-auto max-w-5xl text-center">
                 <p class="text-brand-600 mb-4 text-sm font-medium uppercase tracking-widest">
-                    For Sale By Owner — Minnesota
+                    For Sale By Owner — Nationwide
                 </p>
                 <h1
                     class="font-display text-4xl font-bold leading-tight text-slate-900 md:text-6xl"
@@ -65,15 +65,15 @@
                     />
                     <FeatureCard
                         title="Free CMA Tool"
-                        description="Our market analysis uses real Minnesota sales data — not Zillow's guesswork."
+                        description="Real comparable sales analysis built on public records — not Zillow's guesswork."
                     />
                     <FeatureCard
-                        title="MN Paperwork Guides"
-                        description="Step-by-step walkthroughs for every Minnesota disclosure and contract."
+                        title="Paperwork Guides"
+                        description="Step-by-step walkthroughs for every disclosure and contract you'll need."
                     />
                     <FeatureCard
                         title="Transaction Checklists"
-                        description="Stay on track from offer to closing with smart, MN-specific checklists."
+                        description="State-aware checklists that keep you on track from offer to closing."
                     />
                     <FeatureCard
                         title="Buyer Messaging"
@@ -87,7 +87,7 @@
         <footer
             class="border-t border-slate-100 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500"
         >
-            <p>© 2026 Frula Homes — Built in Minnesota.</p>
+            <p>© 2026 Frula Homes — Sell it yourself.</p>
         </footer>
     </main>
 </template>
@@ -95,6 +95,7 @@
 <script setup lang="ts">
 useSeoMeta({
     title: 'Frula Homes — Sell it yourself',
-    description: 'For Sale By Owner platform for Minnesota. Keep your commission.',
+    description:
+        'Nationwide For Sale By Owner platform. List your home, run your own market analysis, and keep your commission.',
 })
 </script>

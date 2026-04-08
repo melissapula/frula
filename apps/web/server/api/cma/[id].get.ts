@@ -16,18 +16,23 @@ interface Comp {
 
 export interface CmaResult {
     listing_id: string
+    state: string
+    coverage: 'full' | 'preview' | 'unsupported'
     estimate: {
         low: number
         mid: number
         high: number
         confidence: 'low' | 'medium' | 'high'
-    }
+    } | null
     comps: Comp[]
     narrative: string
     disclaimer: string
     source: 'mock' | 'parcels'
     generated_at: string
 }
+
+// States with full Frula CMA coverage. Add more as public parcel sources are wired in.
+const FULL_COVERAGE_STATES = new Set<string>(['MN'])
 
 export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, 'id')
@@ -48,6 +53,32 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 404, statusMessage: 'Listing not found' })
     }
 
+    const state = listing.state || 'XX'
+
+    // States we don't yet have parcel data for: tell the truth, don't fake comps.
+    if (!FULL_COVERAGE_STATES.has(state)) {
+        return {
+            listing_id: listing.id,
+            state,
+            coverage: 'unsupported',
+            estimate: null,
+            comps: [],
+            narrative:
+                `Frula Homes' full Comparable Market Analysis is rolling out state by state as we wire ` +
+                `in each state's public parcel data. ${state} isn't live yet, but it's on the roadmap. ` +
+                `In the meantime, your asking price of $${Number(listing.price).toLocaleString()} is your ` +
+                `best starting point — pair it with a free Zillow/Redfin estimate and any comparable sales ` +
+                `you can find in your neighborhood.`,
+            disclaimer:
+                'Frula Homes does not yet have public records coverage for this state. ' +
+                'When CMA data goes live for ' +
+                state +
+                ', this report will populate automatically.',
+            source: 'mock',
+            generated_at: new Date().toISOString(),
+        } satisfies CmaResult
+    }
+
     // ----- Generate mock comps (deterministic from listing id) -----
     // Replace with a call to public.find_comps() once parcel data is loaded.
     const comps = generateMockComps(listing)
@@ -61,10 +92,12 @@ export default defineEventHandler(async (event) => {
     const low = mid - spread
     const high = mid + spread
 
-    const confidence: CmaResult['estimate']['confidence'] = comps.length >= 5 ? 'medium' : 'low'
+    const confidence: 'low' | 'medium' | 'high' = comps.length >= 5 ? 'medium' : 'low'
 
-    const result: CmaResult = {
+    return {
         listing_id: listing.id,
+        state,
+        coverage: 'preview', // 'full' once we swap mock for real find_comps
         estimate: { low, mid, high, confidence },
         comps,
         narrative: buildNarrative(listing, mid, comps, weightedPpsf),
@@ -73,9 +106,7 @@ export default defineEventHandler(async (event) => {
             'Real estate values fluctuate; consider this one data point among many.',
         source: 'mock',
         generated_at: new Date().toISOString(),
-    }
-
-    return result
+    } satisfies CmaResult
 })
 
 // ---- Helpers ----

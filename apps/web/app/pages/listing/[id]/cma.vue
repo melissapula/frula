@@ -38,8 +38,22 @@
             </div>
 
             <div v-else class="mt-10 space-y-8">
-                <!-- Estimate hero -->
+                <!-- Coming-soon banner for unsupported states -->
                 <section
+                    v-if="data.coverage === 'unsupported'"
+                    class="rounded-2xl border border-amber-200 bg-amber-50 p-6 md:p-8"
+                >
+                    <p class="font-display text-xl font-semibold text-amber-900">
+                        Full CMA coming soon to {{ data.state }}
+                    </p>
+                    <p class="mt-3 leading-relaxed text-amber-900">
+                        {{ data.narrative }}
+                    </p>
+                </section>
+
+                <!-- Estimate hero (only when we actually have one) -->
+                <section
+                    v-else-if="data.estimate"
                     class="border-brand-100 from-brand-50 rounded-2xl border bg-gradient-to-br to-white p-8 shadow-sm"
                 >
                     <p class="text-brand-700 text-sm font-semibold uppercase tracking-wide">
@@ -61,7 +75,10 @@
                 </section>
 
                 <!-- Narrative -->
-                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+                <section
+                    v-if="data.coverage !== 'unsupported'"
+                    class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
+                >
                     <h2 class="font-display text-xl font-semibold">How we got there</h2>
                     <div class="mt-4 whitespace-pre-line leading-relaxed text-slate-700">
                         {{ data.narrative }}
@@ -69,7 +86,7 @@
                 </section>
 
                 <!-- Comps -->
-                <section>
+                <section v-if="data.comps.length">
                     <h2 class="font-display text-xl font-semibold">Comparable sales</h2>
                     <div class="mt-4 grid gap-4 sm:grid-cols-2">
                         <div
@@ -125,9 +142,13 @@
                 >
                     <strong class="block">Note:</strong>
                     {{ data.disclaimer }}
-                    <span v-if="data.source === 'mock'" class="mt-2 block text-xs">
-                        (Currently showing demo comps. Once Minnesota parcel data is loaded, this
-                        will use real recent sales within a radius of your address via PostGIS.)
+                    <span
+                        v-if="data.source === 'mock' && data.coverage === 'preview'"
+                        class="mt-2 block text-xs"
+                    >
+                        (Currently showing demo comps. Once {{ data.state }} parcel data is loaded,
+                        this will use real recent sales within a radius of your address via
+                        PostGIS.)
                     </span>
                 </section>
             </div>

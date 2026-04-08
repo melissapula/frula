@@ -1,13 +1,26 @@
 <template>
     <div class="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 md:p-6">
         <div>
-            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                >City</label
+            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                State
+            </label>
+            <select
+                v-model="local.state"
+                class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
             >
+                <option :value="undefined">All states</option>
+                <option v-for="s in US_STATES" :key="s.code" :value="s.code">{{ s.name }}</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                City
+            </label>
             <input
                 v-model="local.city"
                 type="text"
-                placeholder="Bemidji"
+                placeholder="City"
                 class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
             />
         </div>
@@ -88,6 +101,7 @@
 
 <script setup lang="ts">
 import type { ListingFilters } from '~/types/listing'
+import { US_STATES } from '~/composables/useStates'
 
 const model = defineModel<ListingFilters>({ required: true })
 
@@ -103,6 +117,7 @@ watch(
 )
 
 function reset() {
+    local.state = undefined
     local.city = undefined
     local.minPrice = undefined
     local.maxPrice = undefined

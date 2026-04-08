@@ -13,7 +13,7 @@ export default defineNuxtConfig({
                 {
                     name: 'description',
                     content:
-                        'For Sale By Owner platform for Minnesota. Sell your home without paying agent commissions.',
+                        'Nationwide For Sale By Owner platform. Sell your home without paying agent commissions.',
                 },
             ],
             link: [
