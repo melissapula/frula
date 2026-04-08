@@ -79,10 +79,6 @@
                         title="Buyer Messaging"
                         description="Field questions and showings directly through the platform."
                     />
-                    <FeatureCard
-                        title="Optional TC Services"
-                        description="Need help? Hire Missa, our licensed coordinator, à la carte."
-                    />
                 </div>
             </div>
         </section>

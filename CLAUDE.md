@@ -19,9 +19,13 @@ Frula Homes replaces the agent with:
 - Smart transaction checklists for buyer and seller (MN-specific)
 - Step-by-step paperwork guides for every MN document
 - Buyer/seller messaging
-- Optional licensed TC services offered by the owner (Missa)
 
 **Tagline:** Frula Homes — Sell it yourself.
+
+**Scope decision (April 2026):** Frula Homes is a pure DIY FSBO experience for now.
+Missa is intentionally NOT offering her licensed transaction-coordinator services
+through the platform until she has more on-the-ground experience as a Minnesota
+realtor. See "Possible Future Enhancements" below.
 
 ---
 
@@ -89,12 +93,7 @@ considered but chrissa.com was taken.
 | Standard | $99   | 90-day listing, 40 photos, CMA + refresh, featured |
 | Premium  | $199  | 6-month listing, unlimited photos, top placement   |
 
-**Missa's licensed services (once licensed):**
-
-- Document review: $149 flat
-- Transaction coordination: $399 flat
-- Full representation: TBD (commission or flat fee)
-- Market rate for TC is $300-$600 — local Bemidji agent quoted $2,000 (way over market)
+_Note: TC service tiers are deferred — see "Possible Future Enhancements" below._
 
 ### Legal / Business Notes
 
@@ -144,7 +143,7 @@ PostGIS enabled for geo radius queries.
 ### Landing Page
 
 - Designed and built (shown in Claude conversation)
-- Shows: hero, stats, 6 feature cards, 3 pricing tiers, Missa's TC services card
+- Shows: hero, stats, 5 feature cards, 3 pricing tiers
 - Uses Playfair Display + DM Sans fonts
 - Brand color: #1D9E75 (teal/green)
 
@@ -166,6 +165,18 @@ PostGIS enabled for geo radius queries.
 12. **Coming soon page** — point frulahomes.com at something while building
 13. **Stripe integration** — listing payment tiers
 14. **Admin dashboard** — parcel import, listing moderation
+
+---
+
+## Possible Future Enhancements (deferred — not on current roadmap)
+
+- **Licensed TC services from Missa** — document review (~$149), transaction
+  coordination (~$399), and full representation. Deferred until Missa has more
+  on-the-ground experience as a licensed MN realtor. Market rate for TC is
+  $300-$600 (a local Bemidji agent quoted $2,000, way over market). When this
+  comes back on the roadmap: add a "Hire Missa" feature card to the landing
+  page, a TC services pricing section, a booking flow, and corresponding
+  monetization tiers. Until then, Frula Homes stays a pure DIY experience.
 
 ---
 
