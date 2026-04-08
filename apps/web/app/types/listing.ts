@@ -1,5 +1,6 @@
 export interface Listing {
     id: string
+    user_id: string
     status: string
     address: string
     city: string

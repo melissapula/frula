@@ -2,6 +2,12 @@
     <div class="flex items-center gap-3">
         <template v-if="user">
             <NuxtLink
+                to="/inbox"
+                class="hover:text-brand hidden text-sm font-medium text-slate-600 sm:block"
+            >
+                Inbox
+            </NuxtLink>
+            <NuxtLink
                 to="/account"
                 class="hover:text-brand hidden text-sm font-medium text-slate-600 sm:block"
             >

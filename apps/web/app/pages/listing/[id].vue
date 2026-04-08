@@ -142,12 +142,19 @@
                         </div>
 
                         <button
+                            v-if="!isOwnListing"
                             type="button"
                             class="bg-brand hover:bg-brand-600 mt-6 w-full rounded-full px-4 py-3 text-sm font-semibold text-white shadow-sm transition"
                             @click="contactSeller"
                         >
                             Contact seller
                         </button>
+                        <p
+                            v-else
+                            class="mt-6 rounded-full bg-slate-100 px-4 py-3 text-center text-xs font-medium text-slate-500"
+                        >
+                            This is your listing
+                        </p>
                         <button
                             type="button"
                             class="hover:border-brand hover:text-brand mt-2 w-full rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition"
@@ -187,7 +194,7 @@ const {
         .from('listings')
         .select(
             `
-        id, status, address, city, state, zip, county, lat, lng,
+        id, user_id, status, address, city, state, zip, county, lat, lng,
         property_type, price, sqft, lot_size, beds, full_baths, half_baths,
         year_built, garage, garage_stalls, title, description, highlights,
         listed_at,
@@ -232,9 +239,19 @@ function capitalize(s: string) {
     return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
+const user = useSupabaseUser()
+const router = useRouter()
+
+const isOwnListing = computed(() => listing.value && user.value?.id === listing.value.user_id)
+
 function contactSeller() {
-    // Wired up once auth + messaging are in place
-    alert('Contact seller flow coming next session — needs auth + messaging.')
+    if (!listing.value) return
+    if (!user.value) {
+        router.push(`/login?next=/listing/${listing.value.id}`)
+        return
+    }
+    if (isOwnListing.value) return
+    router.push(`/inbox/${listing.value.id}/${listing.value.user_id}`)
 }
 
 useSeoMeta({
