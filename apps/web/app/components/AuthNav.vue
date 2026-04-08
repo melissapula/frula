@@ -8,6 +8,12 @@
                 Inbox
             </NuxtLink>
             <NuxtLink
+                to="/transactions"
+                class="hover:text-brand hidden text-sm font-medium text-slate-600 sm:block"
+            >
+                Transactions
+            </NuxtLink>
+            <NuxtLink
                 to="/account"
                 class="hover:text-brand hidden text-sm font-medium text-slate-600 sm:block"
             >

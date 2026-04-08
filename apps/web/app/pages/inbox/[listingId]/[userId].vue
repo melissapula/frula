@@ -15,29 +15,49 @@
         </header>
 
         <!-- Listing context -->
-        <NuxtLink
+        <div
             v-if="listing"
-            :to="`/listing/${listing.id}`"
-            class="mx-auto w-full max-w-3xl border-b border-slate-200 bg-white px-4 py-3 hover:bg-slate-50 md:px-8"
+            class="mx-auto w-full max-w-3xl border-b border-slate-200 bg-white px-4 py-3 md:px-8"
         >
             <div class="flex items-center gap-3">
-                <img
-                    v-if="primaryPhoto"
-                    :src="primaryPhoto"
-                    class="h-12 w-16 flex-none rounded-lg object-cover"
-                    alt=""
-                />
-                <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm font-semibold text-slate-900">
-                        {{ listing.address }}
-                    </p>
-                    <p class="truncate text-xs text-slate-500">
-                        {{ listing.city }}, {{ listing.state }} · {{ formatPrice(listing.price) }}
-                    </p>
-                </div>
-                <p class="text-xs text-slate-500">View →</p>
+                <NuxtLink
+                    :to="`/listing/${listing.id}`"
+                    class="flex min-w-0 flex-1 items-center gap-3 hover:opacity-80"
+                >
+                    <img
+                        v-if="primaryPhoto"
+                        :src="primaryPhoto"
+                        class="h-12 w-16 flex-none rounded-lg object-cover"
+                        alt=""
+                    />
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate text-sm font-semibold text-slate-900">
+                            {{ listing.address }}
+                        </p>
+                        <p class="truncate text-xs text-slate-500">
+                            {{ listing.city }}, {{ listing.state }} ·
+                            {{ formatPrice(listing.price) }}
+                        </p>
+                    </div>
+                </NuxtLink>
+                <NuxtLink
+                    v-if="existingTransactionId"
+                    :to="`/transaction/${existingTransactionId}`"
+                    class="bg-brand hover:bg-brand-600 flex-none rounded-full px-4 py-2 text-xs font-semibold text-white"
+                >
+                    Open transaction
+                </NuxtLink>
+                <button
+                    v-else
+                    type="button"
+                    :disabled="startingTxn"
+                    class="hover:border-brand hover:text-brand flex-none rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 disabled:opacity-50"
+                    @click="startTransaction"
+                >
+                    {{ startingTxn ? 'Starting…' : 'Start transaction' }}
+                </button>
             </div>
-        </NuxtLink>
+        </div>
 
         <!-- Messages -->
         <div class="mx-auto w-full max-w-3xl flex-1 space-y-3 px-4 py-6 md:px-8">
@@ -131,11 +151,102 @@ const sending = ref(false)
 const { data: listing } = await useAsyncData(`thread-listing-${listingId.value}`, async () => {
     const { data } = await supabase
         .from('listings')
-        .select('id, address, city, state, price, listing_photos(url, is_primary)')
+        .select('id, user_id, address, city, state, zip, price, listing_photos(url, is_primary)')
         .eq('id', listingId.value)
         .maybeSingle()
     return data
 })
+
+const existingTransactionId = ref<string | null>(null)
+const startingTxn = ref(false)
+
+async function loadExistingTransaction() {
+    if (!user.value) return
+    const { data } = await supabase
+        .from('transactions')
+        .select('id')
+        .eq('listing_id', listingId.value)
+        .or(
+            `and(seller_id.eq.${myId.value},buyer_id.eq.${otherUserId.value}),and(seller_id.eq.${otherUserId.value},buyer_id.eq.${myId.value})`,
+        )
+        .maybeSingle()
+    existingTransactionId.value = (data?.id as string | undefined) ?? null
+}
+
+async function startTransaction() {
+    if (!user.value || !listing.value) return
+    startingTxn.value = true
+
+    // Determine seller / buyer roles from the listing
+    const sellerId = listing.value.user_id as string
+    const buyerId = sellerId === myId.value ? otherUserId.value : myId.value
+    if (sellerId === buyerId) {
+        startingTxn.value = false
+        alert("You can't start a transaction with yourself.")
+        return
+    }
+
+    // Create the transaction
+    const { data: txn, error: txnErr } = await supabase
+        .from('transactions')
+        .insert({
+            listing_id: listing.value.id,
+            seller_id: sellerId,
+            buyer_id: buyerId,
+        })
+        .select('id')
+        .single()
+
+    if (txnErr || !txn) {
+        startingTxn.value = false
+        alert(txnErr?.message || 'Could not start transaction.')
+        return
+    }
+
+    // Pull both checklist templates (any state — MN is the reference for now)
+    const { data: templates } = await supabase
+        .from('checklist_templates')
+        .select('role, items')
+        .eq('property_type', 'residential')
+        .in('role', ['seller', 'buyer'])
+
+    const sellerItems = templates?.find((t) => t.role === 'seller')?.items ?? []
+    const buyerItems = templates?.find((t) => t.role === 'buyer')?.items ?? []
+
+    const seedItems = (raw: unknown[]) =>
+        (raw as Record<string, unknown>[]).map((it) => ({
+            ...it,
+            completed: false,
+            completed_at: null,
+            completed_by: null,
+        }))
+
+    await supabase.from('transaction_checklists').insert([
+        {
+            transaction_id: txn.id,
+            user_id: sellerId,
+            role: 'seller',
+            items: seedItems(sellerItems as unknown[]),
+        },
+        {
+            transaction_id: txn.id,
+            user_id: buyerId,
+            role: 'buyer',
+            items: seedItems(buyerItems as unknown[]),
+        },
+    ])
+
+    // Drop a system message into the thread
+    await supabase.from('messages').insert({
+        listing_id: listing.value.id,
+        sender_id: myId.value,
+        recipient_id: otherUserId.value,
+        body: '🤝 Started a transaction. Both checklists are now active.',
+    })
+
+    startingTxn.value = false
+    router.push(`/transaction/${txn.id}`)
+}
 
 const primaryPhoto = computed(() => {
     const photos =
@@ -169,7 +280,7 @@ async function loadMessages() {
 }
 
 onMounted(async () => {
-    await loadMessages()
+    await Promise.all([loadMessages(), loadExistingTransaction()])
     pending.value = false
 
     // Subscribe to realtime inserts on this thread
