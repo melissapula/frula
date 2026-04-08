@@ -154,6 +154,12 @@
                         >
                             Save listing
                         </button>
+                        <NuxtLink
+                            :to="`/listing/${listing.id}/cma`"
+                            class="hover:border-brand hover:text-brand mt-2 block w-full rounded-full border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition"
+                        >
+                            View market analysis
+                        </NuxtLink>
 
                         <p class="mt-4 text-xs text-slate-500">
                             Listed {{ daysOnMarket }} day{{ daysOnMarket === 1 ? '' : 's' }} ago
