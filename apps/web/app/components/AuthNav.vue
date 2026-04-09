@@ -1,6 +1,12 @@
 <template>
     <div class="flex items-center gap-3">
         <NuxtLink
+            to="/paperwork"
+            class="hover:text-brand hidden text-sm font-medium text-slate-600 sm:block"
+        >
+            📄 Paperwork
+        </NuxtLink>
+        <NuxtLink
             to="/dream-home"
             class="hover:text-brand hidden text-sm font-semibold text-slate-700 sm:block"
         >

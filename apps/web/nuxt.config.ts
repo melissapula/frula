@@ -55,6 +55,8 @@ export default defineNuxtConfig({
                 '/forgot-password',
                 '/reset-password',
                 '/dream-home',
+                '/paperwork',
+                '/paperwork/**',
             ],
             cookieRedirect: false,
         },

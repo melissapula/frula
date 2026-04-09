@@ -1,0 +1,667 @@
+/**
+ * The paperwork-guide library — national from day one.
+ *
+ * Two kinds of guides exist here:
+ *   1. FEDERAL guides — apply identically nationwide. The form is the same
+ *      in every state. Set state: 'US'.
+ *   2. CONCEPT guides — explain a document type that exists in every state
+ *      (seller disclosure, purchase agreement, deeds, etc.) but where each
+ *      state has its own form. Set state: 'ALL'. The detail page renders
+ *      a state-finder helper so users get pointed to THEIR state's
+ *      official form, not ours.
+ *
+ * We do NOT ship state-privileged content for any single state. If a guide
+ * needs deeper state-specific guidance, it should be added equally for
+ * multiple states at once or sourced from community contributors with
+ * verified credentials in that state.
+ *
+ * ⚠️ CONTENT NOTICE: The placeholder content below is a STARTING SCAFFOLD,
+ * not legally-reviewed advice. Before launching to real users, every guide
+ * should be reviewed by a qualified attorney or licensed professional.
+ */
+
+import type { PaperworkGuide } from './types'
+import { STATE_RESOURCES } from './state-resources'
+
+/**
+ * Generate one "state real estate forms" guide per US state by walking
+ * the state-resources directory. Each generated guide is a single-link
+ * landing page that points users to that state's official real estate
+ * commission, where the actual forms live.
+ *
+ * Doing this programmatically (instead of hand-writing 50 entries) means:
+ *   - Adding/updating a state is a one-line change in state-resources.ts
+ *   - Every state gets identical structure and tone — no privilege
+ *   - The library is searchable + filterable by state in the browse UI
+ *
+ * If we ever know a direct form URL (vs. just the commission homepage),
+ * we can override per-state by adding to a small overrides map.
+ */
+function generateStateGuides(): PaperworkGuide[] {
+    return STATE_RESOURCES.map((s) => ({
+        slug: `${s.code.toLowerCase()}-real-estate-forms`,
+        state: s.code,
+        title: `${s.name} Real Estate Forms & Disclosures`,
+        summary: `Official ${s.name} forms and consumer resources from the ${s.commissionName}.`,
+        role: 'both',
+        phase: 'before_listing',
+        estimatedTime: 'Varies by document',
+        officialPdfUrl: s.url,
+        officialPdfSource: s.commissionName,
+        intro: `${s.name} has its own state-specific real estate forms, disclosures, and consumer resources, published by the ${s.commissionName}. The link below takes you straight to the official state authority — your one-stop source for ${s.name} real estate paperwork.`,
+        sections: [
+            {
+                title: "What you'll find at your state commission",
+                body: [
+                    `The ${s.commissionName} is the official state authority for real estate transactions in ${s.name}. Their website typically includes:`,
+                    "• The state-required Seller's Property Disclosure form",
+                    '• The standard Residential Purchase Agreement (in many states)',
+                    '• Consumer guides for buying and selling without an agent',
+                    '• Information about state-specific disclosure requirements that vary by state — radon, lead, well, septic, mineral rights, flood zone, methamphetamine history, and more',
+                    '• Licensing lookups if you want to verify a real estate professional',
+                ],
+            },
+            {
+                title: 'Pair this with our concept guides',
+                body: [
+                    "For deeper plain-English explanations of what each document does and what to watch out for, see our concept guides — they cover seller disclosures, purchase agreements, title insurance, home inspections, and deed types in a way that applies to every state. Use those for the 'why,' then come back here for the 'where.'",
+                ],
+            },
+        ],
+        commonMistakes: [
+            'Using a generic out-of-state form when your state has its own. State forms exist for a reason — your state has specific required disclosures and rights baked in.',
+            'Downloading forms from random third-party sites instead of the official state commission. Always go to the source.',
+            "Skipping state-specific disclosures (well, septic, radon, mineral rights, etc.) that aren't obvious from the main seller disclosure form. Your state commission lists them all.",
+        ],
+        lastReviewed: '2026-04-09',
+        reviewedBy: 'Auto-generated from state real estate commission directory',
+    }))
+}
+
+const FEDERAL_AND_CONCEPT_GUIDES: PaperworkGuide[] = [
+    // ============ FEDERAL — apply identically in all 50 states ============
+    {
+        slug: 'lead-paint-disclosure',
+        state: 'US',
+        title: 'Lead-Based Paint Disclosure',
+        summary:
+            'Federal requirement when selling any home built before 1978. Must be given to the buyer before they sign a purchase agreement.',
+        role: 'seller',
+        phase: 'before_listing',
+        estimatedTime: '5 minutes',
+        officialPdfUrl: 'https://www.epa.gov/lead/real-estate-disclosure',
+        officialPdfSource: 'EPA',
+        propertyTypes: ['residential', 'condo', 'multi-family'],
+        intro: 'Federal law (Title X / 42 U.S.C. § 4852d) requires sellers of any residential dwelling built before 1978 to disclose known lead-based paint hazards and give the buyer the EPA pamphlet "Protect Your Family From Lead in Your Home." This applies in every state — there are no exceptions for FSBO transactions.',
+        sections: [
+            {
+                title: 'Who needs this',
+                body: [
+                    'Any seller of a home built BEFORE 1978, anywhere in the US.',
+                    'Does NOT apply to: homes built in 1978 or later, vacant land, commercial property, housing for the elderly (62+) or persons with disabilities (with no children under 6 expected to reside).',
+                ],
+            },
+            {
+                title: 'What you need to do',
+                fields: [
+                    {
+                        label: 'Lead Warning Statement',
+                        explanation:
+                            "A standard block of text included in the EPA form. You don't write this yourself — it's pre-printed on the official disclosure.",
+                    },
+                    {
+                        label: "Seller's disclosure of known lead hazards",
+                        explanation:
+                            'Check whichever box applies. If you don\'t know of any lead-based paint or hazards, check "Seller has no knowledge." Be honest — failure to disclose known hazards triggers serious penalties.',
+                        warning:
+                            'Penalties under 24 CFR 35 can reach ~$22,000 per violation, plus triple damages in private lawsuits. Lying here is far more expensive than a "yes."',
+                    },
+                    {
+                        label: 'Records and reports',
+                        explanation:
+                            'List any lead inspection reports, risk assessments, or remediation records you have. If none, check "Seller has no reports or records."',
+                    },
+                    {
+                        label: "Buyer's acknowledgment + 10-day inspection opportunity",
+                        explanation:
+                            'The buyer must be given the opportunity (but not required) to conduct a 10-day lead inspection at their own expense. They sign acknowledging they were offered this.',
+                    },
+                ],
+            },
+            {
+                title: 'When to deliver it',
+                body: [
+                    'BEFORE the buyer becomes obligated under the purchase agreement. In practice: include it with the disclosure packet you give to interested buyers, and have it signed alongside the offer.',
+                    'Keep the signed copy for your records for at least 3 years after closing.',
+                ],
+            },
+        ],
+        commonMistakes: [
+            'Forgetting to provide the EPA pamphlet ("Protect Your Family From Lead in Your Home") alongside the disclosure form. Both are required.',
+            'Marking "no knowledge" when you actually know there\'s peeling paint or had a child test high for lead. Disclose what you know.',
+            'Skipping this for a 1979-built home that was previously remodeled with materials from 1977. Year built determines applicability, not materials used.',
+            'Not preserving the signed copy — you need it for 3 years.',
+        ],
+        lastReviewed: '2026-04-09',
+        reviewedBy: 'Placeholder content — pending review',
+    },
+
+    {
+        slug: 'closing-disclosure',
+        state: 'US',
+        title: 'Closing Disclosure (CD)',
+        summary:
+            'The 5-page document that itemizes every dollar of a financed home purchase. Required by federal law for any loan covered by TRID.',
+        role: 'both',
+        phase: 'pre_closing',
+        estimatedTime: '30 minutes to review',
+        officialPdfUrl: 'https://www.consumerfinance.gov/owning-a-home/closing-disclosure/',
+        officialPdfSource: 'CFPB',
+        propertyTypes: ['residential', 'condo', 'multi-family'],
+        intro: 'The Closing Disclosure replaced the old HUD-1 in 2015. It itemizes every cost in a real estate transaction with a mortgage: loan terms, closing costs, escrow, taxes, insurance, prorations. The lender prepares it and is required by federal law to deliver it to the buyer at least 3 business days before closing — in every state.',
+        sections: [
+            {
+                title: 'Who needs this',
+                body: [
+                    'Required for any home purchase using a mortgage covered by TRID (essentially: most consumer mortgages).',
+                    'NOT required for: cash purchases, reverse mortgages, HELOCs, mobile homes not attached to land.',
+                    "The buyer always receives the CD. The seller receives a separate Seller's Closing Disclosure showing only the seller's side.",
+                ],
+            },
+            {
+                title: 'The 3-day rule',
+                body: [
+                    "The buyer's lender must deliver the CD at least 3 business days before closing. This window exists so the buyer can compare the final numbers to the original Loan Estimate without time pressure.",
+                    'If certain key terms change (APR jumps, loan product changes, prepayment penalty appears), a NEW 3-day window starts.',
+                ],
+                fields: [
+                    {
+                        label: 'Why this matters for FSBO',
+                        explanation:
+                            "You don't fill out the CD — the lender does. But if you're the seller, your closing date depends on the buyer's lender getting the CD out on time. Push the buyer to confirm CD delivery 5+ business days before your target closing.",
+                    },
+                ],
+            },
+            {
+                title: 'What to check on the CD',
+                body: [
+                    'Page 1: Loan terms, projected payments. Confirm these match the Loan Estimate.',
+                    'Page 2: Loan costs and other costs. Check for any surprises vs. the LE.',
+                    "Page 3: Calculating cash to close. The buyer should know exactly what to bring (wire, cashier's check) on closing day.",
+                    'Page 4: Loan disclosures (assumption, prepayment, escrow).',
+                    'Page 5: Loan calculations, contact info, totals.',
+                ],
+            },
+        ],
+        commonMistakes: [
+            'Buyers waiting until closing day to read the CD. Read it the moment it arrives so you have time to question discrepancies.',
+            'Not confirming wire instructions DIRECTLY with the title company by phone. Wire fraud is the #1 source of catastrophic real-estate financial loss.',
+            'Sellers assuming the closing date is locked. If the lender misses the 3-day delivery window, closing slides.',
+        ],
+        lastReviewed: '2026-04-09',
+        reviewedBy: 'Placeholder content — pending review',
+    },
+
+    {
+        slug: 'form-1099-s',
+        state: 'US',
+        title: 'Form 1099-S — Proceeds from Real Estate Transactions',
+        summary:
+            'IRS form filed by the closing agent (or in some FSBO cash deals, possibly the seller) reporting the sale.',
+        role: 'seller',
+        phase: 'post_closing',
+        estimatedTime: '15 minutes',
+        officialPdfUrl: 'https://www.irs.gov/forms-pubs/about-form-1099-s',
+        officialPdfSource: 'IRS',
+        intro: "Most home sales are reported to the IRS via Form 1099-S. In a typical sale, the title or escrow company files it for you. In some FSBO and cash transactions where no closing agent is involved, the responsibility can fall on the seller. There's also an exemption certification that can excuse the filing entirely if you meet primary-residence rules. This applies in every state.",
+        sections: [
+            {
+                title: "When you DON'T need to file",
+                body: [
+                    'If you sell a primary residence and meet ALL of these:',
+                    '• Sale price is $250,000 or less ($500,000 for married filing jointly)',
+                    '• You used the home as your primary residence for at least 2 of the last 5 years',
+                    "• You haven't excluded gain from another home sale in the last 2 years",
+                    '• No portion was used as a rental or business',
+                    'Then you can sign the IRS "Certification for No Information Reporting" form and the closing agent doesn\'t file the 1099-S.',
+                ],
+            },
+            {
+                title: 'When you DO need to deal with it',
+                body: [
+                    "If you don't qualify for the exemption above, OR if there's no closing agent at all (rare — most FSBO deals still use a title company), the seller may need to file Form 1099-S directly.",
+                    "In practice: 99% of the time, the title company you close with handles this. Confirm with them in writing that they're filing it, or that you signed the certification.",
+                ],
+            },
+        ],
+        commonMistakes: [
+            'Assuming the title company filed the 1099-S without confirming. Always ask in writing.',
+            'Not signing the no-reporting certification when you qualify, then getting an unexpected 1099-S you have to reconcile on your tax return.',
+            'Forgetting that the $250k/$500k exclusion is on PROFIT (sale price minus basis minus selling costs), not sale price. Even a $700k sale can be tax-free if your basis was high.',
+        ],
+        lastReviewed: '2026-04-09',
+        reviewedBy: 'Placeholder content — pending review',
+    },
+
+    {
+        slug: 'fair-housing-act',
+        state: 'US',
+        title: 'Fair Housing Act — what you can and cannot say',
+        summary:
+            "Federal law prohibits discriminatory advertising and decisions in every home sale. Applies to FSBO sellers too — even when you're not using an agent.",
+        role: 'seller',
+        phase: 'before_listing',
+        estimatedTime: '10 minutes to read',
+        officialPdfUrl:
+            'https://www.hud.gov/program_offices/fair_housing_equal_opp/fair_housing_act_overview',
+        officialPdfSource: 'HUD',
+        intro: 'The Fair Housing Act (42 U.S.C. § 3601 et seq.) makes it illegal to discriminate in the sale or rental of housing on the basis of race, color, national origin, religion, sex, familial status, or disability. Many people assume this only applies to agents and big landlords. It also applies to FSBO sellers in most situations. This guide is short but every seller needs to read it.',
+        sections: [
+            {
+                title: 'What the law forbids',
+                body: [
+                    'Refusing to sell or negotiate with someone because of any protected class.',
+                    'Advertising a preference for or against a protected class ("perfect for a young couple", "no kids", "Christian neighborhood").',
+                    'Lying about availability ("sorry, just sold!" when it isn\'t).',
+                    'Imposing different terms on different buyers based on protected class.',
+                    'Steering buyers toward or away from neighborhoods based on protected class.',
+                ],
+            },
+            {
+                title: 'The "Mrs. Murphy" exemption',
+                body: [
+                    "There IS a narrow exemption for owner-occupied buildings of 4 units or fewer where the owner doesn't use an agent and doesn't run discriminatory ads. Even when this exemption applies to the SALE itself, the advertising rules still apply — you can never run discriminatory ads regardless.",
+                    'For most single-family FSBO sales, the safest assumption is: the law applies to you. The exemption is narrow and easy to lose.',
+                ],
+            },
+            {
+                title: 'Safe vs. unsafe listing language',
+                fields: [
+                    {
+                        label: '✅ Safe — describe the property',
+                        explanation:
+                            '"3 bedrooms," "fenced yard," "near elementary school," "wheelchair-accessible entry," "walkable to grocery store"',
+                    },
+                    {
+                        label: '🚫 Unsafe — describe the buyer',
+                        explanation:
+                            '"Perfect for a young family," "great starter home for newlyweds," "ideal for empty nesters," "in a Christian community," "no children"',
+                        warning:
+                            'Even well-intentioned phrases like "great for retirees" can violate the familial status protection. Stick to facts about the property, not assumptions about who should buy it.',
+                    },
+                ],
+            },
+        ],
+        commonMistakes: [
+            'Writing listing copy that imagines a specific buyer ("perfect for a growing family"). Describe the home, not the buyer.',
+            'Asking buyers about their family situation, religion, or national origin during showings or messages.',
+            'Refusing to consider a buyer because of how they look or sound on the phone.',
+            'Steering buyers toward or away from neighborhoods.',
+        ],
+        lastReviewed: '2026-04-09',
+        reviewedBy: 'Placeholder content — pending review',
+    },
+
+    // ============ CONCEPT GUIDES — every state has a version, link to official source ============
+    {
+        slug: 'sellers-property-disclosure',
+        state: 'ALL',
+        title: "Seller's Property Disclosure Statement",
+        summary:
+            'Almost every state requires home sellers to disclose known material defects. The form is different in every state but the concept and your obligations are similar.',
+        role: 'seller',
+        phase: 'before_listing',
+        estimatedTime: '45-60 minutes',
+        propertyTypes: ['residential', 'condo', 'multi-family'],
+        intro: "A Seller's Property Disclosure Statement is a form where the seller answers questions about the home's condition: roof, foundation, basement, plumbing, electrical, HVAC, water source, sewer, environmental hazards, known defects, and material facts. Almost every state requires some version of this for residential sales — the questions vary, but the legal principle is consistent: you must disclose what you know.",
+        sections: [
+            {
+                title: 'Why this exists',
+                body: [
+                    "States are split into roughly two camps: 'caveat emptor' (buyer beware — minimal seller disclosure required, e.g., parts of TX and AL) and 'disclosure' states (most US states — the seller has an affirmative duty to share known material defects).",
+                    'Even in caveat-emptor states, lying about a known defect can still expose you to fraud liability. The safest posture in any state is: disclose what you know, in writing.',
+                ],
+            },
+            {
+                title: "The standard you're held to",
+                fields: [
+                    {
+                        label: '"To the best of my knowledge"',
+                        explanation:
+                            "You're held to what you actually know — not what an inspector might find. You don't have to hire your own inspector to fill this out.",
+                        warning:
+                            'BUT: if you know something is broken or has been broken, you must disclose it even if it\'s currently fixed. Past basement flooding, past mold remediation, past pest infestations all count. Courts have consistently ruled that "fixed" doesn\'t erase the duty to disclose the original problem.',
+                    },
+                    {
+                        label: '"Unknown" vs. an answer',
+                        explanation:
+                            "Marking 'unknown' for things you actually know is a fast track to a lawsuit. If you've lived in the home 10 years and check 'unknown' on whether the roof has ever leaked, courts treat that as bad faith.",
+                    },
+                ],
+            },
+            {
+                title: 'What every state form covers (in some form)',
+                body: [
+                    '• Structural items: foundation, roof, basement, walls, floors',
+                    '• Mechanical systems: HVAC, plumbing, electrical, water heater, appliances',
+                    '• Water source (city, well, shared) and sewer/septic',
+                    '• Environmental hazards: radon, asbestos, lead paint, mold, underground storage tanks',
+                    '• Pests: termites, rodents, history of treatment',
+                    '• Title issues: encroachments, easements, boundary disputes, HOA',
+                    '• Known material defects, even if "fixed"',
+                ],
+            },
+            {
+                title: 'Timing',
+                body: [
+                    'Most states require delivery to the buyer BEFORE they sign the purchase agreement. If you deliver it after, the buyer typically has the right to rescind.',
+                    'Keep the signed copy for at least 3 years after closing — longer if your state has a longer statute of limitations on real estate fraud.',
+                ],
+            },
+            {
+                title: "Where to find your state's exact form",
+                body: [
+                    "Use the state finder at the top of this page to jump to your state's real estate commission. Most states publish their official disclosure form for free on the commission website. If your state doesn't publish one, your state Realtor association usually does, and you can request it directly or buy a single-use copy.",
+                ],
+            },
+        ],
+        commonMistakes: [
+            'Marking "unknown" when you actually know the answer. Courts treat this as bad faith.',
+            "Skipping disclosures for 'as-is' sales. Selling as-is doesn't waive disclosure obligations in most states. You can sell as-is AND still have to disclose what you know.",
+            "Forgetting that some states require additional separate disclosures beyond the main form (well disclosure, septic disclosure, methamphetamine history, flood zone, mineral rights, etc.). Check your state's commission website for the full list.",
+            'Not preserving the signed copy. If a dispute arises 2 years later, your signed disclosure is your best defense.',
+        ],
+        lastReviewed: '2026-04-09',
+        reviewedBy: 'Placeholder content — pending review',
+    },
+
+    {
+        slug: 'purchase-agreement',
+        state: 'ALL',
+        title: 'Residential Purchase Agreement',
+        summary:
+            'The contract that creates the deal. Every state has its own standard form — read yours before you sign anything.',
+        role: 'both',
+        phase: 'on_offer',
+        estimatedTime: '60+ minutes',
+        propertyTypes: ['residential', 'condo', 'multi-family'],
+        intro: "A purchase agreement is the binding contract that creates the home sale. Once both parties sign it, you're legally committed (subject to whatever contingencies you wrote in). Every state has its own standard residential purchase agreement, usually published by the state real estate commission or the state Realtor association. Use YOUR state's form — not a generic template you found online.",
+        sections: [
+            {
+                title: 'The non-negotiables every purchase agreement covers',
+                body: [
+                    'Identification of the parties (full legal names, current addresses)',
+                    'Description of the property (legal description, not just street address)',
+                    "Purchase price and how it's paid (cash, financing, both)",
+                    "Earnest money amount and where it's held",
+                    'Closing date and possession date',
+                    "Contingencies (inspection, financing, appraisal, sale of buyer's current home, etc.)",
+                    'Title and survey requirements',
+                    'What conveys with the property (appliances, fixtures, window treatments)',
+                    'Risk of loss (what happens if the house burns down before closing)',
+                    'Default remedies (what happens if buyer or seller backs out)',
+                ],
+            },
+            {
+                title: 'The contingencies that protect the buyer',
+                fields: [
+                    {
+                        label: 'Inspection contingency',
+                        explanation:
+                            'Gives the buyer a window (typically 7-14 days) to have the home inspected and either accept the condition, request repairs, or walk away with their earnest money.',
+                    },
+                    {
+                        label: 'Financing contingency',
+                        explanation:
+                            'Lets the buyer back out without losing earnest money if their loan falls through. Cash buyers waive this.',
+                    },
+                    {
+                        label: 'Appraisal contingency',
+                        explanation:
+                            "Lets the buyer back out if the home appraises for less than the purchase price (because their lender won't loan more than appraised value).",
+                    },
+                    {
+                        label: 'Sale of current home contingency',
+                        explanation:
+                            "Lets the buyer back out if they can't sell their existing home in time. Sellers often resist this because it ties up the deal.",
+                    },
+                ],
+            },
+            {
+                title: 'What sellers should never agree to without thinking',
+                body: [
+                    'Open-ended contingencies with no deadline.',
+                    'Possession before closing (creates landlord-tenant issues).',
+                    'Repairs after closing (gone is the leverage to enforce).',
+                    'Closing dates that depend on the buyer selling their current home.',
+                    'Releases of earnest money before all contingencies are removed.',
+                ],
+            },
+            {
+                title: "Where to find your state's official form",
+                body: [
+                    'Use the state finder at the top of this page. Most state real estate commissions publish their standard residential purchase agreement for free, or your state Realtor association does. You can also use a real estate attorney to draft a custom contract — typically $300-800.',
+                    "If you're a buyer or seller in a complicated situation (estate sale, divorce sale, owner financing, contract for deed), don't use a standard form alone. Have an attorney review.",
+                ],
+            },
+        ],
+        commonMistakes: [
+            "Using a generic 'national' purchase agreement template found online. State forms exist for a reason — your state has specific required disclosures and rights baked in.",
+            'Signing before reading every line. A purchase agreement is a binding contract.',
+            'Verbal modifications. If you change anything, write it on the contract and both parties initial it. Verbal side-deals are unenforceable.',
+            "Skipping the attorney review on anything unusual. A $400 attorney review is the cheapest insurance you'll ever buy.",
+        ],
+        lastReviewed: '2026-04-09',
+        reviewedBy: 'Placeholder content — pending review',
+    },
+
+    {
+        slug: 'title-insurance',
+        state: 'ALL',
+        title: 'Title Insurance — what it is and why both parties need it',
+        summary:
+            "Two policies (owner's and lender's) that protect against title defects discovered after closing. Required by virtually every lender; optional but highly recommended for cash buyers.",
+        role: 'both',
+        phase: 'pre_closing',
+        estimatedTime: '15 minutes to read',
+        intro: "Title insurance protects buyers and lenders against losses from title defects — undisclosed liens, forged deeds, errors in public records, missing heirs, undisclosed easements. There are two policies: a Lender's Policy (required by virtually every lender, paid by the buyer) and an Owner's Policy (optional but strongly recommended, sometimes paid by the seller, sometimes the buyer, depending on local custom). Title insurance is a one-time premium paid at closing — it covers you for as long as you own the home.",
+        sections: [
+            {
+                title: 'The two policies',
+                fields: [
+                    {
+                        label: "Lender's Title Policy",
+                        explanation:
+                            'Protects the LENDER against title defects up to the loan amount. Required by almost every mortgage lender. Paid by the buyer at closing. Decreases as the loan is paid down.',
+                    },
+                    {
+                        label: "Owner's Title Policy",
+                        explanation:
+                            'Protects the OWNER against title defects up to the purchase price. Optional but strongly recommended. In some states the seller customarily pays for this; in others the buyer does. Lasts as long as the buyer owns the home (or longer in some policies).',
+                        warning:
+                            "Cash buyers often skip the Owner's Policy because there's no lender requiring it. Don't. A title defect can wipe out your entire equity, and the policy is a one-time cost of typically a few hundred to ~$2,000 depending on home price.",
+                    },
+                ],
+            },
+            {
+                title: 'What title insurance protects against',
+                body: [
+                    '• Errors and omissions in deeds and public records',
+                    '• Undiscovered liens (contractor liens, tax liens, judgment liens)',
+                    '• Forged deeds in the chain of title',
+                    '• Missing heirs who later claim ownership',
+                    '• Boundary disputes from incorrect surveys',
+                    '• Unknown easements or restrictions',
+                    '• Mistakes in legal descriptions',
+                ],
+            },
+            {
+                title: 'Who pays for what (varies by state and local custom)',
+                body: [
+                    "Title insurance custom varies widely by state and even by county. In some markets the seller pays the Owner's Policy; in others the buyer pays both. Negotiating who pays is fair game in your purchase agreement.",
+                    "If you're not sure what's customary in your area, ask your title company — they\'ll tell you what's typical.",
+                ],
+            },
+        ],
+        commonMistakes: [
+            "Cash buyers skipping the Owner's Policy to save money. Title defects can wipe out your entire equity.",
+            'Not shopping around. Title insurance pricing is regulated in many states but title COMPANIES still vary in their service and ancillary fees. Get 2-3 quotes.',
+            "Confusing title insurance with homeowner's insurance. They cover totally different risks. You need both.",
+            "Assuming the title search means there are no problems. The search catches what's in public records — title insurance covers what the search MISSED.",
+        ],
+        lastReviewed: '2026-04-09',
+        reviewedBy: 'Placeholder content — pending review',
+    },
+
+    {
+        slug: 'home-inspection',
+        state: 'ALL',
+        title: 'Home Inspection — buyer guide',
+        summary:
+            'Not legally required anywhere, but used in nearly every transaction. Buyers should always get one; sellers should expect one and prepare.',
+        role: 'buyer',
+        phase: 'inspection',
+        estimatedTime: '20 minutes to read',
+        propertyTypes: ['residential', 'condo', 'multi-family'],
+        intro: "A home inspection is a visual examination of the home's accessible systems and structures by a third-party inspector. It's NOT legally required in any state — but it's used in nearly every modern transaction because it gives the buyer leverage to negotiate repairs (or walk away) before they're locked in. Inspections typically cost $300-700 for a standard residential property and take 2-4 hours.",
+        sections: [
+            {
+                title: 'What an inspection covers',
+                body: [
+                    '• Roof, attic, gutters',
+                    '• Foundation, basement, crawl spaces',
+                    '• HVAC, water heater, plumbing, electrical',
+                    '• Doors, windows, walls, ceilings, floors',
+                    '• Built-in appliances (sometimes)',
+                    '• Visible structural issues',
+                    '• Safety items (smoke detectors, GFCI outlets, handrails)',
+                ],
+            },
+            {
+                title: 'What an inspection does NOT cover',
+                body: [
+                    '• Things behind walls (no destructive testing)',
+                    '• Mold testing, radon testing, lead testing, asbestos testing (these are typically separate services you can add)',
+                    '• Pest inspections (separate, often required by lenders)',
+                    '• Septic and well inspections (often separate, often required if applicable)',
+                    '• Sewer line scopes (separate, ~$200-400)',
+                    '• Code compliance (the inspector reports condition, not whether it meets current code)',
+                ],
+            },
+            {
+                title: 'How to use the inspection report',
+                fields: [
+                    {
+                        label: 'Distinguish must-fix from nice-to-fix',
+                        explanation:
+                            "Major safety issues (gas leaks, electrical hazards, structural defects) are legitimate negotiation items. Cosmetic issues, normal wear, and minor maintenance items usually aren't.",
+                    },
+                    {
+                        label: 'Negotiate via the inspection contingency',
+                        explanation:
+                            "Your purchase agreement's inspection contingency typically gives you a window (often 7-14 days) to either accept the condition, request repairs/credits, or walk away with your earnest money. Use this window deliberately.",
+                    },
+                ],
+            },
+            {
+                title: 'Hiring an inspector',
+                body: [
+                    'Inspectors are licensed (or registered) in most states. Check your state real estate commission for licensing requirements — the state finder at the top of this page links you there. ASHI (American Society of Home Inspectors) and InterNACHI (International Association of Certified Home Inspectors) are the two largest national professional bodies — both maintain searchable directories.',
+                ],
+            },
+        ],
+        commonMistakes: [
+            'Skipping inspection on a competitive offer to look more attractive to the seller. This can save you the deal but cost you thousands later.',
+            "Treating the inspection report as a 'fix everything' demand. Sellers will walk if you ask for too much.",
+            "Hiring the cheapest inspector. A bad inspector misses things that cost you 100x what you 'saved'.",
+            "Not attending the inspection in person. Walking through with the inspector is one of the most educational hours you'll spend on the home.",
+        ],
+        lastReviewed: '2026-04-09',
+        reviewedBy: 'Placeholder content — pending review',
+    },
+
+    {
+        slug: 'deed-types',
+        state: 'ALL',
+        title: 'Deeds — Warranty, Special Warranty, and Quitclaim',
+        summary:
+            'The deed transfers ownership. The TYPE of deed determines what guarantees the seller is making about the title. This matters more than most people realize.',
+        role: 'both',
+        phase: 'closing',
+        estimatedTime: '15 minutes to read',
+        intro: 'A deed is the legal document that transfers ownership of real estate from seller to buyer. Different states use different terminology, but the three main flavors exist nationwide: General Warranty, Special (Limited) Warranty, and Quitclaim. The type of deed used in your transaction determines what the seller is legally promising about the title — and how much recourse the buyer has if something goes wrong.',
+        sections: [
+            {
+                title: 'General Warranty Deed',
+                body: [
+                    "The seller guarantees the title against ALL defects, going back through the entire history of ownership — not just the seller's own period of ownership. This is the strongest protection for the buyer and is the standard in most arms-length residential sales.",
+                    'If a title defect from 50 years ago surfaces, the seller is on the hook (though title insurance is what actually covers it in practice).',
+                ],
+            },
+            {
+                title: 'Special Warranty Deed (a.k.a. Limited Warranty Deed)',
+                body: [
+                    "The seller only guarantees against title defects that arose DURING THEIR OWN OWNERSHIP. Anything from before they bought the home is the buyer's problem.",
+                    'Common in commercial real estate, bank-owned (REO) sales, and estate sales. Buyers should be more cautious and rely more heavily on title insurance.',
+                ],
+            },
+            {
+                title: 'Quitclaim Deed',
+                body: [
+                    "The seller transfers WHATEVER interest they have — without making any guarantees that they actually have any interest. If it turns out the seller didn't own the property, the buyer has no recourse.",
+                    'Used in: divorce settlements, transfers between family members, clearing up clouds on title, gifts. Almost NEVER appropriate for an arms-length sale.',
+                ],
+                fields: [
+                    {
+                        label: '🚫 Red flag',
+                        explanation:
+                            'If a seller tries to give you a quitclaim deed in an arms-length sale, walk away or have an attorney involved immediately. Quitclaim deeds offer the buyer essentially no protection.',
+                        warning:
+                            'Title insurance companies often refuse to insure title transferred via quitclaim.',
+                    },
+                ],
+            },
+            {
+                title: 'Other deed types you might see',
+                body: [
+                    '• Bargain and Sale Deed — implies seller has title but offers no warranties; common in tax sales',
+                    "• Trustee's Deed — used by a trustee transferring property held in trust, including foreclosure trustee",
+                    "• Sheriff's Deed / Tax Deed — used at foreclosure or tax sales; minimal warranties",
+                    '• Grant Deed (CA terminology) — similar to a Special Warranty Deed',
+                ],
+            },
+        ],
+        commonMistakes: [
+            'Accepting a quitclaim deed in an arms-length purchase. Almost always a red flag.',
+            'Not having title insurance to back up whatever deed you receive — even a General Warranty Deed.',
+            "Assuming the deed type doesn't matter because 'we have title insurance.' The deed type still affects your legal position.",
+            'DIY-ing the deed itself. Deed preparation is regulated (and in some states is the unauthorized practice of law). Use a title company or attorney to draft and record it.',
+        ],
+        lastReviewed: '2026-04-09',
+        reviewedBy: 'Placeholder content — pending review',
+    },
+]
+
+/**
+ * Final exported library: federal + concept guides hand-written above,
+ * plus 50 auto-generated state guides from the resources directory.
+ */
+export const GUIDES: PaperworkGuide[] = [...FEDERAL_AND_CONCEPT_GUIDES, ...generateStateGuides()]
+
+/** Convenience: get a guide by slug, or undefined if not found. */
+export function getGuideBySlug(slug: string): PaperworkGuide | undefined {
+    return GUIDES.find((g) => g.slug === slug)
+}
+
+/** All unique state codes used in the library, with US first and ALL second. */
+export function getStates(): string[] {
+    const set = new Set(GUIDES.map((g) => g.state))
+    const states = Array.from(set).sort()
+    const ordered: string[] = []
+    if (set.has('US')) ordered.push('US')
+    if (set.has('ALL')) ordered.push('ALL')
+    for (const s of states) {
+        if (s !== 'US' && s !== 'ALL') ordered.push(s)
+    }
+    return ordered
+}
