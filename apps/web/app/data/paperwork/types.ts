@@ -1,13 +1,17 @@
 /**
- * Shape of a paperwork guide. Each guide is a structured walkthrough
- * of a single document: what it is, who fills it out, when, where to
- * get the official blank PDF, field-by-field guidance, and common
- * mistakes drawn from real-world experience.
+ * Shape of a paperwork directory entry. Each entry describes a single
+ * document at an informational level: what it is, who needs it, when
+ * it's used, where to get the official version, and commonly reported
+ * issues.
  *
- * IMPORTANT: We never prepare or fill out the actual document for the
- * user. We guide them through filling it themselves. That's the legal
- * line between "educational platform" (TurboTax) and "practicing law"
- * (regulated profession). Every guide should respect that line.
+ * ⚠️ POSITIONING: Frula Homes is an INFORMATIONAL platform, not a
+ * walkthrough service. Entries should describe documents — not teach
+ * users how to fill them out field-by-field. Keep content descriptive
+ * ("this is a seller disclosure; it covers X, Y, Z") rather than
+ * prescriptive ("here's how to answer question 14"). The `fields` array
+ * below exists for legacy data shape but is NOT rendered on the public
+ * pages — keeping the field data around lets us revisit later without
+ * losing work, while the UI stays informational-only.
  */
 
 export type PaperworkRole = 'seller' | 'buyer' | 'both'

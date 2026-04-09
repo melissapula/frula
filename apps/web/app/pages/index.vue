@@ -12,8 +12,9 @@
                     Sell your home.<br />Keep the commission.
                 </h1>
                 <p class="mx-auto mt-6 max-w-2xl text-lg text-slate-600 md:text-xl">
-                    Frula Homes gives you everything an agent does — listing, photos, market
-                    analysis, paperwork guides, and a transaction checklist — without the 6% fee.
+                    Frula Homes is your information hub for selling or buying a home without an
+                    agent. List your property, browse homes nationwide, find the official forms for
+                    your state, and stay on track with smart checklists — all in one place.
                 </p>
                 <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                     <NuxtLink
@@ -60,7 +61,7 @@
                             <p class="mt-3 max-w-2xl text-base text-white/90 md:text-lg">
                                 Tell us what your dream home looks like — beds, views, waterfront,
                                 garage, anything. We'll rank every for-sale-by-owner listing in the
-                                country by how well it matches, and email you when new ones show up.
+                                country by how well it matches and email you when new ones show up.
                             </p>
                         </div>
                         <div class="flex md:justify-end">
@@ -99,30 +100,44 @@
         <section class="px-6 py-20">
             <div class="mx-auto max-w-5xl">
                 <h2 class="font-display text-center text-3xl font-bold md:text-4xl">
-                    Everything you need to sell
+                    Everything you need in one place
                 </h2>
+                <p class="mx-auto mt-3 max-w-2xl text-center text-slate-600">
+                    Frula is a nationwide information and listing platform for for-sale-by-owner
+                    homes. We connect buyers and sellers, point you to the right official resources,
+                    and help you stay organized — so you can sell or buy with confidence.
+                </p>
                 <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     <FeatureCard
-                        title="Smart Listing Builder"
-                        description="Photo uploads, auto-fill from public parcel data, and a guided form built for mobile."
+                        title="Nationwide Listings"
+                        description="Browse or list for-sale-by-owner homes in all 50 states. Map, filters, photos, and direct buyer-seller messaging."
                     />
                     <FeatureCard
-                        title="Free CMA Tool"
-                        description="Real comparable sales analysis built on public records — not Zillow's guesswork."
+                        title="Dream Home Finder"
+                        description="Describe your perfect home once. We rank every listing nationwide by how well it matches — sorted by score."
                     />
                     <FeatureCard
-                        title="Paperwork Guides"
-                        description="Step-by-step walkthroughs for every disclosure and contract you'll need."
+                        title="Market Estimates"
+                        description="Comparable sales data drawn from public records, clearly labeled as seller estimates — not appraisals."
+                    />
+                    <FeatureCard
+                        title="Paperwork Directory"
+                        description="Find the official forms, disclosures, and consumer resources for your state — sourced straight from each state's real estate commission."
                     />
                     <FeatureCard
                         title="Transaction Checklists"
-                        description="State-aware checklists that keep you on track from offer to closing."
+                        description="Smart checklists that keep buyers and sellers on track from accepted offer through closing day."
                     />
                     <FeatureCard
-                        title="Buyer Messaging"
-                        description="Field questions and showings directly through the platform."
+                        title="Offers & Viewings"
+                        description="Send structured offers and schedule showings directly through the platform. No back-and-forth by text."
                     />
                 </div>
+                <p class="mx-auto mt-10 max-w-2xl text-center text-xs italic text-slate-500">
+                    Frula Homes is an informational platform. We provide resources and tools — we're
+                    not your agent, attorney, or licensed representative, and we don't prepare or
+                    review legal documents for you.
+                </p>
             </div>
         </section>
 
@@ -139,6 +154,6 @@
 useSeoMeta({
     title: 'Frula Homes — Sell it yourself',
     description:
-        'Nationwide For Sale By Owner platform. List your home, run your own market analysis, and keep your commission.',
+        "Nationwide For Sale By Owner information platform. List your home, browse listings, find your state's official forms, and stay organized with smart checklists — all without paying agent commissions.",
 })
 </script>

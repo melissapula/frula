@@ -13,7 +13,7 @@ export default defineNuxtConfig({
                 {
                     name: 'description',
                     content:
-                        'Nationwide For Sale By Owner platform. Sell your home without paying agent commissions.',
+                        'Nationwide For Sale By Owner information platform. List your home, browse listings, and find official forms for your state — all without paying agent commissions.',
                 },
             ],
             link: [

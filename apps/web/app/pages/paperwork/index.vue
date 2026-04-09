@@ -12,12 +12,13 @@
         <div class="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12">
             <div class="mb-8">
                 <h1 class="font-display text-3xl font-bold text-slate-900 md:text-4xl">
-                    📄 Paperwork guides
+                    📄 Paperwork directory
                 </h1>
                 <p class="mt-2 max-w-2xl text-slate-600">
-                    Step-by-step walkthroughs of every disclosure and document you'll need to sell
-                    or buy a home yourself. We never fill out the documents for you — we help you
-                    understand them so you can fill them out confidently.
+                    A directory of the official forms, disclosures, and consumer resources you'll
+                    encounter when selling or buying a home without an agent. Pick your state to
+                    find the authoritative sources for your area — all links go straight to the
+                    official publisher.
                 </p>
             </div>
 
@@ -132,13 +133,13 @@
             <div
                 class="mt-12 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900"
             >
-                <p class="font-semibold">📌 This is educational information, not legal advice.</p>
+                <p class="font-semibold">📌 Informational only — not legal advice.</p>
                 <p class="mt-1">
-                    Frula Homes is a technology platform. We provide guidance to help you understand
-                    the documents involved in selling or buying a home, but we don't prepare them
-                    for you and we're not your attorney or real estate agent. For questions about
-                    your specific situation, consult a licensed attorney or qualified real estate
-                    professional in your state.
+                    Frula Homes is an informational platform. We point you to official sources for
+                    the documents involved in real estate transactions — we don't prepare, review,
+                    or interpret legal documents, and we're not your attorney or real estate agent.
+                    For questions about your specific situation, consult a licensed attorney or
+                    qualified real estate professional in your state.
                 </p>
             </div>
         </div>

@@ -7,7 +7,7 @@
                         to="/paperwork"
                         class="hover:text-brand text-sm font-medium text-slate-600"
                     >
-                        ← All guides
+                        ← Directory
                     </NuxtLink>
                 </div>
                 <AuthNav />
@@ -52,16 +52,16 @@
                 </p>
             </div>
 
-            <!-- Pending review banner -->
+            <!-- Draft content banner -->
             <div
                 v-if="guide.reviewedBy?.includes('Placeholder')"
                 class="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
             >
                 <p class="font-semibold">⚠️ Draft content</p>
                 <p class="mt-1">
-                    This guide is a working draft and hasn't been reviewed by a licensed
-                    professional yet. Use it as a starting point, but verify the specifics for your
-                    situation before relying on it.
+                    This entry is a working draft and hasn't been reviewed by a licensed
+                    professional yet. Always use the official source linked below as your
+                    authoritative reference.
                 </p>
             </div>
 
@@ -149,41 +149,21 @@
                             {{ p }}
                         </p>
                     </div>
-
-                    <div
-                        v-if="s.fields && s.fields.length"
-                        class="mt-4 space-y-4 rounded-2xl border border-slate-200 bg-white p-5"
-                    >
-                        <div
-                            v-for="(field, fIdx) in s.fields"
-                            :key="fIdx"
-                            :class="['space-y-1', fIdx > 0 && 'border-t border-slate-100 pt-4']"
-                        >
-                            <p class="font-display text-base font-semibold text-slate-900">
-                                {{ field.label }}
-                            </p>
-                            <p class="text-sm leading-relaxed text-slate-700">
-                                {{ field.explanation }}
-                            </p>
-                            <p
-                                v-if="field.warning"
-                                class="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900"
-                            >
-                                ⚠️ <strong>{{ field.warning }}</strong>
-                            </p>
-                        </div>
-                    </div>
                 </section>
             </div>
 
-            <!-- Common mistakes -->
+            <!-- Things to watch out for -->
             <section
                 v-if="guide.commonMistakes && guide.commonMistakes.length"
                 class="mt-10 rounded-2xl border border-red-200 bg-red-50 p-6"
             >
                 <h2 class="font-display text-xl font-bold text-red-900">
-                    🚫 Common mistakes to avoid
+                    ⚠️ Things to watch out for
                 </h2>
+                <p class="mt-1 text-xs text-red-800/80">
+                    Commonly-reported issues people run into with this document. Always verify the
+                    specifics with your state's official source or a licensed professional.
+                </p>
                 <ul class="mt-3 space-y-2">
                     <li
                         v-for="(m, i) in guide.commonMistakes"
@@ -206,10 +186,11 @@
                     <span v-if="guide.reviewedBy"> · {{ guide.reviewedBy }}</span>
                 </p>
                 <p class="mt-2">
-                    This guide is educational information, not legal advice. Frula Homes is a
-                    technology platform — we help you understand the documents involved in real
-                    estate transactions, but we don't prepare them for you. For legal questions
-                    specific to your situation, consult a licensed attorney in your state.
+                    This entry is informational only — not legal advice. Frula Homes is an
+                    informational platform. We point you to official sources; we don't prepare,
+                    review, or interpret legal documents, and we're not your attorney or real estate
+                    agent. For legal questions specific to your situation, consult a licensed
+                    attorney in your state.
                 </p>
             </div>
         </article>
