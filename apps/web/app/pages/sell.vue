@@ -11,10 +11,14 @@
 
         <div class="mx-auto max-w-3xl px-4 py-8 md:px-8 md:py-12">
             <h1 class="font-display text-3xl font-bold text-slate-900 md:text-4xl">
-                List your home
+                {{ editingId ? 'Edit your listing' : 'List your home' }}
             </h1>
             <p class="mt-2 text-slate-600">
-                Tell buyers about your property. You can edit any of this later.
+                {{
+                    editingId
+                        ? 'Update any details below and save your changes.'
+                        : 'Tell buyers about your property. You can edit any of this later.'
+                }}
             </p>
 
             <form class="mt-8 space-y-8" @submit.prevent="submit">
@@ -129,10 +133,18 @@
                             />
                         </Field>
                     </div>
-                    <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="grid gap-4 sm:grid-cols-3">
                         <Field label="Garage stalls">
                             <input
                                 v-model.number="form.garage_stalls"
+                                type="number"
+                                min="0"
+                                class="input"
+                            />
+                        </Field>
+                        <Field label="Other parking spaces">
+                            <input
+                                v-model.number="form.parking_spaces"
                                 type="number"
                                 min="0"
                                 class="input"
@@ -143,6 +155,151 @@
                                 <option value="none">None</option>
                                 <option value="unfinished">Unfinished</option>
                                 <option value="finished">Finished</option>
+                            </select>
+                        </Field>
+                    </div>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <Field label="Stories">
+                            <input
+                                v-model.number="form.stories"
+                                type="number"
+                                step="0.5"
+                                min="0"
+                                placeholder="2"
+                                class="input"
+                            />
+                        </Field>
+                        <Field label="HOA fee (USD)">
+                            <input
+                                v-model.number="form.hoa_fee"
+                                type="number"
+                                min="0"
+                                placeholder="(leave blank if no HOA)"
+                                class="input"
+                            />
+                        </Field>
+                    </div>
+                    <label class="flex items-center gap-2 text-sm text-slate-700">
+                        <input
+                            v-model="form.single_story"
+                            type="checkbox"
+                            class="text-brand focus:ring-brand h-4 w-4 rounded border-slate-300"
+                        />
+                        Single story / no stairs
+                    </label>
+                </Section>
+
+                <!-- Lifestyle & features -->
+                <Section title="Features & lifestyle">
+                    <label class="flex items-center gap-2 text-sm text-slate-700">
+                        <input
+                            v-model="form.waterfront"
+                            type="checkbox"
+                            class="text-brand focus:ring-brand h-4 w-4 rounded border-slate-300"
+                        />
+                        Waterfront
+                    </label>
+                    <Field v-if="form.waterfront" label="Body of water">
+                        <input
+                            v-model="form.water_body_name"
+                            type="text"
+                            placeholder="e.g. Lake Bemidji"
+                            class="input"
+                        />
+                    </Field>
+
+                    <Field label="Views (select all that apply)">
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                v-for="v in VIEW_OPTIONS"
+                                :key="v.value"
+                                type="button"
+                                :class="chipClass(form.view_types.includes(v.value))"
+                                @click="toggleArray('view_types', v.value)"
+                            >
+                                {{ v.label }}
+                            </button>
+                        </div>
+                    </Field>
+
+                    <Field label="Features (select all that apply)">
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                v-for="f in FEATURE_OPTIONS"
+                                :key="f.value"
+                                type="button"
+                                :class="chipClass(form.features.includes(f.value))"
+                                @click="toggleArray('features', f.value)"
+                            >
+                                {{ f.label }}
+                            </button>
+                        </div>
+                    </Field>
+                </Section>
+
+                <!-- Land-specific -->
+                <Section v-if="form.property_type === 'land'" title="Land details">
+                    <Field label="Terrain (select all that apply)">
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                v-for="t in TERRAIN_OPTIONS"
+                                :key="t.value"
+                                type="button"
+                                :class="chipClass(form.terrain.includes(t.value))"
+                                @click="toggleArray('terrain', t.value)"
+                            >
+                                {{ t.label }}
+                            </button>
+                        </div>
+                    </Field>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <Field label="Road access">
+                            <select v-model="form.road_access" class="input">
+                                <option :value="undefined">Select…</option>
+                                <option
+                                    v-for="r in ROAD_ACCESS_OPTIONS"
+                                    :key="r.value"
+                                    :value="r.value"
+                                >
+                                    {{ r.label }}
+                                </option>
+                            </select>
+                        </Field>
+                    </div>
+
+                    <Field label="Utilities at lot (select all that apply)">
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                v-for="u in UTILITY_OPTIONS"
+                                :key="u.value"
+                                type="button"
+                                :class="chipClass(form.utilities.includes(u.value))"
+                                @click="toggleArray('utilities', u.value)"
+                            >
+                                {{ u.label }}
+                            </button>
+                        </div>
+                    </Field>
+                </Section>
+
+                <!-- Utilities (homes) -->
+                <Section v-else title="Utilities">
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <Field label="Water source">
+                            <select v-model="form.water_source" class="input">
+                                <option :value="undefined">Select…</option>
+                                <option value="city">City</option>
+                                <option value="well">Well</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </Field>
+                        <Field label="Sewer">
+                            <select v-model="form.sewer_type" class="input">
+                                <option :value="undefined">Select…</option>
+                                <option value="city">City</option>
+                                <option value="septic">Septic</option>
+                                <option value="other">Other</option>
                             </select>
                         </Field>
                     </div>
@@ -193,17 +350,10 @@
                 <!-- Photos -->
                 <Section title="Photos">
                     <p class="mb-3 text-sm text-slate-500">
-                        Paste one photo URL per line. We'll wire up real photo uploads in a
-                        follow-up.
+                        Drag and drop your listing photos, or click to browse. The first photo
+                        becomes the primary thumbnail buyers see.
                     </p>
-                    <Field label="Photo URLs">
-                        <textarea
-                            v-model="photosText"
-                            rows="4"
-                            placeholder="https://images.unsplash.com/…"
-                            class="input"
-                        />
-                    </Field>
+                    <PhotoUploader v-model="photos" />
                 </Section>
 
                 <!-- Errors / submit -->
@@ -223,10 +373,19 @@
                     </NuxtLink>
                     <button
                         type="submit"
-                        :disabled="submitting"
-                        class="bg-brand hover:bg-brand-600 rounded-full px-8 py-3 text-sm font-semibold text-white shadow-sm transition disabled:opacity-60"
+                        :disabled="submitting || !canSubmit"
+                        :title="canSubmit ? '' : 'Fill in all required fields first'"
+                        class="bg-brand hover:bg-brand-600 rounded-full px-8 py-3 text-sm font-semibold text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        {{ submitting ? 'Publishing…' : 'Publish listing' }}
+                        {{
+                            submitting
+                                ? editingId
+                                    ? 'Saving…'
+                                    : 'Publishing…'
+                                : editingId
+                                  ? 'Save changes'
+                                  : 'Publish listing'
+                        }}
                     </button>
                 </div>
             </form>
@@ -236,12 +395,24 @@
 
 <script setup lang="ts">
 import { US_STATES } from '~/composables/useStates'
+import {
+    VIEW_OPTIONS,
+    FEATURE_OPTIONS,
+    TERRAIN_OPTIONS,
+    ROAD_ACCESS_OPTIONS,
+    UTILITY_OPTIONS,
+} from '~/types/listing'
 
 definePageMeta({ layout: false })
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const router = useRouter()
+const route = useRoute()
+
+// `?edit=<id>` flips this page into edit mode: load the existing listing,
+// pre-populate the form, and update on submit instead of insert.
+const editingId = computed(() => (route.query.edit as string | undefined) ?? null)
 
 watchEffect(() => {
     if (!user.value && import.meta.client) router.replace('/login')
@@ -261,19 +432,145 @@ const form = reactive({
     sqft: undefined as number | undefined,
     lot_size: undefined as number | undefined,
     garage_stalls: undefined as number | undefined,
+    parking_spaces: undefined as number | undefined,
+    single_story: false,
+    stories: undefined as number | undefined,
     basement_type: 'none' as 'none' | 'unfinished' | 'finished',
     price: undefined as number | undefined,
     title: '',
     description: '',
+    // Lifestyle / features
+    waterfront: false,
+    water_body_name: '',
+    view_types: [] as string[],
+    features: [] as string[],
+    // Land
+    terrain: [] as string[],
+    road_access: undefined as string | undefined,
+    utilities: [] as string[],
+    // Utilities (homes)
+    water_source: undefined as string | undefined,
+    sewer_type: undefined as string | undefined,
+    // HOA
+    hoa_fee: undefined as number | undefined,
 })
 
+type ArrayFormKey = 'view_types' | 'features' | 'terrain' | 'utilities'
+function toggleArray(key: ArrayFormKey, value: string) {
+    const current = form[key]
+    if (current.includes(value)) {
+        form[key] = current.filter((x) => x !== value)
+    } else {
+        form[key] = [...current, value]
+    }
+}
+
+function chipClass(active: boolean): string {
+    return [
+        'rounded-full border px-3 py-1.5 text-sm font-medium transition',
+        active
+            ? 'border-brand bg-brand text-white'
+            : 'border-slate-300 bg-white text-slate-700 hover:border-slate-400',
+    ].join(' ')
+}
+
 const highlightsText = ref('')
-const photosText = ref('')
+const photos = ref<{ url: string; publicId?: string }[]>([])
 const submitting = ref(false)
 const error = ref<string | null>(null)
 
+// Load existing listing on mount if editing.
+onMounted(async () => {
+    if (!editingId.value || !user.value) return
+    const { data, error: loadErr } = await supabase
+        .from('listings')
+        .select(
+            `id, user_id, address, city, state, zip, county, property_type,
+             year_built, beds, full_baths, half_baths, sqft, lot_size,
+             garage_stalls, parking_spaces, single_story, stories,
+             basement, basement_finished, price, title, description, highlights,
+             waterfront, water_body_name, view_types, features,
+             terrain, road_access, utilities,
+             water_source, sewer_type, hoa, hoa_fee,
+             listing_photos ( url, sort_order, is_primary )`,
+        )
+        .eq('id', editingId.value)
+        .maybeSingle()
+
+    if (loadErr || !data) {
+        error.value = loadErr?.message || 'Could not load this listing for editing.'
+        return
+    }
+    if (data.user_id !== user.value.id) {
+        error.value = 'You can only edit listings you own.'
+        return
+    }
+
+    Object.assign(form, {
+        address: data.address ?? '',
+        city: data.city ?? '',
+        state: data.state ?? '',
+        zip: data.zip ?? '',
+        county: data.county ?? '',
+        property_type: data.property_type ?? 'residential',
+        year_built: data.year_built ?? undefined,
+        beds: data.beds ?? undefined,
+        full_baths: data.full_baths ?? undefined,
+        half_baths: data.half_baths ?? undefined,
+        sqft: data.sqft ?? undefined,
+        lot_size: data.lot_size ?? undefined,
+        garage_stalls: data.garage_stalls ?? undefined,
+        parking_spaces: data.parking_spaces ?? undefined,
+        single_story: data.single_story ?? false,
+        stories: data.stories ?? undefined,
+        basement_type: data.basement_finished ? 'finished' : data.basement ? 'unfinished' : 'none',
+        price: data.price ?? undefined,
+        title: data.title ?? '',
+        description: data.description ?? '',
+        waterfront: data.waterfront ?? false,
+        water_body_name: data.water_body_name ?? '',
+        view_types: data.view_types ?? [],
+        features: data.features ?? [],
+        terrain: data.terrain ?? [],
+        road_access: data.road_access ?? undefined,
+        utilities: data.utilities ?? [],
+        water_source: data.water_source ?? undefined,
+        sewer_type: data.sewer_type ?? undefined,
+        hoa_fee: data.hoa_fee ?? undefined,
+    })
+    highlightsText.value = (data.highlights ?? []).join('\n')
+    photos.value = (
+        (data.listing_photos ?? []) as { url: string; sort_order: number; is_primary: boolean }[]
+    )
+        .sort((a, b) => {
+            if (a.is_primary && !b.is_primary) return -1
+            if (!a.is_primary && b.is_primary) return 1
+            return a.sort_order - b.sort_order
+        })
+        .map((p) => ({ url: p.url }))
+})
+
+// Required-field gate for the submit button. Mirrors the `required` attribute
+// on the inputs but disables the button up front so users can't even click
+// it (and double-click their way into duplicate listings).
+const canSubmit = computed(() => {
+    return (
+        form.address.trim().length > 0 &&
+        form.city.trim().length > 0 &&
+        form.state.trim().length > 0 &&
+        form.zip.trim().length > 0 &&
+        !!form.property_type &&
+        typeof form.price === 'number' &&
+        form.price > 0
+    )
+})
+
 async function submit() {
     if (!user.value) return
+    // Re-entrancy guard. Even if the button is somehow clicked twice (slow
+    // network, double-click, Enter key + click), only the first call proceeds.
+    if (submitting.value) return
+    if (!canSubmit.value) return
     error.value = null
     submitting.value = true
 
@@ -282,64 +579,136 @@ async function submit() {
         .map((s) => s.trim())
         .filter(Boolean)
 
-    const photoUrls = photosText.value
-        .split('\n')
-        .map((s) => s.trim())
-        .filter(Boolean)
+    const photoUrls = photos.value.map((p) => p.url)
 
-    const { data: listing, error: insertError } = await supabase
-        .from('listings')
-        .insert({
-            user_id: user.value.id,
-            status: 'active',
-            address: form.address,
-            city: form.city,
-            state: form.state,
-            zip: form.zip,
-            county: form.county || null,
-            property_type: form.property_type,
-            price: form.price,
-            sqft: form.sqft ?? null,
-            lot_size: form.lot_size ?? null,
-            beds: form.beds ?? null,
-            full_baths: form.full_baths ?? null,
-            half_baths: form.half_baths ?? null,
-            year_built: form.year_built ?? null,
-            garage: (form.garage_stalls ?? 0) > 0,
-            garage_stalls: form.garage_stalls ?? null,
-            basement: form.basement_type !== 'none',
-            basement_finished: form.basement_type === 'finished',
-            title: form.title || null,
-            description: form.description || null,
-            highlights,
-            listed_at: new Date().toISOString(),
+    // Geocode the address so the new listing shows up on the browse map.
+    // Failure is non-fatal — the listing will still publish, just without
+    // a pin until the user (or an admin) corrects it.
+    let lat: number | null = null
+    let lng: number | null = null
+    try {
+        const q = `${form.address}, ${form.city}, ${form.state} ${form.zip}`
+        const geo = await $fetch<{ lat: number; lng: number }>('/api/geocode', {
+            params: { q },
         })
-        .select('id')
-        .single()
+        lat = geo.lat
+        lng = geo.lng
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('Geocoding failed for new listing:', e)
+    }
 
-    if (insertError || !listing) {
-        submitting.value = false
-        error.value = insertError?.message || 'Something went wrong creating your listing.'
-        return
+    const payload = {
+        address: form.address,
+        city: form.city,
+        state: form.state,
+        zip: form.zip,
+        county: form.county || null,
+        lat,
+        lng,
+        property_type: form.property_type,
+        price: form.price,
+        sqft: form.sqft ?? null,
+        lot_size: form.lot_size ?? null,
+        beds: form.beds ?? null,
+        full_baths: form.full_baths ?? null,
+        half_baths: form.half_baths ?? null,
+        year_built: form.year_built ?? null,
+        garage: (form.garage_stalls ?? 0) > 0,
+        garage_stalls: form.garage_stalls ?? null,
+        parking_spaces: form.parking_spaces ?? null,
+        single_story: form.single_story,
+        stories: form.stories ?? null,
+        basement: form.basement_type !== 'none',
+        basement_finished: form.basement_type === 'finished',
+        title: form.title || null,
+        description: form.description || null,
+        highlights,
+        // Lifestyle / features
+        waterfront: form.waterfront,
+        water_body_name: form.waterfront && form.water_body_name ? form.water_body_name : null,
+        view_types: form.view_types,
+        features: form.features,
+        // Land
+        terrain: form.property_type === 'land' ? form.terrain : [],
+        road_access: form.property_type === 'land' ? (form.road_access ?? null) : null,
+        utilities: form.property_type === 'land' ? form.utilities : [],
+        // Utilities (homes)
+        water_source: form.property_type !== 'land' ? (form.water_source ?? null) : null,
+        sewer_type: form.property_type !== 'land' ? (form.sewer_type ?? null) : null,
+        // HOA — derive boolean from fee presence
+        hoa: !!form.hoa_fee,
+        hoa_fee: form.hoa_fee ?? null,
+    }
+
+    let listingId: string
+    if (editingId.value) {
+        // ----- UPDATE existing listing -----
+        const { data: updated, error: updErr } = await supabase
+            .from('listings')
+            .update(payload)
+            .eq('id', editingId.value)
+            .eq('user_id', user.value.id) // RLS belt-and-suspenders
+            .select('id')
+            .single()
+        if (updErr || !updated) {
+            submitting.value = false
+            if (updErr?.code === '23505') {
+                error.value =
+                    'Another active listing already exists at this address. Edit that one instead of duplicating it.'
+            } else {
+                error.value = updErr?.message || 'Could not save your changes.'
+            }
+            return
+        }
+        listingId = updated.id
+
+        // Replace photos: delete existing rows then re-insert in current order.
+        // Cloudinary assets aren't deleted (they're cheap and the user might
+        // re-add them); we only manage the DB pointers.
+        await supabase.from('listing_photos').delete().eq('listing_id', listingId)
+    } else {
+        // ----- INSERT new listing -----
+        const { data: listing, error: insertError } = await supabase
+            .from('listings')
+            .insert({
+                user_id: user.value.id,
+                status: 'active',
+                ...payload,
+                listed_at: new Date().toISOString(),
+            })
+            .select('id')
+            .single()
+
+        if (insertError || !listing) {
+            submitting.value = false
+            if (insertError?.code === '23505') {
+                error.value =
+                    'This address is already listed as active. If you need to update the existing listing, edit it from your account page instead of creating a new one.'
+            } else {
+                error.value = insertError?.message || 'Something went wrong creating your listing.'
+            }
+            return
+        }
+        listingId = listing.id
     }
 
     if (photoUrls.length) {
         const { error: photoError } = await supabase.from('listing_photos').insert(
             photoUrls.map((url, i) => ({
-                listing_id: listing.id,
+                listing_id: listingId,
                 url,
                 sort_order: i,
                 is_primary: i === 0,
             })),
         )
         if (photoError) {
-            // listing was created — let user see it even if photos failed
             // eslint-disable-next-line no-console
             console.error('Photo insert failed:', photoError)
         }
     }
 
-    await router.push(`/listing/${listing.id}`)
+    await router.push(`/listing/${listingId}`)
 }
 
 useSeoMeta({ title: 'List your home — Frula Homes' })

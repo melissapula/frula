@@ -9,10 +9,13 @@
             </NuxtLink>
 
             <div class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-                <h1 class="font-display text-2xl font-bold text-slate-900">Sign in</h1>
-                <p class="mt-1 text-sm text-slate-600">Welcome back.</p>
+                <h1 class="font-display text-2xl font-bold text-slate-900">Reset your password</h1>
+                <p class="mt-1 text-sm text-slate-600">
+                    Enter the email you used to sign up and we'll send you a link to set a new
+                    password.
+                </p>
 
-                <form class="mt-6 space-y-4" @submit.prevent="signIn">
+                <form v-if="!sent" class="mt-6 space-y-4" @submit.prevent="submit">
                     <div>
                         <label
                             class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -24,29 +27,6 @@
                             type="email"
                             required
                             autocomplete="email"
-                            class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                        />
-                    </div>
-
-                    <div>
-                        <div class="flex items-center justify-between">
-                            <label
-                                class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                            >
-                                Password
-                            </label>
-                            <NuxtLink
-                                to="/forgot-password"
-                                class="text-brand text-xs font-semibold hover:underline"
-                            >
-                                Forgot password?
-                            </NuxtLink>
-                        </div>
-                        <input
-                            v-model="password"
-                            type="password"
-                            required
-                            autocomplete="current-password"
                             class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
                         />
                     </div>
@@ -63,14 +43,29 @@
                         :disabled="loading"
                         class="bg-brand hover:bg-brand-600 w-full rounded-full px-4 py-3 text-sm font-semibold text-white shadow-sm transition disabled:opacity-60"
                     >
-                        {{ loading ? 'Signing in…' : 'Sign in' }}
+                        {{ loading ? 'Sending…' : 'Send reset link' }}
                     </button>
                 </form>
 
+                <div
+                    v-else
+                    class="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"
+                >
+                    <p class="font-semibold">Check your email 💌</p>
+                    <p class="mt-1">
+                        If an account exists for <strong>{{ email }}</strong
+                        >, we just sent a password reset link. Click the link in the email to set a
+                        new password.
+                    </p>
+                    <p class="mt-2 text-xs text-emerald-700">
+                        The link expires in 1 hour. Don't see it? Check your spam folder.
+                    </p>
+                </div>
+
                 <p class="mt-6 text-center text-sm text-slate-600">
-                    No account?
-                    <NuxtLink to="/signup" class="text-brand font-semibold hover:underline"
-                        >Sign up</NuxtLink
+                    Remembered it?
+                    <NuxtLink to="/login" class="text-brand font-semibold hover:underline"
+                        >Back to sign in</NuxtLink
                     >
                 </p>
             </div>
@@ -82,32 +77,31 @@
 definePageMeta({ layout: false })
 
 const supabase = useSupabaseClient()
-const user = useSupabaseUser()
-const router = useRouter()
 
 const email = ref('')
-const password = ref('')
 const loading = ref(false)
 const error = ref<string | null>(null)
+const sent = ref(false)
 
-watchEffect(() => {
-    if (user.value) router.replace('/account')
-})
-
-async function signIn() {
+async function submit() {
     error.value = null
     loading.value = true
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.value,
-        password: password.value,
+    // Tells Supabase where to redirect the user after they click the reset link.
+    // The /reset-password page reads the recovery token from the URL and lets
+    // them choose a new password.
+    const redirectTo =
+        typeof window !== 'undefined' ? `${window.location.origin}/reset-password` : undefined
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.value, {
+        redirectTo,
     })
     loading.value = false
-    if (signInError) {
-        error.value = signInError.message
+    if (resetError) {
+        error.value = resetError.message
         return
     }
-    await router.replace('/account')
+    sent.value = true
 }
 
-useSeoMeta({ title: 'Sign in — Frula Homes' })
+useSeoMeta({ title: 'Forgot password — Frula Homes' })
 </script>

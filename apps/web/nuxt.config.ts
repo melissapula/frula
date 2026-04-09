@@ -30,6 +30,8 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             mapboxToken: process.env.MAPBOX_TOKEN,
+            cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+            cloudinaryUploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET,
             apiBase: process.env.API_BASE || 'http://localhost:3001',
         },
     },
@@ -39,7 +41,17 @@ export default defineNuxtConfig({
             login: '/login',
             callback: '/confirm',
             include: ['/account', '/sell', '/sell/**'],
-            exclude: ['/', '/browse', '/listing/**', '/health', '/login', '/signup'],
+            exclude: [
+                '/',
+                '/browse',
+                '/listing/**',
+                '/health',
+                '/login',
+                '/signup',
+                '/forgot-password',
+                '/reset-password',
+                '/dream-home',
+            ],
             cookieRedirect: false,
         },
     },

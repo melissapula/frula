@@ -141,20 +141,50 @@
                             For Sale By Owner
                         </div>
 
-                        <button
-                            v-if="!isOwnListing"
-                            type="button"
-                            class="bg-brand hover:bg-brand-600 mt-6 w-full rounded-full px-4 py-3 text-sm font-semibold text-white shadow-sm transition"
-                            @click="contactSeller"
-                        >
-                            Contact seller
-                        </button>
-                        <p
-                            v-else
-                            class="mt-6 rounded-full bg-slate-100 px-4 py-3 text-center text-xs font-medium text-slate-500"
-                        >
-                            This is your listing
-                        </p>
+                        <div v-if="!isOwnListing" class="mt-6 space-y-2">
+                            <button
+                                type="button"
+                                class="bg-brand hover:bg-brand-600 w-full rounded-full px-4 py-3 text-sm font-semibold text-white shadow-sm transition"
+                                @click="openOffer"
+                            >
+                                💰 Make an offer
+                            </button>
+                            <button
+                                type="button"
+                                class="hover:border-brand hover:text-brand w-full rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition"
+                                @click="openViewing"
+                            >
+                                📅 Request a viewing
+                            </button>
+                            <button
+                                type="button"
+                                class="hover:border-brand hover:text-brand w-full rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition"
+                                @click="contactSeller"
+                            >
+                                Contact seller
+                            </button>
+                        </div>
+                        <div v-else class="mt-6 space-y-2">
+                            <p
+                                class="rounded-full bg-slate-100 px-4 py-2 text-center text-xs font-medium text-slate-500"
+                            >
+                                This is your listing
+                            </p>
+                            <NuxtLink
+                                :to="`/sell?edit=${listing.id}`"
+                                class="bg-brand hover:bg-brand-600 block w-full rounded-full px-4 py-3 text-center text-sm font-semibold text-white shadow-sm transition"
+                            >
+                                Edit listing
+                            </NuxtLink>
+                            <button
+                                type="button"
+                                :disabled="deleting"
+                                class="block w-full rounded-full border border-red-300 px-4 py-3 text-sm font-semibold text-red-600 transition hover:border-red-500 hover:bg-red-50 disabled:opacity-50"
+                                @click="deleteListing"
+                            >
+                                {{ deleting ? 'Deleting…' : 'Delete listing' }}
+                            </button>
+                        </div>
                         <button
                             type="button"
                             class="hover:border-brand hover:text-brand mt-2 w-full rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition"
@@ -175,6 +205,27 @@
                 </aside>
             </div>
         </article>
+
+        <!-- Offer + viewing modals -->
+        <OfferModal
+            v-if="listing"
+            :open="offerOpen"
+            :listing-id="listing.id"
+            :recipient-id="listing.user_id"
+            :listing-address="listing.address"
+            :listing-price="listing.price"
+            @close="offerOpen = false"
+            @sent="offerOpen = false"
+        />
+        <ViewingModal
+            v-if="listing"
+            :open="viewingOpen"
+            :listing-id="listing.id"
+            :recipient-id="listing.user_id"
+            :listing-address="listing.address"
+            @close="viewingOpen = false"
+            @sent="viewingOpen = false"
+        />
     </main>
 </template>
 
@@ -252,6 +303,42 @@ function contactSeller() {
     }
     if (isOwnListing.value) return
     router.push(`/inbox/${listing.value.id}/${listing.value.user_id}`)
+}
+
+const offerOpen = ref(false)
+const viewingOpen = ref(false)
+
+function requireLoginThen(action: () => void) {
+    if (!user.value) {
+        router.push(`/login?next=/listing/${listing.value?.id ?? ''}`)
+        return
+    }
+    if (isOwnListing.value) return
+    action()
+}
+
+function openOffer() {
+    requireLoginThen(() => (offerOpen.value = true))
+}
+function openViewing() {
+    requireLoginThen(() => (viewingOpen.value = true))
+}
+
+const deleting = ref(false)
+async function deleteListing() {
+    if (!listing.value || !isOwnListing.value) return
+    const ok = window.confirm(
+        `Permanently delete this listing for ${listing.value.address}? This cannot be undone.`,
+    )
+    if (!ok) return
+    deleting.value = true
+    const { error: delErr } = await supabase.from('listings').delete().eq('id', listing.value.id)
+    if (delErr) {
+        deleting.value = false
+        window.alert(`Could not delete listing: ${delErr.message}`)
+        return
+    }
+    router.push('/account')
 }
 
 useSeoMeta({

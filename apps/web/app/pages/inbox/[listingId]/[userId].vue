@@ -70,13 +70,36 @@
                 No messages yet. Send the first one below.
             </div>
 
-            <div v-else>
+            <div v-else class="space-y-3">
                 <div
                     v-for="m in messages"
                     :key="m.id"
                     :class="['flex', m.sender_id === myId ? 'justify-end' : 'justify-start']"
                 >
+                    <!-- Offer card -->
+                    <OfferCard
+                        v-if="m.kind === 'offer' && m.payload"
+                        :payload="m.payload as OfferPayload"
+                        :can-act="m.recipient_id === myId"
+                        :from-me="m.sender_id === myId"
+                        @accept="acceptOffer(m)"
+                        @counter="counterOffer(m)"
+                        @decline="declineOffer(m)"
+                    />
+
+                    <!-- Viewing card -->
+                    <ViewingCard
+                        v-else-if="m.kind === 'viewing_request' && m.payload"
+                        :payload="m.payload as ViewingPayload"
+                        :can-act="m.recipient_id === myId"
+                        :from-me="m.sender_id === myId"
+                        @confirm="confirmViewing(m)"
+                        @decline="declineViewing(m)"
+                    />
+
+                    <!-- Plain text bubble -->
                     <div
+                        v-else
                         :class="[
                             'max-w-[80%] rounded-2xl px-4 py-2.5 text-sm shadow-sm',
                             m.sender_id === myId
@@ -96,6 +119,20 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Counter-offer modal (only mounted when needed) -->
+            <OfferModal
+                v-if="counterModalOpen && counterContext"
+                :open="counterModalOpen"
+                :listing-id="listingId"
+                :recipient-id="counterContext.recipientId"
+                :listing-address="listing?.address ?? ''"
+                :listing-price="listing?.price ?? 0"
+                :initial-price="counterContext.initialPrice"
+                mode="counter"
+                @close="counterModalOpen = false"
+                @sent="onCounterSent"
+            />
         </div>
 
         <!-- Composer -->
@@ -124,8 +161,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Message } from '~/composables/useMessages'
+import type { Message, OfferPayload, ViewingPayload } from '~/composables/useMessages'
 import { formatPrice } from '~/composables/useListings'
+import { useUnreadBadge } from '~/composables/useUnreadBadge'
+
+const { bump: bumpUnreadBadge } = useUnreadBadge()
 
 definePageMeta({ layout: false })
 
@@ -276,6 +316,8 @@ async function loadMessages() {
         .map((m) => m.id)
     if (unreadIds.length) {
         await supabase.from('messages').update({ is_read: true }).in('id', unreadIds)
+        // Tell the global navbar badge to recount immediately
+        bumpUnreadBadge()
     }
 }
 
@@ -294,13 +336,19 @@ onMounted(async () => {
                 table: 'messages',
                 filter: `listing_id=eq.${listingId.value}`,
             },
-            (payload) => {
+            async (payload) => {
                 const m = payload.new as Message
                 const isThisThread =
                     (m.sender_id === myId.value && m.recipient_id === otherUserId.value) ||
                     (m.sender_id === otherUserId.value && m.recipient_id === myId.value)
                 if (isThisThread && !messages.value.some((x) => x.id === m.id)) {
                     messages.value.push(m)
+                    // If a new message arrived while we're sitting in the open thread,
+                    // mark it as read immediately so the badge stays accurate.
+                    if (m.recipient_id === myId.value && !m.is_read) {
+                        await supabase.from('messages').update({ is_read: true }).eq('id', m.id)
+                        bumpUnreadBadge()
+                    }
                 }
             },
         )
@@ -334,6 +382,115 @@ async function send() {
     if (data && !messages.value.some((m) => m.id === data.id)) {
         messages.value.push(data as Message)
     }
+}
+
+// =====================================================
+// Offer / viewing actions
+// =====================================================
+
+const counterModalOpen = ref(false)
+const counterContext = ref<{ recipientId: string; initialPrice: number } | null>(null)
+
+async function patchMessagePayload(messageId: string, patch: Record<string, unknown>) {
+    // Reactively update local state first so the UI feels instant
+    const msg = messages.value.find((m) => m.id === messageId)
+    if (msg && msg.payload) {
+        msg.payload = { ...msg.payload, ...patch } as typeof msg.payload
+    }
+    const newPayload = msg?.payload
+    const { error } = await supabase
+        .from('messages')
+        .update({ payload: newPayload })
+        .eq('id', messageId)
+    if (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to update message payload:', error)
+    }
+}
+
+async function dropSystemMessage(body: string) {
+    if (!user.value) return
+    await supabase.from('messages').insert({
+        listing_id: listingId.value,
+        sender_id: myId.value,
+        recipient_id: otherUserId.value,
+        body,
+    })
+}
+
+async function acceptOffer(m: Message) {
+    if (
+        !confirm(
+            'Accept this offer? This will start a transaction and unlock the post-offer checklists.',
+        )
+    )
+        return
+
+    await patchMessagePayload(m.id, { status: 'accepted' })
+
+    // Reuse the existing transaction-creation flow if one doesn't already exist
+    if (!existingTransactionId.value) {
+        await startTransaction()
+    }
+
+    const offerPrice = (m.payload as OfferPayload | null)?.offer_price
+    await dropSystemMessage(
+        `✅ Offer accepted${offerPrice ? ` at ${formatPrice(offerPrice)}` : ''}. Transaction is now open.`,
+    )
+}
+
+function counterOffer(m: Message) {
+    const payload = m.payload as OfferPayload | null
+    if (!payload) return
+    counterContext.value = {
+        // Counter goes back to whoever sent the original offer
+        recipientId: m.sender_id,
+        initialPrice: payload.offer_price,
+    }
+    counterModalOpen.value = true
+}
+
+async function onCounterSent() {
+    counterModalOpen.value = false
+    // Mark the original offer as countered (look up the most recent pending offer
+    // received from the other party — there's only ever one in practice)
+    const original = [...messages.value]
+        .reverse()
+        .find(
+            (m) =>
+                m.kind === 'offer' &&
+                m.recipient_id === myId.value &&
+                (m.payload as OfferPayload | null)?.status === 'pending',
+        )
+    if (original) await patchMessagePayload(original.id, { status: 'countered' })
+}
+
+async function declineOffer(m: Message) {
+    const reason =
+        window.prompt("Optional: tell the buyer why you're declining (leave blank to skip)") ?? ''
+    await patchMessagePayload(m.id, { status: 'declined' })
+    const offerPrice = (m.payload as OfferPayload | null)?.offer_price
+    await dropSystemMessage(
+        `✗ Offer${offerPrice ? ` of ${formatPrice(offerPrice)}` : ''} declined.${
+            reason.trim() ? `\n\nReason: ${reason.trim()}` : ''
+        }`,
+    )
+}
+
+async function confirmViewing(m: Message) {
+    await patchMessagePayload(m.id, { status: 'confirmed' })
+    const payload = m.payload as ViewingPayload | null
+    const dateStr = payload?.date_primary ? ` for ${payload.date_primary}` : ''
+    await dropSystemMessage(`✅ Viewing confirmed${dateStr}.`)
+}
+
+async function declineViewing(m: Message) {
+    const reason =
+        window.prompt('Optional: suggest another time or explain why (leave blank to skip)') ?? ''
+    await patchMessagePayload(m.id, { status: 'declined' })
+    await dropSystemMessage(
+        `✗ Viewing request declined.${reason.trim() ? `\n\n${reason.trim()}` : ''}`,
+    )
 }
 
 function formatTime(iso: string) {

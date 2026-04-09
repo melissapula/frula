@@ -32,6 +32,49 @@
             </div>
         </section>
 
+        <!-- Dream Home callout -->
+        <section class="px-6 pb-20">
+            <div class="mx-auto max-w-5xl">
+                <NuxtLink
+                    to="/dream-home"
+                    class="from-brand to-brand-600 group relative block overflow-hidden rounded-3xl bg-gradient-to-br p-8 text-white shadow-xl transition hover:shadow-2xl md:p-12"
+                >
+                    <!-- Decorative blurs -->
+                    <div
+                        class="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"
+                    ></div>
+                    <div
+                        class="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-white/10 blur-3xl"
+                    ></div>
+
+                    <div class="relative grid items-center gap-6 md:grid-cols-[1fr_auto]">
+                        <div>
+                            <p
+                                class="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest backdrop-blur"
+                            >
+                                ✨ For buyers
+                            </p>
+                            <h2 class="font-display text-3xl font-bold leading-tight md:text-4xl">
+                                Find your dream home in 60 seconds.
+                            </h2>
+                            <p class="mt-3 max-w-2xl text-base text-white/90 md:text-lg">
+                                Tell us what your dream home looks like — beds, views, waterfront,
+                                garage, anything. We'll rank every for-sale-by-owner listing in the
+                                country by how well it matches, and email you when new ones show up.
+                            </p>
+                        </div>
+                        <div class="flex md:justify-end">
+                            <span
+                                class="text-brand inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-base font-semibold shadow-lg transition group-hover:scale-105"
+                            >
+                                Try it free →
+                            </span>
+                        </div>
+                    </div>
+                </NuxtLink>
+            </div>
+        </section>
+
         <!-- Stats -->
         <section class="border-y border-slate-100 bg-white px-6 py-12">
             <div class="mx-auto grid max-w-5xl grid-cols-1 gap-8 text-center md:grid-cols-3">

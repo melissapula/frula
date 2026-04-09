@@ -10,28 +10,167 @@ export interface Listing {
     lat: number | null
     lng: number | null
     property_type: string
+    listing_type?: string
     price: number
+    price_reduced_from?: number | null
     sqft: number | null
     lot_size: number | null
+    lot_unit?: 'acres' | 'sqft'
     beds: number | null
     full_baths: number | null
     half_baths: number | null
     year_built: number | null
     garage: boolean
     garage_stalls: number | null
+    parking_spaces?: number | null
+    single_story?: boolean
+    pets_allowed?: boolean | null
+    large_dogs_ok?: boolean | null
+    rent_period?: 'month' | 'week' | 'night' | null
+    lease_term_months?: number | null
+    available_from?: string | null
+    furnished?: boolean
+    basement?: boolean
+    basement_finished?: boolean
+    stories?: number | null
+    waterfront?: boolean
+    water_body_name?: string | null
+    view_types?: string[]
+    features?: string[]
+    hoa?: boolean
+    water_source?: string | null
+    sewer_type?: string | null
     title: string | null
     description: string | null
     highlights: string[]
     listed_at: string | null
     listing_photos: { url: string; is_primary: boolean; sort_order: number }[]
+    /** Populated only when results come from a radius search */
+    distance_meters?: number
 }
 
+export interface GeoCenter {
+    lat: number
+    lng: number
+    label: string
+}
+
+/** Property category buckets used by the basic filter chips. */
+export type PropertyCategory = 'homes' | 'land' | 'commercial'
+
+/** Map a category to the underlying `property_type` values stored in the DB. */
+export const CATEGORY_TYPES: Record<PropertyCategory, string[]> = {
+    homes: ['residential', 'condo', 'multi-family'],
+    land: ['land'],
+    commercial: ['commercial'],
+}
+
+export const VIEW_OPTIONS = [
+    { value: 'water', label: 'Water' },
+    { value: 'lake', label: 'Lake' },
+    { value: 'river', label: 'River' },
+    { value: 'mountain', label: 'Mountain' },
+    { value: 'city', label: 'City skyline' },
+    { value: 'woods', label: 'Woods / forest' },
+    { value: 'golf', label: 'Golf course' },
+] as const
+
+export const TERRAIN_OPTIONS = [
+    { value: 'wooded', label: 'Wooded' },
+    { value: 'cleared', label: 'Cleared' },
+    { value: 'flat', label: 'Flat' },
+    { value: 'rolling', label: 'Rolling' },
+    { value: 'hilly', label: 'Hilly' },
+    { value: 'pasture', label: 'Pasture' },
+    { value: 'tillable', label: 'Tillable / farmland' },
+    { value: 'prairie', label: 'Prairie' },
+    { value: 'wetland', label: 'Wetland' },
+] as const
+
+export const ROAD_ACCESS_OPTIONS = [
+    { value: 'paved', label: 'Paved' },
+    { value: 'gravel', label: 'Gravel' },
+    { value: 'dirt', label: 'Dirt' },
+    { value: 'seasonal', label: 'Seasonal access' },
+    { value: 'none', label: 'No road access' },
+] as const
+
+export const UTILITY_OPTIONS = [
+    { value: 'electric', label: 'Electric' },
+    { value: 'gas', label: 'Natural gas' },
+    { value: 'city_water', label: 'City water' },
+    { value: 'well', label: 'Well' },
+    { value: 'city_sewer', label: 'City sewer' },
+    { value: 'septic', label: 'Septic' },
+    { value: 'internet', label: 'Internet / fiber' },
+] as const
+
+export const FEATURE_OPTIONS = [
+    { value: 'pool', label: 'Pool' },
+    { value: 'fireplace', label: 'Fireplace' },
+    { value: 'central_ac', label: 'Central A/C' },
+    { value: 'deck', label: 'Deck / patio' },
+    { value: 'fenced_yard', label: 'Fenced yard' },
+    { value: 'updated_kitchen', label: 'Updated kitchen' },
+    { value: 'new_roof', label: 'New roof' },
+    { value: 'solar', label: 'Solar' },
+    { value: 'ev_charger', label: 'EV charger' },
+    { value: 'dock', label: 'Dock' },
+] as const
+
 export interface ListingFilters {
+    // Location
+    near?: GeoCenter
+    radiusMiles?: number
+    state?: string
+    city?: string
+
+    // Category / type
+    categories?: PropertyCategory[]
+    propertyType?: string
+
+    // Price
     minPrice?: number
     maxPrice?: number
+    priceReducedOnly?: boolean
+
+    // Size
+    minSqft?: number
+    maxSqft?: number
+    minLotAcres?: number
+    maxLotAcres?: number
+
+    // Rooms
     beds?: number
+    maxBeds?: number
     baths?: number
-    propertyType?: string
-    city?: string
-    state?: string
+    maxBaths?: number
+
+    // Build
+    minYearBuilt?: number
+    maxYearBuilt?: number
+    stories?: number
+
+    // Construction / utilities
+    garage?: boolean
+    minParkingSpaces?: number
+    basement?: boolean
+    basementFinished?: boolean
+    singleStory?: boolean
+    waterSource?: 'city' | 'well' | 'other'
+    sewerType?: 'city' | 'septic' | 'other'
+    noHoa?: boolean
+
+    // Lifestyle
+    waterfront?: boolean
+    views?: string[]
+    features?: string[]
+
+    // Land
+    terrain?: string[]
+    roadAccess?: string
+    utilities?: string[]
+
+    // Freshness
+    daysOnMarketMax?: number
 }
