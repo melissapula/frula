@@ -345,6 +345,8 @@
                 </section>
             </div>
         </div>
+
+        <SiteFooter />
     </main>
 </template>
 

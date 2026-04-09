@@ -143,6 +143,8 @@
                 </p>
             </div>
         </div>
+
+        <SiteFooter />
     </main>
 </template>
 

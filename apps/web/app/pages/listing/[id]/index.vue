@@ -257,6 +257,21 @@
                             <Fact label="County" :value="listing.county" />
                         </dl>
                     </div>
+
+                    <!-- Location map -->
+                    <div v-if="listing.lat != null && listing.lng != null" class="mt-8">
+                        <h2 class="font-display text-xl font-semibold">Where it is</h2>
+                        <p class="mb-3 mt-1 text-sm text-slate-500">
+                            {{ listing.address }} · {{ listing.city }}, {{ listing.state }}
+                            {{ listing.zip }}
+                        </p>
+                        <ListingLocationMap
+                            :lat="listing.lat"
+                            :lng="listing.lng"
+                            :property-type="listing.property_type"
+                            :address="listing.address"
+                        />
+                    </div>
                 </div>
 
                 <!-- Sticky sidebar -->
@@ -325,7 +340,7 @@
                             :to="`/listing/${listing.id}/cma`"
                             class="hover:border-brand hover:text-brand mt-2 block w-full rounded-full border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition"
                         >
-                            View market analysis
+                            📊 View market snapshot
                         </NuxtLink>
 
                         <p class="mt-4 text-xs text-slate-500">

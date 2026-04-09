@@ -76,23 +76,208 @@
             </div>
         </section>
 
-        <!-- Stats -->
-        <section class="border-y border-slate-100 bg-white px-6 py-12">
-            <div class="mx-auto grid max-w-5xl grid-cols-1 gap-8 text-center md:grid-cols-3">
-                <div>
-                    <div class="font-display text-brand text-4xl font-bold">$18,000</div>
-                    <p class="mt-2 text-sm text-slate-600">
-                        Average commission saved on a $300k home
+        <!-- Why Frula -->
+        <section class="border-y border-slate-100 bg-white px-6 py-20">
+            <div class="mx-auto max-w-5xl">
+                <div class="mx-auto max-w-2xl text-center">
+                    <p class="text-brand-600 mb-3 text-xs font-semibold uppercase tracking-widest">
+                        Why Frula Homes
+                    </p>
+                    <h2 class="font-display text-3xl font-bold text-slate-900 md:text-4xl">
+                        Why would anyone skip the agent?
+                    </h2>
+                    <p class="mt-4 text-base leading-relaxed text-slate-600">
+                        Honestly? Because the math doesn't work for most people. Real estate agents
+                        earn their commission by marketing, paperwork, and negotiating — and if
+                        you're willing to do those three things yourself, the savings are hard to
+                        ignore.
                     </p>
                 </div>
-                <div>
-                    <div class="font-display text-brand text-4xl font-bold">74%</div>
-                    <p class="mt-2 text-sm text-slate-600">Of homebuyers search on mobile first</p>
+
+                <!-- The seller math block -->
+                <div
+                    class="from-brand-50 border-brand/20 mt-10 rounded-2xl border bg-gradient-to-br to-white p-6 md:p-10"
+                >
+                    <div class="grid items-center gap-6 md:grid-cols-[1fr_auto] md:gap-10">
+                        <div>
+                            <p class="text-brand-700 text-xs font-bold uppercase tracking-wider">
+                                💰 The math for sellers
+                            </p>
+                            <h3
+                                class="font-display mt-1 text-2xl font-bold text-slate-900 md:text-3xl"
+                            >
+                                On a $400,000 home, a 6% commission is
+                                <span class="text-brand">$24,000</span>.
+                            </h3>
+                            <p class="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">
+                                That's the going rate in most of the U.S., split between the listing
+                                agent and the buyer's agent. It comes straight out of the seller's
+                                proceeds at closing. For many homeowners, that's more than a year of
+                                mortgage payments — paid to someone else. If you'd rather keep it,
+                                Frula gives you the tools to sell the home yourself.
+                            </p>
+                        </div>
+                        <div class="flex-none text-center">
+                            <div class="font-display text-brand text-5xl font-bold md:text-6xl">
+                                $24k
+                            </div>
+                            <p class="mt-2 text-xs uppercase tracking-wider text-slate-500">
+                                Typical 6% commission on a $400k sale
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <div class="font-display text-brand text-4xl font-bold">$49</div>
-                    <p class="mt-2 text-sm text-slate-600">Starting price to list your home</p>
+
+                <!-- The buyer math block — nobody else talks about this -->
+                <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 md:p-10">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                        🏠 The piece nobody tells buyers
+                    </p>
+                    <h3 class="font-display mt-1 text-2xl font-bold text-slate-900 md:text-3xl">
+                        You pay the buyer's agent commission, too — it's just hidden.
+                    </h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">
+                        Here's the thing most buyers never realize: when a home is listed through a
+                        traditional agent, the seller pays a commission that almost always gets
+                        baked into the asking price. So if you're the buyer, that commission is
+                        really coming out of the price you pay — whether you use a buyer's agent or
+                        not. When you buy directly from a for-sale-by-owner seller, that's 2-3%
+                        that's actually on the negotiating table. On a $400,000 home, that's
+                        <strong>$8,000 to $12,000</strong> you can potentially negotiate off the
+                        price, keep in your pocket, or put toward closing costs.
+                    </p>
                 </div>
+
+                <!-- What makes Frula different from other FSBO sites -->
+                <div class="mt-14">
+                    <div class="mx-auto max-w-2xl text-center">
+                        <h3 class="font-display text-2xl font-bold text-slate-900 md:text-3xl">
+                            What makes Frula different
+                        </h3>
+                        <p class="mt-3 text-slate-600">
+                            There are other for-sale-by-owner sites out there. Here's what we do
+                            that they don't.
+                        </p>
+                    </div>
+
+                    <div class="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <div class="rounded-2xl border border-slate-200 bg-white p-6">
+                            <div class="text-2xl">🎯</div>
+                            <h4 class="font-display mt-3 text-base font-bold text-slate-900">
+                                Truly FSBO, not a hidden brokerage
+                            </h4>
+                            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                                Many "FSBO" sites are actually licensed flat-fee brokerages that
+                                take a cut at closing. Frula is a pure information platform — we
+                                never act as your agent or take a commission. Ever.
+                            </p>
+                        </div>
+
+                        <div class="rounded-2xl border border-slate-200 bg-white p-6">
+                            <div class="text-2xl">🗺️</div>
+                            <h4 class="font-display mt-3 text-base font-bold text-slate-900">
+                                Nationwide from day one
+                            </h4>
+                            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                                Every state, every county. No "coming soon to your area." List your
+                                home anywhere in the U.S., and buyers anywhere can find it. We treat
+                                Montana the same as California.
+                            </p>
+                        </div>
+
+                        <div class="rounded-2xl border border-slate-200 bg-white p-6">
+                            <div class="text-2xl">✨</div>
+                            <h4 class="font-display mt-3 text-base font-bold text-slate-900">
+                                The Dream Home Finder
+                            </h4>
+                            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                                Buyers tell us what their ideal home looks like — beds, views,
+                                waterfront, features — and we rank every nationwide listing by how
+                                well it matches. No other FSBO site does this.
+                            </p>
+                        </div>
+
+                        <div class="rounded-2xl border border-slate-200 bg-white p-6">
+                            <div class="text-2xl">💬</div>
+                            <h4 class="font-display mt-3 text-base font-bold text-slate-900">
+                                Real transaction tools
+                            </h4>
+                            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                                Structured offers, viewing requests, buyer-seller messaging, and
+                                smart checklists — all built in. Most FSBO sites are just listing
+                                boards that dump you into email once you get interest.
+                            </p>
+                        </div>
+
+                        <div class="rounded-2xl border border-slate-200 bg-white p-6">
+                            <div class="text-2xl">📄</div>
+                            <h4 class="font-display mt-3 text-base font-bold text-slate-900">
+                                Official-source paperwork
+                            </h4>
+                            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                                We point you straight to your state's real estate commission for the
+                                official forms. No sketchy third-party copies. No "document
+                                preparation" services that create legal ambiguity. Just links you
+                                can trust.
+                            </p>
+                        </div>
+
+                        <div class="rounded-2xl border border-slate-200 bg-white p-6">
+                            <div class="text-2xl">💰</div>
+                            <h4 class="font-display mt-3 text-base font-bold text-slate-900">
+                                You keep the savings
+                            </h4>
+                            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                                Whether you're a seller skipping the commission or a buyer
+                                negotiating directly, the savings stay with you — not a middleman.
+                                That's the whole point.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Free-to-list commitment card -->
+                <div
+                    class="from-brand to-brand-600 mt-14 overflow-hidden rounded-2xl bg-gradient-to-br p-8 text-white shadow-lg md:p-10"
+                >
+                    <div class="grid items-center gap-6 md:grid-cols-[1fr_auto]">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-white/80">
+                                💚 Our commitment to you
+                            </p>
+                            <h3 class="font-display mt-2 text-2xl font-bold md:text-3xl">
+                                Free to list. Free to browse. Always.
+                            </h3>
+                            <p class="mt-3 text-sm leading-relaxed text-white/90 md:text-base">
+                                Listing your home on Frula is free — not for a trial, not for a
+                                promo period, just always. Browsing, saving, messaging, making
+                                offers, and requesting viewings are free too. As Frula grows, we'll
+                                eventually offer optional paid visibility boosts for sellers who
+                                want extra prominence, plus a curated directory of vetted local
+                                service providers. None of it will ever be required.
+                            </p>
+                            <NuxtLink
+                                to="/how-we-make-money"
+                                class="mt-4 inline-flex items-center text-sm font-semibold text-white underline decoration-white/40 decoration-2 underline-offset-4 hover:decoration-white"
+                            >
+                                Read our full pricing promise →
+                            </NuxtLink>
+                        </div>
+                        <div class="flex-none text-center">
+                            <div class="font-display text-6xl font-bold md:text-7xl">$0</div>
+                            <p class="mt-1 text-xs uppercase tracking-wider text-white/80">
+                                To list your home
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Honest disclaimer -->
+                <p class="mt-10 text-center text-xs italic text-slate-500">
+                    FSBO isn't for everyone. If you need someone to handle every detail, a
+                    traditional agent is worth considering. Frula is for people who want to manage
+                    the process themselves — and keep what they save.
+                </p>
             </div>
         </section>
 
@@ -141,12 +326,7 @@
             </div>
         </section>
 
-        <!-- Footer -->
-        <footer
-            class="border-t border-slate-100 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500"
-        >
-            <p>© 2026 Frula Homes — Sell it yourself.</p>
-        </footer>
+        <SiteFooter />
     </main>
 </template>
 
