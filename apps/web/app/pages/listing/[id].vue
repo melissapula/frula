@@ -71,6 +71,18 @@
                         />
                     </div>
 
+                    <!-- Key feature badges (waterfront, single story, etc) -->
+                    <div v-if="keyFeatureBadges.length" class="mt-5 flex flex-wrap gap-2">
+                        <span
+                            v-for="b in keyFeatureBadges"
+                            :key="b.label"
+                            class="bg-brand-50 text-brand-700 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
+                        >
+                            <span>{{ b.icon }}</span>
+                            {{ b.label }}
+                        </span>
+                    </div>
+
                     <!-- Description -->
                     <div v-if="listing.description" class="mt-6">
                         <h2 class="font-display text-xl font-semibold">About this home</h2>
@@ -93,6 +105,80 @@
                         </div>
                     </div>
 
+                    <!-- Lifestyle: views + features (homes/condo/etc) -->
+                    <div v-if="!isLand && (viewTags.length || featureTags.length)" class="mt-8">
+                        <h2 class="font-display text-xl font-semibold">Features & lifestyle</h2>
+                        <div v-if="viewTags.length" class="mt-3">
+                            <p
+                                class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Views
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    v-for="tag in viewTags"
+                                    :key="tag"
+                                    class="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700"
+                                >
+                                    {{ tag }}
+                                </span>
+                            </div>
+                        </div>
+                        <div v-if="featureTags.length" class="mt-4">
+                            <p
+                                class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Features
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    v-for="tag in featureTags"
+                                    :key="tag"
+                                    class="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700"
+                                >
+                                    {{ tag }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Land specifics -->
+                    <div v-if="isLand" class="mt-8">
+                        <h2 class="font-display text-xl font-semibold">Land details</h2>
+                        <div v-if="terrainTags.length" class="mt-3">
+                            <p
+                                class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Terrain
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    v-for="tag in terrainTags"
+                                    :key="tag"
+                                    class="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700"
+                                >
+                                    {{ tag }}
+                                </span>
+                            </div>
+                        </div>
+                        <div v-if="utilityTags.length" class="mt-4">
+                            <p
+                                class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Utilities at lot
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    v-for="tag in utilityTags"
+                                    :key="tag"
+                                    class="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700"
+                                >
+                                    {{ tag }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Facts grid -->
                     <div class="mt-8">
                         <h2 class="font-display text-xl font-semibold">Property facts</h2>
@@ -106,10 +192,8 @@
                                 label="Square feet"
                                 :value="listing.sqft ? formatNumber(listing.sqft) : null"
                             />
-                            <Fact
-                                label="Lot size"
-                                :value="listing.lot_size ? `${listing.lot_size} acres` : null"
-                            />
+                            <Fact label="Lot size" :value="lotLabel" />
+                            <Fact label="Stories" :value="listing.stories" />
                             <Fact label="Bedrooms" :value="listing.beds" />
                             <Fact label="Full baths" :value="listing.full_baths" />
                             <Fact label="Half baths" :value="listing.half_baths" />
@@ -119,13 +203,64 @@
                                     listing.garage_stalls ? `${listing.garage_stalls}-car` : 'No'
                                 "
                             />
+                            <Fact
+                                label="Other parking"
+                                :value="
+                                    listing.parking_spaces
+                                        ? `${listing.parking_spaces} spaces`
+                                        : null
+                                "
+                            />
+                            <Fact
+                                label="Basement"
+                                :value="
+                                    listing.basement_finished
+                                        ? 'Finished'
+                                        : listing.basement
+                                          ? 'Unfinished'
+                                          : null
+                                "
+                            />
+                            <Fact
+                                label="Single story"
+                                :value="listing.single_story ? 'Yes' : null"
+                            />
+                            <Fact
+                                v-if="!isLand"
+                                label="Water source"
+                                :value="
+                                    listing.water_source ? capitalize(listing.water_source) : null
+                                "
+                            />
+                            <Fact
+                                v-if="!isLand"
+                                label="Sewer"
+                                :value="listing.sewer_type ? capitalize(listing.sewer_type) : null"
+                            />
+                            <Fact
+                                v-if="isLand"
+                                label="Road access"
+                                :value="
+                                    listing.road_access
+                                        ? (ROAD_ACCESS_LABELS[listing.road_access] ??
+                                          listing.road_access)
+                                        : null
+                                "
+                            />
+                            <Fact
+                                label="Waterfront"
+                                :value="
+                                    listing.waterfront ? listing.water_body_name || 'Yes' : null
+                                "
+                            />
+                            <Fact label="HOA" :value="hoaSummary" />
                             <Fact label="County" :value="listing.county" />
                         </dl>
                     </div>
                 </div>
 
                 <!-- Sticky sidebar -->
-                <aside class="md:sticky md:top-6 md:self-start">
+                <aside class="space-y-4 md:sticky md:top-6 md:self-start">
                     <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div class="font-display text-3xl font-bold text-slate-900">
                             {{ formatPrice(listing.price) }}
@@ -185,12 +320,7 @@
                                 {{ deleting ? 'Deleting…' : 'Delete listing' }}
                             </button>
                         </div>
-                        <button
-                            type="button"
-                            class="hover:border-brand hover:text-brand mt-2 w-full rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition"
-                        >
-                            Save listing
-                        </button>
+                        <SaveButton :listing-id="listing.id" variant="full" />
                         <NuxtLink
                             :to="`/listing/${listing.id}/cma`"
                             class="hover:border-brand hover:text-brand mt-2 block w-full rounded-full border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition"
@@ -202,6 +332,9 @@
                             Listed {{ daysOnMarket }} day{{ daysOnMarket === 1 ? '' : 's' }} ago
                         </p>
                     </div>
+
+                    <!-- Owner-only stats card -->
+                    <SellerStatsCard v-if="isOwnListing" :listing-id="listing.id" />
                 </aside>
             </div>
         </article>
@@ -246,8 +379,13 @@ const {
         .select(
             `
         id, user_id, status, address, city, state, zip, county, lat, lng,
-        property_type, price, sqft, lot_size, beds, full_baths, half_baths,
-        year_built, garage, garage_stalls, title, description, highlights,
+        property_type, price, sqft, lot_size, lot_unit, beds, full_baths, half_baths,
+        year_built, garage, garage_stalls, parking_spaces, single_story, stories,
+        basement, basement_finished,
+        waterfront, water_body_name, view_types, features,
+        terrain, road_access, utilities,
+        water_source, sewer_type, hoa, hoa_fee, hoa_frequency,
+        title, description, highlights,
         listed_at,
         listing_photos ( url, is_primary, sort_order )
       `,
@@ -290,10 +428,128 @@ function capitalize(s: string) {
     return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
+// =====================================================
+// Display labels for the structured filter fields. Keeps
+// the listing detail page in sync with what sellers picked
+// in the sell form (and what buyers searched for).
+// =====================================================
+const VIEW_LABELS: Record<string, string> = {
+    water: 'Water view',
+    lake: 'Lake view',
+    river: 'River view',
+    mountain: 'Mountain view',
+    city: 'City skyline',
+    woods: 'Woods / forest',
+    golf: 'Golf course view',
+}
+
+const FEATURE_LABELS: Record<string, string> = {
+    pool: 'Pool',
+    fireplace: 'Fireplace',
+    central_ac: 'Central A/C',
+    deck: 'Deck / patio',
+    fenced_yard: 'Fenced yard',
+    updated_kitchen: 'Updated kitchen',
+    new_roof: 'New roof',
+    solar: 'Solar',
+    ev_charger: 'EV charger',
+    dock: 'Dock',
+}
+
+const TERRAIN_LABELS: Record<string, string> = {
+    wooded: 'Wooded',
+    cleared: 'Cleared',
+    flat: 'Flat',
+    rolling: 'Rolling',
+    hilly: 'Hilly',
+    pasture: 'Pasture',
+    tillable: 'Tillable / farmland',
+    prairie: 'Prairie',
+    wetland: 'Wetland',
+}
+
+const UTILITY_LABELS: Record<string, string> = {
+    electric: 'Electric',
+    gas: 'Natural gas',
+    city_water: 'City water',
+    well: 'Well',
+    city_sewer: 'City sewer',
+    septic: 'Septic',
+    internet: 'Internet / fiber',
+}
+
+const ROAD_ACCESS_LABELS: Record<string, string> = {
+    paved: 'Paved road',
+    gravel: 'Gravel road',
+    dirt: 'Dirt road',
+    seasonal: 'Seasonal access',
+    none: 'No road access',
+}
+
+function lookupList(values: string[] | null | undefined, labels: Record<string, string>) {
+    return (values ?? []).map((v) => labels[v] ?? v)
+}
+
+const viewTags = computed(() => lookupList(listing.value?.view_types, VIEW_LABELS))
+const featureTags = computed(() => lookupList(listing.value?.features, FEATURE_LABELS))
+const terrainTags = computed(() => lookupList(listing.value?.terrain, TERRAIN_LABELS))
+const utilityTags = computed(() => lookupList(listing.value?.utilities, UTILITY_LABELS))
+
+const lotLabel = computed(() => {
+    const l = listing.value
+    if (!l?.lot_size) return null
+    if (l.lot_unit === 'sqft') return `${formatNumber(Math.round(l.lot_size))} sqft`
+    return `${l.lot_size} acres`
+})
+
+const isLand = computed(() => listing.value?.property_type === 'land')
+
+// Pulls the most "wow" attributes into a single hero badge strip near the
+// top of the listing — this is what catches a buyer's eye in the first
+// 2 seconds and signals "yes, this matches what I was searching for".
+const keyFeatureBadges = computed(() => {
+    const l = listing.value
+    if (!l) return []
+    const badges: { icon: string; label: string }[] = []
+    if (l.waterfront) badges.push({ icon: '🌊', label: l.water_body_name || 'Waterfront' })
+    if (l.single_story) badges.push({ icon: '♿', label: 'Single story' })
+    if ((l.view_types ?? []).includes('mountain'))
+        badges.push({ icon: '⛰️', label: 'Mountain view' })
+    if ((l.view_types ?? []).includes('lake')) badges.push({ icon: '🏞️', label: 'Lake view' })
+    if ((l.features ?? []).includes('pool')) badges.push({ icon: '🏊', label: 'Pool' })
+    if ((l.features ?? []).includes('fireplace')) badges.push({ icon: '🔥', label: 'Fireplace' })
+    if ((l.features ?? []).includes('updated_kitchen'))
+        badges.push({ icon: '✨', label: 'Updated kitchen' })
+    if ((l.features ?? []).includes('new_roof')) badges.push({ icon: '🏠', label: 'New roof' })
+    if ((l.features ?? []).includes('solar')) badges.push({ icon: '☀️', label: 'Solar' })
+    if ((l.features ?? []).includes('dock')) badges.push({ icon: '⚓', label: 'Dock' })
+    if (l.garage_stalls && l.garage_stalls >= 3)
+        badges.push({ icon: '🚗', label: `${l.garage_stalls}-car garage` })
+    return badges
+})
+
+const hoaSummary = computed(() => {
+    const l = listing.value
+    if (!l?.hoa || !l.hoa_fee) return null
+    const period =
+        l.hoa_frequency === 'annual' ? '/yr' : l.hoa_frequency === 'quarterly' ? '/qtr' : '/mo'
+    return `$${formatNumber(l.hoa_fee)}${period}`
+})
+
 const user = useSupabaseUser()
 const router = useRouter()
 
 const isOwnListing = computed(() => listing.value && user.value?.id === listing.value.user_id)
+
+// Log a view event on mount, but only when the viewer isn't the seller —
+// otherwise the seller's own clicks would inflate their own stats card.
+onMounted(async () => {
+    if (!listing.value || isOwnListing.value) return
+    await supabase.from('listing_views').insert({
+        listing_id: listing.value.id,
+        viewer_id: user.value?.id ?? null,
+    })
+})
 
 function contactSeller() {
     if (!listing.value) return

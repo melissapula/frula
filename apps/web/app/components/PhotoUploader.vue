@@ -78,10 +78,16 @@
                         <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
                             <div
                                 class="bg-brand h-full transition-all"
-                                :style="{ width: `${photo.progress}%` }"
+                                :style="{ width: `${photo.compressing ? 0 : photo.progress}%` }"
                             />
                         </div>
-                        <p class="text-xs text-slate-500">Uploading… {{ photo.progress }}%</p>
+                        <p class="text-xs text-slate-500">
+                            {{
+                                photo.compressing
+                                    ? 'Optimizing photo…'
+                                    : `Uploading… ${photo.progress}%`
+                            }}
+                        </p>
                     </div>
                 </div>
 
@@ -139,17 +145,21 @@
 
 <script setup lang="ts">
 import { useCloudinaryUpload } from '~/composables/useCloudinaryUpload'
+import { useImageCompression } from '~/composables/useImageCompression'
 
 interface PhotoEntry {
     localId: string
     url: string | null
     publicId: string | null
     uploading: boolean
+    /** True while we're shrinking the file before the upload begins. */
+    compressing: boolean
     progress: number
 }
 
 const photos = defineModel<{ url: string; publicId?: string }[]>({ default: () => [] })
 const { uploadFile, isConfigured } = useCloudinaryUpload()
+const { compressImage } = useImageCompression()
 
 // Internal entries (with progress + localId) mirrored back to the v-model
 // as the simpler {url, publicId}[] shape on every change.
@@ -159,6 +169,7 @@ const entries = ref<PhotoEntry[]>(
         url: p.url,
         publicId: p.publicId ?? null,
         uploading: false,
+        compressing: false,
         progress: 100,
     })),
 )
@@ -198,12 +209,19 @@ async function addFiles(files: File[]) {
             url: null,
             publicId: null,
             uploading: true,
+            compressing: true,
             progress: 0,
         }
         entries.value.push(entry)
 
         try {
-            const result = await uploadFile(file, (pct) => {
+            // Shrink first — saves Cloudinary bandwidth + dodges the 10 MB
+            // free-tier limit on giant phone photos. compressImage is a
+            // no-op for already-small images so this is safe to always call.
+            const compressed = await compressImage(file)
+            entry.compressing = false
+
+            const result = await uploadFile(compressed, (pct) => {
                 entry.progress = pct
             })
             entry.url = result.url

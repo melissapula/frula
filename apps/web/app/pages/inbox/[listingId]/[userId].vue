@@ -164,8 +164,10 @@
 import type { Message, OfferPayload, ViewingPayload } from '~/composables/useMessages'
 import { formatPrice } from '~/composables/useListings'
 import { useUnreadBadge } from '~/composables/useUnreadBadge'
+import { useNotificationEmail } from '~/composables/useNotificationEmail'
 
 const { bump: bumpUnreadBadge } = useUnreadBadge()
+const { notify } = useNotificationEmail()
 
 definePageMeta({ layout: false })
 
@@ -381,6 +383,8 @@ async function send() {
     draft.value = ''
     if (data && !messages.value.some((m) => m.id === data.id)) {
         messages.value.push(data as Message)
+        // Fire the email notification (non-blocking, fails silently)
+        notify(data.id)
     }
 }
 

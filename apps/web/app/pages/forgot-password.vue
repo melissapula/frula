@@ -49,17 +49,41 @@
 
                 <div
                     v-else
-                    class="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"
+                    class="mt-6 space-y-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"
                 >
                     <p class="font-semibold">Check your email 💌</p>
-                    <p class="mt-1">
+                    <p>
                         If an account exists for <strong>{{ email }}</strong
                         >, we just sent a password reset link. Click the link in the email to set a
-                        new password.
+                        new password. The link expires in 1 hour.
                     </p>
-                    <p class="mt-2 text-xs text-emerald-700">
-                        The link expires in 1 hour. Don't see it? Check your spam folder.
-                    </p>
+                    <div
+                        class="rounded-md border border-emerald-200 bg-white/60 p-3 text-xs text-emerald-900"
+                    >
+                        <p class="font-semibold">Don't see it after a couple minutes?</p>
+                        <ol class="ml-4 mt-1 list-decimal space-y-1 text-emerald-800">
+                            <li>
+                                Check your <strong>spam</strong> or <strong>junk</strong> folder —
+                                Gmail users, also peek in <strong>Promotions</strong>.
+                            </li>
+                            <li>
+                                Add
+                                <strong>noreply@frulahomes.com</strong>
+                                to your contacts so future emails land in your inbox.
+                            </li>
+                            <li>
+                                Still nothing?
+                                <button
+                                    type="button"
+                                    class="font-semibold underline"
+                                    @click="sent = false"
+                                >
+                                    Try sending again
+                                </button>
+                                with the same or a different email.
+                            </li>
+                        </ol>
+                    </div>
                 </div>
 
                 <p class="mt-6 text-center text-sm text-slate-600">

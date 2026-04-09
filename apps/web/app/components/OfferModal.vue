@@ -194,6 +194,9 @@
 
 <script setup lang="ts">
 import { formatPrice } from '~/composables/useListings'
+import { useNotificationEmail } from '~/composables/useNotificationEmail'
+
+const { notify } = useNotificationEmail()
 
 const props = defineProps<{
     open: boolean
@@ -305,29 +308,34 @@ async function submit() {
     submitting.value = true
     error.value = null
 
-    const { error: insertError } = await supabase.from('messages').insert({
-        listing_id: props.listingId,
-        sender_id: user.value.id,
-        recipient_id: props.recipientId,
-        body: buildBody(),
-        kind: 'offer',
-        payload: {
-            status: 'pending',
-            offer_price: form.offerPrice,
-            earnest_money: form.earnestMoney ?? null,
-            financing: form.financing,
-            closing_date: form.closingDate || null,
-            contingencies: form.contingencies,
-            note: form.note || null,
-            asking_price_at_offer: props.listingPrice,
-        },
-    })
+    const { data: inserted, error: insertError } = await supabase
+        .from('messages')
+        .insert({
+            listing_id: props.listingId,
+            sender_id: user.value.id,
+            recipient_id: props.recipientId,
+            body: buildBody(),
+            kind: 'offer',
+            payload: {
+                status: 'pending',
+                offer_price: form.offerPrice,
+                earnest_money: form.earnestMoney ?? null,
+                financing: form.financing,
+                closing_date: form.closingDate || null,
+                contingencies: form.contingencies,
+                note: form.note || null,
+                asking_price_at_offer: props.listingPrice,
+            },
+        })
+        .select('id')
+        .single()
 
     submitting.value = false
     if (insertError) {
         error.value = insertError.message
         return
     }
+    if (inserted?.id) await notify(inserted.id)
     emit('sent')
     router.push(`/inbox/${props.listingId}/${props.recipientId}`)
 }

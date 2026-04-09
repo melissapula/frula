@@ -7,6 +7,17 @@
             ✨ Dream Home
         </NuxtLink>
         <template v-if="user">
+            <NotificationsBell />
+            <NuxtLink
+                to="/saved"
+                :class="[
+                    'hover:text-brand hidden text-sm font-medium sm:flex sm:items-center sm:gap-1.5',
+                    savedCount > 0 ? 'text-slate-700' : 'text-slate-600',
+                ]"
+            >
+                ❤️
+                <span v-if="savedCount > 0" class="text-xs">{{ savedCount }}</span>
+            </NuxtLink>
             <NuxtLink
                 to="/inbox"
                 :class="[
@@ -64,6 +75,8 @@ const user = useSupabaseUser()
 const supabase = useSupabaseClient()
 const route = useRoute()
 const { version: unreadBadgeVersion } = useUnreadBadge()
+const { savedIds } = useSaved()
+const savedCount = computed(() => savedIds.value.size)
 
 // Live unread-message count for the badge on the Inbox link.
 // Refreshes whenever the user changes, the route changes (so opening a

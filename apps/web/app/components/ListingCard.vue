@@ -32,6 +32,9 @@
             >
                 FSBO
             </div>
+            <div class="absolute bottom-3 right-3 z-10">
+                <SaveButton :listing-id="listing.id" variant="icon" />
+            </div>
             <div
                 v-if="matchPercent != null"
                 :class="[

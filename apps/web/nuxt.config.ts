@@ -28,10 +28,14 @@ export default defineNuxtConfig({
     },
 
     runtimeConfig: {
+        // Server-only secrets (never exposed to the browser)
+        resendApiKey: process.env.RESEND_API_KEY,
+        emailFrom: process.env.EMAIL_FROM || 'Frula Homes <noreply@frulahomes.com>',
         public: {
             mapboxToken: process.env.MAPBOX_TOKEN,
             cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
             cloudinaryUploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET,
+            siteUrl: process.env.PUBLIC_SITE_URL || 'http://localhost:3000',
             apiBase: process.env.API_BASE || 'http://localhost:3001',
         },
     },
@@ -40,7 +44,7 @@ export default defineNuxtConfig({
         redirectOptions: {
             login: '/login',
             callback: '/confirm',
-            include: ['/account', '/sell', '/sell/**'],
+            include: ['/account', '/sell', '/sell/**', '/saved'],
             exclude: [
                 '/',
                 '/browse',

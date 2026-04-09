@@ -132,12 +132,16 @@
 </template>
 
 <script setup lang="ts">
+import { useNotificationEmail } from '~/composables/useNotificationEmail'
+
 const props = defineProps<{
     open: boolean
     listingId: string
     recipientId: string
     listingAddress: string
 }>()
+
+const { notify } = useNotificationEmail()
 
 const emit = defineEmits<{
     (e: 'close'): void
@@ -205,27 +209,32 @@ async function submit() {
     submitting.value = true
     error.value = null
 
-    const { error: insertError } = await supabase.from('messages').insert({
-        listing_id: props.listingId,
-        sender_id: user.value.id,
-        recipient_id: props.recipientId,
-        body: buildBody(),
-        kind: 'viewing_request',
-        payload: {
-            status: 'pending',
-            date_primary: form.date1,
-            date_backup: form.date2 || null,
-            time_of_day: form.timeOfDay,
-            party_size: form.partySize,
-            note: form.note || null,
-        },
-    })
+    const { data: inserted, error: insertError } = await supabase
+        .from('messages')
+        .insert({
+            listing_id: props.listingId,
+            sender_id: user.value.id,
+            recipient_id: props.recipientId,
+            body: buildBody(),
+            kind: 'viewing_request',
+            payload: {
+                status: 'pending',
+                date_primary: form.date1,
+                date_backup: form.date2 || null,
+                time_of_day: form.timeOfDay,
+                party_size: form.partySize,
+                note: form.note || null,
+            },
+        })
+        .select('id')
+        .single()
 
     submitting.value = false
     if (insertError) {
         error.value = insertError.message
         return
     }
+    if (inserted?.id) await notify(inserted.id)
     emit('sent')
     router.push(`/inbox/${props.listingId}/${props.recipientId}`)
 }
