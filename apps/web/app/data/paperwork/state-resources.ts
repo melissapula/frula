@@ -64,7 +64,7 @@ export const STATE_RESOURCES: StateResource[] = [
         code: 'CT',
         name: 'Connecticut',
         commissionName: 'Connecticut Real Estate Commission',
-        url: 'https://portal.ct.gov/dcp/license-services-division/real-estate/real-estate-licensing',
+        url: 'https://portal.ct.gov/dcp/occupational-and-professional-division/occupational-boards/connecticut-real-estate-commission',
     },
     {
         code: 'DE',
@@ -106,7 +106,7 @@ export const STATE_RESOURCES: StateResource[] = [
         code: 'IN',
         name: 'Indiana',
         commissionName: 'Indiana Real Estate Commission',
-        url: 'https://www.in.gov/pla/professions/real-estate-commission-home/',
+        url: 'https://www.in.gov/pla/professions/real-estate-home/',
     },
     {
         code: 'IA',
@@ -118,7 +118,7 @@ export const STATE_RESOURCES: StateResource[] = [
         code: 'KS',
         name: 'Kansas',
         commissionName: 'Kansas Real Estate Commission',
-        url: 'https://krec.ks.gov/',
+        url: 'https://www.krec.ks.gov/',
     },
     {
         code: 'KY',
@@ -136,7 +136,7 @@ export const STATE_RESOURCES: StateResource[] = [
         code: 'ME',
         name: 'Maine',
         commissionName: 'Maine Real Estate Commission',
-        url: 'https://www.maine.gov/pfr/professionallicensing/professions/real-estate',
+        url: 'https://www.maine.gov/pfr/professionallicensing/professions/real-estate-commission',
     },
     {
         code: 'MD',
@@ -155,13 +155,13 @@ export const STATE_RESOURCES: StateResource[] = [
         code: 'MI',
         name: 'Michigan',
         commissionName: 'Michigan Board of Real Estate Brokers and Salespersons',
-        url: 'https://www.michigan.gov/lara/bureau-list/bpl/occ/prof/realestate',
+        url: 'https://www.michigan.gov/lara/bureau-list/bpl/occ/prof/real-estate',
     },
     {
         code: 'MN',
         name: 'Minnesota',
         commissionName: 'Minnesota Department of Commerce',
-        url: 'https://mn.gov/commerce/industries/real-estate/',
+        url: 'https://mn.gov/commerce/business/real-estate/index.jsp',
     },
     {
         code: 'MS',
@@ -179,7 +179,7 @@ export const STATE_RESOURCES: StateResource[] = [
         code: 'MT',
         name: 'Montana',
         commissionName: 'Montana Board of Realty Regulation',
-        url: 'https://boards.bsd.dli.mt.gov/realestate',
+        url: 'https://boards.bsd.dli.mt.gov/realty-regulation/',
     },
     {
         code: 'NE',
@@ -197,7 +197,7 @@ export const STATE_RESOURCES: StateResource[] = [
         code: 'NH',
         name: 'New Hampshire',
         commissionName: 'New Hampshire Real Estate Commission',
-        url: 'https://www.oplc.nh.gov/real-estate',
+        url: 'https://www.oplc.nh.gov/find-board/nh-real-estate-commission',
     },
     {
         code: 'NJ',
@@ -233,7 +233,7 @@ export const STATE_RESOURCES: StateResource[] = [
         code: 'OH',
         name: 'Ohio',
         commissionName: 'Ohio Division of Real Estate and Professional Licensing',
-        url: 'https://com.ohio.gov/divisions-and-programs/real-estate-and-professional-licensing/real-estate-and-professional-licensing',
+        url: 'https://elicense3.com.ohio.gov/',
     },
     {
         code: 'OK',
@@ -317,7 +317,7 @@ export const STATE_RESOURCES: StateResource[] = [
         code: 'WI',
         name: 'Wisconsin',
         commissionName: 'Wisconsin Real Estate Examining Board',
-        url: 'https://dsps.wi.gov/Pages/Professions/RealEstateBroker/Default.aspx',
+        url: 'https://dsps.wi.gov/Pages/BoardsCouncils/RealEstate/Default.aspx',
     },
     {
         code: 'WY',
