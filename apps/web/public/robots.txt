@@ -1,2 +1,32 @@
+# Frula Homes — robots.txt
+# Allow crawling of all public pages; block private/auth pages.
+
 User-Agent: *
-Disallow:
+Allow: /
+Allow: /browse
+Allow: /dream-home
+Allow: /paperwork
+Allow: /paperwork/*
+Allow: /listing/*
+Allow: /how-we-make-money
+Allow: /privacy
+Allow: /terms
+
+# Auth + private pages — no value in search results
+Disallow: /account
+Disallow: /sell
+Disallow: /inbox
+Disallow: /inbox/*
+Disallow: /saved
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /confirm
+Disallow: /transaction
+Disallow: /transaction/*
+
+# API routes — never index
+Disallow: /api/
+
+Sitemap: https://frulahomes.com/sitemap.xml
