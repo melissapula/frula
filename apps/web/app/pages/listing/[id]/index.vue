@@ -474,18 +474,11 @@ const VIEW_LABELS: Record<string, string> = {
     golf: 'Golf course view',
 }
 
-const FEATURE_LABELS: Record<string, string> = {
-    pool: 'Pool',
-    fireplace: 'Fireplace',
-    central_ac: 'Central A/C',
-    deck: 'Deck / patio',
-    fenced_yard: 'Fenced yard',
-    updated_kitchen: 'Updated kitchen',
-    new_roof: 'New roof',
-    solar: 'Solar',
-    ev_charger: 'EV charger',
-    dock: 'Dock',
-}
+// Build feature labels dynamically from the grouped source of truth
+import { FEATURE_GROUPS } from '~/types/listing'
+const FEATURE_LABELS: Record<string, string> = Object.fromEntries(
+    FEATURE_GROUPS.flatMap((g) => g.options.map((o) => [o.value, o.label])),
+)
 
 const TERRAIN_LABELS: Record<string, string> = {
     wooded: 'Wooded',

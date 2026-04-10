@@ -222,19 +222,31 @@
                         </div>
                     </Field>
 
-                    <Field label="Features (select all that apply)">
-                        <div class="flex flex-wrap gap-2">
-                            <button
-                                v-for="f in FEATURE_OPTIONS"
-                                :key="f.value"
-                                type="button"
-                                :class="chipClass(form.features.includes(f.value))"
-                                @click="toggleArray('features', f.value)"
-                            >
-                                {{ f.label }}
-                            </button>
+                    <div>
+                        <p
+                            class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
+                            Features (select all that apply)
+                        </p>
+                        <div class="space-y-4">
+                            <div v-for="group in FEATURE_GROUPS" :key="group.label">
+                                <p class="mb-2 text-xs font-medium text-slate-600">
+                                    {{ group.label }}
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    <button
+                                        v-for="f in group.options"
+                                        :key="f.value"
+                                        type="button"
+                                        :class="chipClass(form.features.includes(f.value))"
+                                        @click="toggleArray('features', f.value)"
+                                    >
+                                        {{ f.label }}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </Field>
+                    </div>
                 </Section>
 
                 <!-- Land-specific -->
@@ -397,7 +409,7 @@
 import { US_STATES } from '~/composables/useStates'
 import {
     VIEW_OPTIONS,
-    FEATURE_OPTIONS,
+    FEATURE_GROUPS,
     TERRAIN_OPTIONS,
     ROAD_ACCESS_OPTIONS,
     UTILITY_OPTIONS,

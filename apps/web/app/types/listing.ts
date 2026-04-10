@@ -105,18 +105,83 @@ export const UTILITY_OPTIONS = [
     { value: 'internet', label: 'Internet / fiber' },
 ] as const
 
-export const FEATURE_OPTIONS = [
-    { value: 'pool', label: 'Pool' },
-    { value: 'fireplace', label: 'Fireplace' },
-    { value: 'central_ac', label: 'Central A/C' },
-    { value: 'deck', label: 'Deck / patio' },
-    { value: 'fenced_yard', label: 'Fenced yard' },
-    { value: 'updated_kitchen', label: 'Updated kitchen' },
-    { value: 'new_roof', label: 'New roof' },
-    { value: 'solar', label: 'Solar' },
-    { value: 'ev_charger', label: 'EV charger' },
-    { value: 'dock', label: 'Dock' },
+/**
+ * Grouped feature options for the sell form, Dream Home finder, and
+ * browse filters. All stored as flat strings in the `features TEXT[]`
+ * column — the grouping is purely a UI concern.
+ */
+export interface FeatureGroup {
+    label: string
+    options: readonly { value: string; label: string }[]
+}
+
+export const FEATURE_GROUPS: readonly FeatureGroup[] = [
+    {
+        label: 'Interior layout',
+        options: [
+            { value: 'open_concept', label: 'Open concept' },
+            { value: 'main_level_master', label: 'Main-level primary bedroom' },
+            { value: 'master_ensuite', label: 'Primary bedroom with en-suite bath' },
+            { value: 'walk_in_closet', label: 'Walk-in closet' },
+            { value: 'mud_room', label: 'Mud room' },
+            { value: 'walk_in_pantry', label: 'Walk-in pantry' },
+            { value: 'main_level_laundry', label: 'Main-level laundry' },
+            { value: 'bonus_room', label: 'Bonus / flex room' },
+            { value: 'home_office', label: 'Dedicated home office' },
+            { value: 'in_law_suite', label: 'In-law suite / ADU' },
+            { value: 'hardwood_floors', label: 'Hardwood floors' },
+        ],
+    },
+    {
+        label: 'Kitchen & bath',
+        options: [
+            { value: 'updated_kitchen', label: 'Updated kitchen' },
+            { value: 'granite_quartz', label: 'Granite / quartz countertops' },
+            { value: 'stainless_appliances', label: 'Stainless steel appliances' },
+            { value: 'kitchen_island', label: 'Kitchen island' },
+            { value: 'double_vanity', label: 'Double vanity in primary bath' },
+        ],
+    },
+    {
+        label: 'Outdoor',
+        options: [
+            { value: 'deck', label: 'Deck / patio' },
+            { value: 'fenced_yard', label: 'Fenced yard' },
+            { value: 'pool', label: 'Pool' },
+            { value: 'covered_porch', label: 'Covered porch' },
+            { value: 'screened_porch', label: 'Screened porch / 3-season' },
+            { value: 'outdoor_kitchen', label: 'Outdoor kitchen' },
+            { value: 'fire_pit', label: 'Fire pit' },
+            { value: 'dock', label: 'Dock' },
+            { value: 'rv_parking', label: 'RV parking' },
+            { value: 'workshop', label: 'Workshop / outbuilding' },
+        ],
+    },
+    {
+        label: 'Energy & technology',
+        options: [
+            { value: 'central_ac', label: 'Central A/C' },
+            { value: 'fireplace', label: 'Fireplace' },
+            { value: 'new_roof', label: 'New roof' },
+            { value: 'solar', label: 'Solar panels' },
+            { value: 'ev_charger', label: 'EV charger' },
+            { value: 'smart_home', label: 'Smart home / automation' },
+            { value: 'generator', label: 'Backup generator' },
+        ],
+    },
+    {
+        label: 'Specialty rooms',
+        options: [
+            { value: 'theater', label: 'Theater / media room' },
+            { value: 'wine_cellar', label: 'Wine cellar' },
+            { value: 'storm_shelter', label: 'Storm shelter / safe room' },
+            { value: 'sunroom', label: 'Sunroom' },
+        ],
+    },
 ] as const
+
+/** Flat list for backwards compatibility with components that don't use groups */
+export const FEATURE_OPTIONS = FEATURE_GROUPS.flatMap((g) => g.options)
 
 export interface ListingFilters {
     // Location

@@ -80,23 +80,25 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600"
-                                    >Min beds</label
+                                    >Ideal bedrooms</label
                                 >
                                 <input
-                                    v-model.number="prefs.minBeds"
+                                    v-model.number="prefs.idealBeds"
                                     type="number"
                                     min="0"
+                                    placeholder="e.g. 4"
                                     class="input mt-1"
                                 />
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-600"
-                                    >Min baths</label
+                                    >Ideal bathrooms</label
                                 >
                                 <input
-                                    v-model.number="prefs.minBaths"
+                                    v-model.number="prefs.idealBaths"
                                     type="number"
                                     min="0"
+                                    placeholder="e.g. 2"
                                     class="input mt-1"
                                 />
                             </div>
@@ -192,16 +194,25 @@
 
                         <div>
                             <label class="block text-xs font-medium text-slate-600">Features</label>
-                            <div class="mt-1.5 flex flex-wrap gap-1.5">
-                                <button
-                                    v-for="f in FEATURE_OPTIONS"
-                                    :key="f.value"
-                                    type="button"
-                                    :class="chip(prefs.features.includes(f.value))"
-                                    @click="toggle('features', f.value)"
-                                >
-                                    {{ f.label }}
-                                </button>
+                            <div class="mt-2 space-y-3">
+                                <div v-for="group in FEATURE_GROUPS" :key="group.label">
+                                    <p
+                                        class="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400"
+                                    >
+                                        {{ group.label }}
+                                    </p>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <button
+                                            v-for="f in group.options"
+                                            :key="f.value"
+                                            type="button"
+                                            :class="chip(prefs.features.includes(f.value))"
+                                            @click="toggle('features', f.value)"
+                                        >
+                                            {{ f.label }}
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -352,7 +363,7 @@
 
 <script setup lang="ts">
 import type { Listing } from '~/types/listing'
-import { VIEW_OPTIONS, FEATURE_OPTIONS, TERRAIN_OPTIONS } from '~/types/listing'
+import { VIEW_OPTIONS, FEATURE_GROUPS, TERRAIN_OPTIONS } from '~/types/listing'
 import { US_STATES } from '~/composables/useStates'
 
 const supabase = useSupabaseClient()
@@ -364,8 +375,8 @@ interface DreamPrefs {
     state?: string
     propertyType?: string
     // Soft prefs
-    minBeds?: number
-    minBaths?: number
+    idealBeds?: number
+    idealBaths?: number
     minSqft?: number
     minAcres?: number
     minYearBuilt?: number
@@ -415,8 +426,8 @@ function reset() {
         maxPrice: undefined,
         state: undefined,
         propertyType: undefined,
-        minBeds: undefined,
-        minBaths: undefined,
+        idealBeds: undefined,
+        idealBaths: undefined,
         minSqft: undefined,
         minAcres: undefined,
         minYearBuilt: undefined,
@@ -474,13 +485,20 @@ function scoreListing(l: Listing): { score: number; matched: number; total: numb
     let matched = 0
     let total = 0
 
-    if (prefs.minBeds != null) {
+    // Beds/baths use proximity scoring: exact = 1.0, ±1 = 0.75, ±2 = 0.25, ±3+ = 0
+    if (prefs.idealBeds != null) {
         total++
-        if ((l.beds ?? 0) >= prefs.minBeds) matched++
+        const diff = Math.abs((l.beds ?? 0) - prefs.idealBeds)
+        if (diff === 0) matched += 1
+        else if (diff === 1) matched += 0.75
+        else if (diff === 2) matched += 0.25
     }
-    if (prefs.minBaths != null) {
+    if (prefs.idealBaths != null) {
         total++
-        if ((l.full_baths ?? 0) >= prefs.minBaths) matched++
+        const diff = Math.abs((l.full_baths ?? 0) - prefs.idealBaths)
+        if (diff === 0) matched += 1
+        else if (diff === 1) matched += 0.75
+        else if (diff === 2) matched += 0.25
     }
     if (prefs.minSqft != null) {
         total++

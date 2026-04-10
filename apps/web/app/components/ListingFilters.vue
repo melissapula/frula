@@ -337,21 +337,30 @@
                 </div>
             </div>
 
-            <!-- Features -->
+            <!-- Features (grouped) -->
             <div>
                 <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
                     >Features</label
                 >
-                <div class="mt-2 flex flex-wrap gap-2">
-                    <button
-                        v-for="f in FEATURE_OPTIONS"
-                        :key="f.value"
-                        type="button"
-                        :class="chipClass(local.features?.includes(f.value))"
-                        @click="toggleArrayValue('features', f.value)"
-                    >
-                        {{ f.label }}
-                    </button>
+                <div class="mt-2 space-y-3">
+                    <div v-for="group in FEATURE_GROUPS" :key="group.label">
+                        <p
+                            class="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400"
+                        >
+                            {{ group.label }}
+                        </p>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button
+                                v-for="f in group.options"
+                                :key="f.value"
+                                type="button"
+                                :class="chipClass(local.features?.includes(f.value))"
+                                @click="toggleArrayValue('features', f.value)"
+                            >
+                                {{ f.label }}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -469,7 +478,7 @@
 import type { ListingFilters } from '~/types/listing'
 import {
     VIEW_OPTIONS,
-    FEATURE_OPTIONS,
+    FEATURE_GROUPS,
     TERRAIN_OPTIONS,
     ROAD_ACCESS_OPTIONS,
     UTILITY_OPTIONS,

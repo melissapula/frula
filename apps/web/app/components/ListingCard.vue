@@ -177,18 +177,10 @@ const TYPE_LABELS: Record<string, string> = {
     commercial: 'Commercial',
 }
 
-const FEATURE_LABELS: Record<string, string> = {
-    pool: 'Pool',
-    fireplace: 'Fireplace',
-    central_ac: 'Central A/C',
-    deck: 'Deck',
-    fenced_yard: 'Fenced yard',
-    updated_kitchen: 'Updated kitchen',
-    new_roof: 'New roof',
-    solar: 'Solar',
-    ev_charger: 'EV charger',
-    dock: 'Dock',
-}
+import { FEATURE_GROUPS } from '~/types/listing'
+const FEATURE_LABELS: Record<string, string> = Object.fromEntries(
+    FEATURE_GROUPS.flatMap((g) => g.options.map((o) => [o.value, o.label])),
+)
 
 const VIEW_LABELS: Record<string, string> = {
     water: 'Water view',
