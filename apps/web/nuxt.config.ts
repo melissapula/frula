@@ -61,6 +61,7 @@ export default defineNuxtConfig({
                 '/how-we-make-money',
                 '/privacy',
                 '/terms',
+                '/seller/**',
             ],
             cookieRedirect: false,
         },

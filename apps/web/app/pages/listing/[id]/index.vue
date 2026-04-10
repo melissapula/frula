@@ -300,12 +300,13 @@
                             {{ formatPrice(Math.round(listing.price / listing.sqft)) }}/sqft
                         </p>
 
-                        <div
-                            class="bg-brand-50 text-brand-700 mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
+                        <NuxtLink
+                            :to="`/seller/${listing.user_id}`"
+                            class="bg-brand-50 text-brand-700 hover:bg-brand-100 mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold transition"
                         >
                             <span class="bg-brand h-2 w-2 rounded-full"></span>
-                            For Sale By Owner
-                        </div>
+                            For Sale By Owner — view seller profile →
+                        </NuxtLink>
 
                         <div v-if="!isOwnListing" class="mt-6 space-y-2">
                             <button
