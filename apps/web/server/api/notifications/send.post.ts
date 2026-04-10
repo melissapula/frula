@@ -202,6 +202,7 @@ export default defineEventHandler(async (event) => {
             body: {
                 from: config.emailFrom,
                 to: recipient.email,
+                reply_to: config.emailReplyTo || undefined,
                 subject,
                 html,
             },

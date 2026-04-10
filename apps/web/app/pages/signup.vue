@@ -131,13 +131,28 @@ async function signUp() {
         return
     }
 
-    // If email confirmation is on, session will be null until they click the link
+    // If email confirmation is on, session will be null until they click the link.
+    // The welcome email gets sent from /confirm.vue once they're authenticated.
     if (!data.session) {
         success.value = 'Check your inbox to confirm your email address.'
         return
     }
 
+    // Email confirmation disabled in Supabase project settings → user is
+    // already authenticated. Fire the welcome email now (idempotent — the
+    // server route uses a `welcomed_at` flag so this is safe to call from
+    // multiple places).
+    fireWelcome()
+
     await router.replace('/account')
+}
+
+async function fireWelcome() {
+    try {
+        await $fetch('/api/notifications/welcome', { method: 'POST' })
+    } catch {
+        // Non-fatal — don't block the signup flow on a missed welcome email
+    }
 }
 
 useSeoMeta({ title: 'Sign up — Frula Homes' })

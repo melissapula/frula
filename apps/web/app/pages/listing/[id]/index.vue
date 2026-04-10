@@ -272,6 +272,22 @@
                             :address="listing.address"
                         />
                     </div>
+
+                    <!-- Mortgage calculator (skip for land — different financing world) -->
+                    <div v-if="listing.property_type !== 'land'" class="mt-8">
+                        <MortgageCalculator :initial-price="listing.price" />
+                    </div>
+
+                    <!-- Share this listing -->
+                    <div class="mt-8">
+                        <ShareButtons
+                            :listing-id="listing.id"
+                            :address="listing.address"
+                            :city="listing.city"
+                            :state="listing.state"
+                            :price="listing.price"
+                        />
+                    </div>
                 </div>
 
                 <!-- Sticky sidebar -->

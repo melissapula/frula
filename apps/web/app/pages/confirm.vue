@@ -13,7 +13,20 @@ definePageMeta({ layout: false })
 const user = useSupabaseUser()
 const router = useRouter()
 
-watchEffect(() => {
-    if (user.value) router.replace('/account')
+// Fire the welcome email once the user is confirmed + authenticated.
+// Idempotent via `welcomed_at` — safe to call from here AND from /signup.
+const firedWelcome = ref(false)
+watchEffect(async () => {
+    if (user.value) {
+        if (!firedWelcome.value) {
+            firedWelcome.value = true
+            try {
+                await $fetch('/api/notifications/welcome', { method: 'POST' })
+            } catch {
+                // Non-fatal
+            }
+        }
+        router.replace('/account')
+    }
 })
 </script>

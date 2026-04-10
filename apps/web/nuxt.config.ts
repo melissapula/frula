@@ -31,6 +31,7 @@ export default defineNuxtConfig({
         // Server-only secrets (never exposed to the browser)
         resendApiKey: process.env.RESEND_API_KEY,
         emailFrom: process.env.EMAIL_FROM || 'Frula Homes <noreply@frulahomes.com>',
+        emailReplyTo: process.env.EMAIL_REPLY_TO || '',
         public: {
             mapboxToken: process.env.MAPBOX_TOKEN,
             cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
