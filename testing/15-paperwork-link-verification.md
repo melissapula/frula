@@ -121,62 +121,8 @@ Verify each state commission link loads. If you find a direct "forms" or "consum
 
 ---
 
-## Per-State Document Hunt
-
-For each state, try to find direct links to these key documents. Not every state will have all of them — some states don't provide standardized forms. Note what you find and what doesn't exist.
-
-### What to look for on each state's site:
-
-- [ ] **Seller's Property Disclosure form** — the state-required disclosure sellers must fill out
-- [ ] **Residential Purchase Agreement** — standardized purchase contract (many states don't have one — REALTOR associations provide them instead)
-- [ ] **Lead paint disclosure** — state-specific version or addendum (federal form covers most)
-- [ ] **Consumer guide for FSBO** — any "selling without an agent" resources
-- [ ] **License lookup tool** — URL for verifying a real estate professional's license
-- [ ] **Complaint/consumer protection page** — where buyers/sellers can file complaints
-
-### States with known FSBO-friendly resources (check these first):
-
-- [ ] **Texas** — TREC provides standardized contracts anyone can use (not just agents)
-- [ ] **California** — DRE has extensive consumer resources
-- [ ] **Florida** — good consumer-facing forms section
-- [ ] **Minnesota** — Commerce dept has consumer real estate pages
-- [ ] **New York** — DOS has disclosure forms publicly available
-- [ ] **Ohio** — has transaction forms and disclosures section
-- [ ] **North Carolina** — NCREC has standardized forms
-- [ ] **Georgia** — GREC has disclosure forms available
-
----
-
-## Concept Guide Links
-
-Verify that each concept guide's `officialPdfUrl` still works:
-
-- [ ] **Seller's Property Disclosure** — concept guide (no single federal link — state-specific)
-- [ ] **Purchase Agreement** — concept guide (no single federal link — state-specific)
-- [ ] **Title Insurance** — concept guide (no single federal link — varies by provider)
-- [ ] **Home Inspection** — concept guide (no single federal link — varies)
-- [ ] **Deed Types** — concept guide (no single federal link — county-level)
-
----
-
-## When you find a direct form link
-
-Update `state-resources.ts` — change the `url` field to point to the forms page rather than the commission homepage. Example:
-
-```typescript
-// Before:
-url: 'https://www.trec.texas.gov/',
-
-// After (if you find a direct forms page):
-url: 'https://www.trec.texas.gov/forms',
-```
-
-For federal guides, update `officialPdfUrl` in `guides.ts`.
-
----
-
 ## Notes
 
 - Some state commissions block automated requests (403) — the link checker flags these as warnings, not failures. They work fine in a browser.
-- If a state doesn't provide standardized forms (they rely on REALTOR association forms instead), that's fine — just verify the commission link works and note it.
-- Don't link to REALTOR association forms — those typically require membership. Only link to official state/government sources.
+- The daily GitHub Actions link checker (`scripts/check-paperwork-links.mjs`) will catch future breakage automatically once pushed to GitHub.
+- If a link is broken, update the URL in `state-resources.ts` or `guides.ts`.
