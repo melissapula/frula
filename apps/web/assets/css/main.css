@@ -9,6 +9,11 @@
 html {
     font-family: 'DM Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+body {
+    overflow-x: hidden;
 }
 
 h1,

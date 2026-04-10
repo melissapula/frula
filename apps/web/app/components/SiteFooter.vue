@@ -33,6 +33,11 @@
                         <li>
                             <NuxtLink to="/saved" class="hover:text-brand">Saved homes</NuxtLink>
                         </li>
+                        <li>
+                            <NuxtLink to="/checklist/buyer-guide" class="hover:text-brand"
+                                >Buyer's guide</NuxtLink
+                            >
+                        </li>
                     </ul>
                 </div>
 
@@ -44,6 +49,11 @@
                     <ul class="mt-3 space-y-2 text-sm text-slate-700">
                         <li>
                             <NuxtLink to="/sell" class="hover:text-brand">List your home</NuxtLink>
+                        </li>
+                        <li>
+                            <NuxtLink to="/checklist/seller-prep" class="hover:text-brand"
+                                >Seller prep checklist</NuxtLink
+                            >
                         </li>
                         <li>
                             <NuxtLink to="/paperwork" class="hover:text-brand"

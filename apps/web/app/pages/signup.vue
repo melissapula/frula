@@ -108,8 +108,12 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 const success = ref<string | null>(null)
 
+// If the user is already logged in (e.g. navigating back to /signup),
+// redirect immediately. But skip during signup flow so fireWelcome()
+// can complete before navigating.
+const skipAutoRedirect = ref(false)
 watchEffect(() => {
-    if (user.value) router.replace('/account')
+    if (user.value && !skipAutoRedirect.value) router.replace('/account')
 })
 
 async function signUp() {
@@ -117,11 +121,15 @@ async function signUp() {
     success.value = null
     loading.value = true
 
+    const emailRedirectTo =
+        typeof window !== 'undefined' ? `${window.location.origin}/confirm` : undefined
+
     const { data, error: signUpError } = await supabase.auth.signUp({
         email: email.value,
         password: password.value,
         options: {
             data: { full_name: fullName.value },
+            emailRedirectTo,
         },
     })
     loading.value = false
@@ -141,8 +149,9 @@ async function signUp() {
     // Email confirmation disabled in Supabase project settings → user is
     // already authenticated. Fire the welcome email now (idempotent — the
     // server route uses a `welcomed_at` flag so this is safe to call from
-    // multiple places).
-    fireWelcome()
+    // multiple places). Block the watchEffect redirect until this completes.
+    skipAutoRedirect.value = true
+    await fireWelcome()
 
     await router.replace('/account')
 }

@@ -89,6 +89,7 @@
                     class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95"
                     role="dialog"
                     aria-modal="true"
+                    tabindex="-1"
                     @click.self="closeLightbox"
                     @keydown.escape="closeLightbox"
                     @keydown.left="lightboxPrev"
@@ -111,11 +112,21 @@
                         </svg>
                     </button>
 
-                    <!-- Counter -->
-                    <div
-                        class="absolute left-4 top-4 rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-white"
-                    >
-                        {{ lightboxIndex + 1 }} / {{ photos.length }}
+                    <!-- Counter + "View all" button -->
+                    <div class="absolute left-4 top-4 flex items-center gap-3">
+                        <div
+                            class="rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-white"
+                        >
+                            {{ lightboxIndex + 1 }} / {{ photos.length }}
+                        </div>
+                        <button
+                            v-if="photos.length > 1"
+                            type="button"
+                            class="rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-white/20"
+                            @click="galleryOpen = true"
+                        >
+                            View all photos
+                        </button>
                     </div>
 
                     <!-- Prev / next arrows -->
@@ -136,11 +147,12 @@
                         ›
                     </button>
 
-                    <!-- The image -->
+                    <!-- The image — click opens full scrollable gallery -->
                     <img
                         :src="photos[lightboxIndex]?.url"
                         :alt="`${title} — photo ${lightboxIndex + 1}`"
-                        class="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
+                        class="max-h-[90vh] max-w-[90vw] cursor-pointer rounded-lg object-contain"
+                        @click="galleryOpen = true"
                     />
 
                     <!-- Thumbnail strip -->
@@ -170,6 +182,60 @@
                 </div>
             </Transition>
         </Teleport>
+
+        <!-- Full-page scrollable gallery -->
+        <Teleport to="body">
+            <Transition name="lightbox">
+                <div
+                    v-if="galleryOpen"
+                    class="fixed inset-0 z-[110] overflow-y-auto bg-black"
+                    @keydown.escape="galleryOpen = false"
+                    tabindex="-1"
+                    ref="galleryRef"
+                >
+                    <!-- Sticky header -->
+                    <div
+                        class="sticky top-0 z-10 flex items-center justify-between bg-black/80 px-4 py-3 backdrop-blur-sm md:px-8"
+                    >
+                        <p class="text-sm font-medium text-white">{{ photos.length }} photos</p>
+                        <button
+                            type="button"
+                            class="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
+                            aria-label="Close gallery"
+                            @click="galleryOpen = false"
+                        >
+                            <svg
+                                class="h-5 w-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Scrollable photo list -->
+                    <div class="mx-auto max-w-4xl space-y-4 px-4 pb-12 pt-4 md:px-8">
+                        <div v-for="(photo, i) in photos" :key="i">
+                            <img
+                                :src="photo.url"
+                                :alt="`${title} — photo ${i + 1}`"
+                                class="w-full rounded-lg object-contain"
+                            />
+                            <p class="mt-1 text-center text-xs text-white/50">
+                                {{ i + 1 }} / {{ photos.length }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </Transition>
+        </Teleport>
     </div>
 </template>
 
@@ -194,10 +260,13 @@ function next() {
 const lightboxOpen = ref(false)
 const lightboxIndex = ref(0)
 
+// Full-page gallery state
+const galleryOpen = ref(false)
+const galleryRef = ref<HTMLElement | null>(null)
+
 function openLightbox(index: number) {
     lightboxIndex.value = index
     lightboxOpen.value = true
-    // Focus the overlay so keyboard events work immediately
     nextTick(() => {
         const el = document.querySelector('[role="dialog"]') as HTMLElement | null
         el?.focus()
@@ -208,6 +277,18 @@ function closeLightbox() {
     lightboxOpen.value = false
 }
 
+watch(galleryOpen, (open) => {
+    if (open) {
+        nextTick(() => galleryRef.value?.focus())
+    }
+    if (!open && typeof document !== 'undefined') {
+        // Restore body scroll only if lightbox is also closed
+        if (!lightboxOpen.value) {
+            document.body.style.overflow = ''
+        }
+    }
+})
+
 function lightboxPrev() {
     lightboxIndex.value = (lightboxIndex.value - 1 + props.photos.length) % props.photos.length
 }
@@ -216,10 +297,10 @@ function lightboxNext() {
     lightboxIndex.value = (lightboxIndex.value + 1) % props.photos.length
 }
 
-// Prevent body scroll while lightbox is open
-watch(lightboxOpen, (open) => {
+// Prevent body scroll while lightbox or gallery is open
+watch([lightboxOpen, galleryOpen], ([lb, gal]) => {
     if (typeof document === 'undefined') return
-    document.body.style.overflow = open ? 'hidden' : ''
+    document.body.style.overflow = lb || gal ? 'hidden' : ''
 })
 
 // Cleanup on unmount

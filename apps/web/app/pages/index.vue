@@ -1,5 +1,17 @@
 <template>
-    <main>
+    <main class="relative">
+        <!-- Sign in / Sign up (top-right, logged-out only) -->
+        <div v-if="!user" class="fixed right-4 top-4 z-50 flex items-center gap-3 md:right-8">
+            <NuxtLink to="/login" class="text-sm font-medium text-slate-600 hover:text-slate-900"
+                >Sign in</NuxtLink
+            >
+            <NuxtLink
+                to="/signup"
+                class="bg-brand hover:bg-brand-600 rounded-full px-4 py-2 text-sm font-semibold text-white"
+                >Sign up</NuxtLink
+            >
+        </div>
+
         <!-- Hero -->
         <section class="from-brand-50 bg-gradient-to-b to-white px-6 pb-20 pt-16 md:pb-28 md:pt-24">
             <div class="mx-auto max-w-5xl text-center">
@@ -28,6 +40,21 @@
                         class="hover:border-brand hover:text-brand rounded-full border border-slate-300 px-8 py-4 text-base font-semibold text-slate-700 transition"
                     >
                         Browse Listings
+                    </NuxtLink>
+                </div>
+                <div v-if="!user" class="mt-6 flex items-center justify-center gap-3">
+                    <NuxtLink
+                        to="/login"
+                        class="hover:text-brand text-sm font-medium text-slate-600"
+                    >
+                        Sign in
+                    </NuxtLink>
+                    <span class="text-slate-300">|</span>
+                    <NuxtLink
+                        to="/signup"
+                        class="text-brand hover:text-brand-600 text-sm font-semibold"
+                    >
+                        Create an account
                     </NuxtLink>
                 </div>
             </div>
@@ -331,6 +358,8 @@
 </template>
 
 <script setup lang="ts">
+const user = useSupabaseUser()
+
 useSeoMeta({
     title: 'Frula Homes — Sell it yourself',
     description:

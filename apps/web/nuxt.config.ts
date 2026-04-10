@@ -62,6 +62,7 @@ export default defineNuxtConfig({
                 '/privacy',
                 '/terms',
                 '/seller/**',
+                '/checklist/**',
             ],
             cookieRedirect: false,
         },

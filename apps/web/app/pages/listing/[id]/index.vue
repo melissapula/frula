@@ -308,13 +308,20 @@
                             For Sale By Owner — view seller profile →
                         </NuxtLink>
 
-                        <div v-if="!isOwnListing" class="mt-6 space-y-2">
+                        <NuxtLink
+                            :to="`/listing/${listing.id}/cma`"
+                            class="hover:border-brand hover:text-brand mt-4 block w-full rounded-full border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition"
+                        >
+                            📊 View market snapshot
+                        </NuxtLink>
+                        <SaveButton :listing-id="listing.id" variant="full" />
+                        <div v-if="!isOwnListing" class="mt-2 space-y-2">
                             <button
                                 type="button"
-                                class="bg-brand hover:bg-brand-600 w-full rounded-full px-4 py-3 text-sm font-semibold text-white shadow-sm transition"
-                                @click="openOffer"
+                                class="hover:border-brand hover:text-brand w-full rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition"
+                                @click="contactSeller"
                             >
-                                💰 Make an offer
+                                💬 Contact seller
                             </button>
                             <button
                                 type="button"
@@ -325,13 +332,13 @@
                             </button>
                             <button
                                 type="button"
-                                class="hover:border-brand hover:text-brand w-full rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition"
-                                @click="contactSeller"
+                                class="bg-brand hover:bg-brand-600 w-full rounded-full px-4 py-3 text-sm font-semibold text-white shadow-sm transition"
+                                @click="openOffer"
                             >
-                                Contact seller
+                                💰 Make an offer
                             </button>
                         </div>
-                        <div v-else class="mt-6 space-y-2">
+                        <div v-else class="mt-2 space-y-2">
                             <p
                                 class="rounded-full bg-slate-100 px-4 py-2 text-center text-xs font-medium text-slate-500"
                             >
@@ -352,13 +359,6 @@
                                 {{ deleting ? 'Deleting…' : 'Delete listing' }}
                             </button>
                         </div>
-                        <SaveButton :listing-id="listing.id" variant="full" />
-                        <NuxtLink
-                            :to="`/listing/${listing.id}/cma`"
-                            class="hover:border-brand hover:text-brand mt-2 block w-full rounded-full border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition"
-                        >
-                            📊 View market snapshot
-                        </NuxtLink>
 
                         <p class="mt-4 text-xs text-slate-500">
                             Listed {{ daysOnMarket }} day{{ daysOnMarket === 1 ? '' : 's' }} ago

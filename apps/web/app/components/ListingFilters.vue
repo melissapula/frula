@@ -165,304 +165,382 @@
             </div>
         </div>
 
-        <!-- ============ ADVANCED TOGGLE ============ -->
+        <!-- ============ ADVANCED FILTERS BUTTON ============ -->
         <button
             type="button"
-            class="hover:border-brand hover:text-brand flex w-full items-center justify-between rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700"
-            @click="advancedOpen = !advancedOpen"
+            class="hover:border-brand hover:text-brand flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700"
+            @click="advancedOpen = true"
         >
-            <span>{{ advancedOpen ? 'Hide' : 'Show' }} advanced filters</span>
-            <svg
-                class="h-4 w-4 transition"
-                :class="{ 'rotate-180': advancedOpen }"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
+            Advanced filters
+            <span
+                v-if="advancedCount > 0"
+                class="bg-brand inline-flex min-w-[20px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none text-white"
             >
-                <path
-                    fill-rule="evenodd"
-                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                    clip-rule="evenodd"
-                />
-            </svg>
+                {{ advancedCount }}
+            </span>
         </button>
 
-        <!-- ============ ADVANCED ============ -->
-        <div v-if="advancedOpen" class="space-y-5 border-t border-slate-200 pt-5">
-            <!-- Specific property type -->
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >Property type</label
+        <!-- ============ ADVANCED FILTERS MODAL ============ -->
+        <Teleport to="body">
+            <div
+                v-if="advancedOpen"
+                class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm md:items-center"
+                @mousedown.self="advancedOpen = false"
+            >
+                <div
+                    class="relative my-4 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl"
                 >
-                <select
-                    v-model="local.propertyType"
-                    class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                >
-                    <option :value="undefined">Any</option>
-                    <option value="residential">Residential</option>
-                    <option value="condo">Condo</option>
-                    <option value="multi-family">Multi-family</option>
-                    <option value="land">Land</option>
-                    <option value="commercial">Commercial</option>
-                </select>
-            </div>
-
-            <!-- Square feet -->
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >Square feet</label
-                >
-                <div class="mt-1 grid grid-cols-2 gap-2">
-                    <input
-                        v-model.number="local.minSqft"
-                        type="number"
-                        placeholder="Min"
-                        class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                    />
-                    <input
-                        v-model.number="local.maxSqft"
-                        type="number"
-                        placeholder="Max"
-                        class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                    />
-                </div>
-            </div>
-
-            <!-- Lot size -->
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >Lot size (acres)</label
-                >
-                <div class="mt-1 grid grid-cols-2 gap-2">
-                    <input
-                        v-model.number="local.minLotAcres"
-                        type="number"
-                        step="0.1"
-                        placeholder="Min"
-                        class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                    />
-                    <input
-                        v-model.number="local.maxLotAcres"
-                        type="number"
-                        step="0.1"
-                        placeholder="Max"
-                        class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                    />
-                </div>
-            </div>
-
-            <!-- Year built -->
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >Year built</label
-                >
-                <div class="mt-1 grid grid-cols-2 gap-2">
-                    <input
-                        v-model.number="local.minYearBuilt"
-                        type="number"
-                        placeholder="Min year"
-                        class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                    />
-                    <input
-                        v-model.number="local.maxYearBuilt"
-                        type="number"
-                        placeholder="Max year"
-                        class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                    />
-                </div>
-            </div>
-
-            <!-- Stories -->
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >Stories (min)</label
-                >
-                <select
-                    v-model.number="local.stories"
-                    class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                >
-                    <option :value="undefined">Any</option>
-                    <option :value="1">1+</option>
-                    <option :value="1.5">1.5+</option>
-                    <option :value="2">2+</option>
-                    <option :value="3">3+</option>
-                </select>
-            </div>
-
-            <!-- Parking -->
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >Parking spaces (min)</label
-                >
-                <input
-                    v-model.number="local.minParkingSpaces"
-                    type="number"
-                    min="0"
-                    placeholder="Any"
-                    class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                />
-            </div>
-
-            <!-- Construction toggles -->
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >Must have</label
-                >
-                <div class="mt-2 space-y-2">
-                    <Toggle v-model="local.singleStory" label="Single story (no stairs)" />
-                    <Toggle v-model="local.garage" label="Garage" />
-                    <Toggle v-model="local.basement" label="Basement" />
-                    <Toggle v-model="local.basementFinished" label="Finished basement" />
-                    <Toggle v-model="local.noHoa" label="No HOA" />
-                    <Toggle v-model="local.waterfront" label="Waterfront" />
-                    <Toggle v-model="local.priceReducedOnly" label="Price reduced" />
-                </div>
-            </div>
-
-            <!-- Views -->
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >View</label
-                >
-                <div class="mt-2 flex flex-wrap gap-2">
-                    <button
-                        v-for="v in VIEW_OPTIONS"
-                        :key="v.value"
-                        type="button"
-                        :class="chipClass(local.views?.includes(v.value))"
-                        @click="toggleArrayValue('views', v.value)"
+                    <!-- Modal header -->
+                    <div
+                        class="sticky top-0 z-10 flex items-center justify-between rounded-t-2xl border-b border-slate-200 bg-white px-6 py-4"
                     >
-                        {{ v.label }}
-                    </button>
-                </div>
-            </div>
-
-            <!-- Features (grouped) -->
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >Features</label
-                >
-                <div class="mt-2 space-y-3">
-                    <div v-for="group in FEATURE_GROUPS" :key="group.label">
-                        <p
-                            class="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400"
+                        <h2 class="font-display text-lg font-bold text-slate-900">
+                            Advanced Filters
+                        </h2>
+                        <button
+                            type="button"
+                            class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                            @click="advancedOpen = false"
                         >
-                            {{ group.label }}
-                        </p>
-                        <div class="flex flex-wrap gap-1.5">
-                            <button
-                                v-for="f in group.options"
-                                :key="f.value"
-                                type="button"
-                                :class="chipClass(local.features?.includes(f.value))"
-                                @click="toggleArrayValue('features', f.value)"
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="max-h-[70vh] space-y-6 overflow-y-auto px-6 py-5">
+                        <!-- Property Details -->
+                        <section>
+                            <h3
+                                class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500"
                             >
-                                {{ f.label }}
-                            </button>
-                        </div>
+                                Property Details
+                            </h3>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Property type</label
+                                    >
+                                    <select
+                                        v-model="local.propertyType"
+                                        class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                                    >
+                                        <option :value="undefined">Any</option>
+                                        <option value="residential">Residential</option>
+                                        <option value="condo">Condo</option>
+                                        <option value="multi-family">Multi-family</option>
+                                        <option value="land">Land</option>
+                                        <option value="commercial">Commercial</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Stories (min)</label
+                                    >
+                                    <select
+                                        v-model.number="local.stories"
+                                        class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                                    >
+                                        <option :value="undefined">Any</option>
+                                        <option :value="1">1+</option>
+                                        <option :value="1.5">1.5+</option>
+                                        <option :value="2">2+</option>
+                                        <option :value="3">3+</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Square feet</label
+                                    >
+                                    <div class="mt-1 grid grid-cols-2 gap-2">
+                                        <input
+                                            v-model.number="local.minSqft"
+                                            type="number"
+                                            placeholder="Min"
+                                            class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                                        />
+                                        <input
+                                            v-model.number="local.maxSqft"
+                                            type="number"
+                                            placeholder="Max"
+                                            class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Lot size (acres)</label
+                                    >
+                                    <div class="mt-1 grid grid-cols-2 gap-2">
+                                        <input
+                                            v-model.number="local.minLotAcres"
+                                            type="number"
+                                            step="0.1"
+                                            placeholder="Min"
+                                            class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                                        />
+                                        <input
+                                            v-model.number="local.maxLotAcres"
+                                            type="number"
+                                            step="0.1"
+                                            placeholder="Max"
+                                            class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Year built</label
+                                    >
+                                    <div class="mt-1 grid grid-cols-2 gap-2">
+                                        <input
+                                            v-model.number="local.minYearBuilt"
+                                            type="number"
+                                            placeholder="Min"
+                                            class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                                        />
+                                        <input
+                                            v-model.number="local.maxYearBuilt"
+                                            type="number"
+                                            placeholder="Max"
+                                            class="focus:border-brand focus:ring-brand rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Parking spaces (min)</label
+                                    >
+                                    <input
+                                        v-model.number="local.minParkingSpaces"
+                                        type="number"
+                                        min="0"
+                                        placeholder="Any"
+                                        class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="block text-xs font-medium text-slate-600"
+                                    >Listed within</label
+                                >
+                                <select
+                                    v-model.number="local.daysOnMarketMax"
+                                    class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 sm:w-1/2"
+                                >
+                                    <option :value="undefined">Any time</option>
+                                    <option :value="1">Last 24 hours</option>
+                                    <option :value="7">Last 7 days</option>
+                                    <option :value="14">Last 14 days</option>
+                                    <option :value="30">Last 30 days</option>
+                                </select>
+                            </div>
+                        </section>
+
+                        <!-- Must Have -->
+                        <section class="border-t border-slate-100 pt-5">
+                            <h3
+                                class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Must Have
+                            </h3>
+                            <div class="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3">
+                                <Toggle v-model="local.singleStory" label="Single story" />
+                                <Toggle v-model="local.garage" label="Garage" />
+                                <Toggle v-model="local.basement" label="Basement" />
+                                <Toggle
+                                    v-model="local.basementFinished"
+                                    label="Finished basement"
+                                />
+                                <Toggle v-model="local.noHoa" label="No HOA" />
+                                <Toggle v-model="local.waterfront" label="Waterfront" />
+                                <Toggle v-model="local.priceReducedOnly" label="Price reduced" />
+                            </div>
+                        </section>
+
+                        <!-- Views -->
+                        <section class="border-t border-slate-100 pt-5">
+                            <h3
+                                class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Views
+                            </h3>
+                            <div class="flex flex-wrap gap-2">
+                                <button
+                                    v-for="v in VIEW_OPTIONS"
+                                    :key="v.value"
+                                    type="button"
+                                    :class="chipClass(local.views?.includes(v.value))"
+                                    @click="toggleArrayValue('views', v.value)"
+                                >
+                                    {{ v.label }}
+                                </button>
+                            </div>
+                        </section>
+
+                        <!-- Features -->
+                        <section class="border-t border-slate-100 pt-5">
+                            <h3
+                                class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Features
+                            </h3>
+                            <div class="space-y-3">
+                                <div v-for="group in FEATURE_GROUPS" :key="group.label">
+                                    <p
+                                        class="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400"
+                                    >
+                                        {{ group.label }}
+                                    </p>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <button
+                                            v-for="f in group.options"
+                                            :key="f.value"
+                                            type="button"
+                                            :class="chipClass(local.features?.includes(f.value))"
+                                            @click="toggleArrayValue('features', f.value)"
+                                        >
+                                            {{ f.label }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Water & Sewer -->
+                        <section class="border-t border-slate-100 pt-5">
+                            <h3
+                                class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Water & Sewer
+                            </h3>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Water source</label
+                                    >
+                                    <select
+                                        v-model="local.waterSource"
+                                        class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                                    >
+                                        <option :value="undefined">Any</option>
+                                        <option value="city">City</option>
+                                        <option value="well">Well</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Sewer type</label
+                                    >
+                                    <select
+                                        v-model="local.sewerType"
+                                        class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                                    >
+                                        <option :value="undefined">Any</option>
+                                        <option value="city">City</option>
+                                        <option value="septic">Septic</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Land -->
+                        <section class="border-t border-slate-100 pt-5">
+                            <h3
+                                class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >
+                                Land
+                            </h3>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600"
+                                    >Terrain</label
+                                >
+                                <div class="mt-1.5 flex flex-wrap gap-2">
+                                    <button
+                                        v-for="t in TERRAIN_OPTIONS"
+                                        :key="t.value"
+                                        type="button"
+                                        :class="chipClass(local.terrain?.includes(t.value))"
+                                        @click="toggleArrayValue('terrain', t.value)"
+                                    >
+                                        {{ t.label }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="block text-xs font-medium text-slate-600"
+                                    >Road access</label
+                                >
+                                <select
+                                    v-model="local.roadAccess"
+                                    class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 sm:w-1/2"
+                                >
+                                    <option :value="undefined">Any</option>
+                                    <option
+                                        v-for="r in ROAD_ACCESS_OPTIONS"
+                                        :key="r.value"
+                                        :value="r.value"
+                                    >
+                                        {{ r.label }}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="block text-xs font-medium text-slate-600"
+                                    >Utilities at lot</label
+                                >
+                                <div class="mt-1.5 flex flex-wrap gap-2">
+                                    <button
+                                        v-for="u in UTILITY_OPTIONS"
+                                        :key="u.value"
+                                        type="button"
+                                        :class="chipClass(local.utilities?.includes(u.value))"
+                                        @click="toggleArrayValue('utilities', u.value)"
+                                    >
+                                        {{ u.label }}
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
                     </div>
-                </div>
-            </div>
 
-            <!-- Water / sewer -->
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label
-                        class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                        >Water</label
+                    <!-- Modal footer -->
+                    <div
+                        class="sticky bottom-0 flex items-center justify-between rounded-b-2xl border-t border-slate-200 bg-white px-6 py-4"
                     >
-                    <select
-                        v-model="local.waterSource"
-                        class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                    >
-                        <option :value="undefined">Any</option>
-                        <option value="city">City</option>
-                        <option value="well">Well</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div>
-                    <label
-                        class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                        >Sewer</label
-                    >
-                    <select
-                        v-model="local.sewerType"
-                        class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                    >
-                        <option :value="undefined">Any</option>
-                        <option value="city">City</option>
-                        <option value="septic">Septic</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- ===== Land-specific ===== -->
-            <div class="rounded-xl bg-slate-50 p-3">
-                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Land</p>
-
-                <div class="mt-3">
-                    <label class="block text-xs font-medium text-slate-600">Terrain</label>
-                    <div class="mt-1.5 flex flex-wrap gap-2">
                         <button
-                            v-for="t in TERRAIN_OPTIONS"
-                            :key="t.value"
                             type="button"
-                            :class="chipClass(local.terrain?.includes(t.value))"
-                            @click="toggleArrayValue('terrain', t.value)"
+                            class="text-sm font-medium text-slate-500 hover:text-slate-700"
+                            @click="clearAdvanced"
                         >
-                            {{ t.label }}
+                            Clear advanced filters
+                        </button>
+                        <button
+                            type="button"
+                            class="bg-brand hover:bg-brand-600 rounded-full px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition"
+                            @click="advancedOpen = false"
+                        >
+                            Apply filters
                         </button>
                     </div>
                 </div>
-
-                <div class="mt-3">
-                    <label class="block text-xs font-medium text-slate-600">Road access</label>
-                    <select
-                        v-model="local.roadAccess"
-                        class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                    >
-                        <option :value="undefined">Any</option>
-                        <option v-for="r in ROAD_ACCESS_OPTIONS" :key="r.value" :value="r.value">
-                            {{ r.label }}
-                        </option>
-                    </select>
-                </div>
-
-                <div class="mt-3">
-                    <label class="block text-xs font-medium text-slate-600">Utilities at lot</label>
-                    <div class="mt-1.5 flex flex-wrap gap-2">
-                        <button
-                            v-for="u in UTILITY_OPTIONS"
-                            :key="u.value"
-                            type="button"
-                            :class="chipClass(local.utilities?.includes(u.value))"
-                            @click="toggleArrayValue('utilities', u.value)"
-                        >
-                            {{ u.label }}
-                        </button>
-                    </div>
-                </div>
             </div>
-
-            <!-- Days on market -->
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                    >Listed within</label
-                >
-                <select
-                    v-model.number="local.daysOnMarketMax"
-                    class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                >
-                    <option :value="undefined">Any time</option>
-                    <option :value="1">Last 24 hours</option>
-                    <option :value="7">Last 7 days</option>
-                    <option :value="14">Last 14 days</option>
-                    <option :value="30">Last 30 days</option>
-                </select>
-            </div>
-        </div>
+        </Teleport>
 
         <button
             type="button"
@@ -499,6 +577,68 @@ watch(
 )
 
 const advancedOpen = ref(false)
+
+// Count how many advanced filters are active (for the badge)
+const advancedCount = computed(() => {
+    let n = 0
+    if (local.propertyType) n++
+    if (local.minSqft) n++
+    if (local.maxSqft) n++
+    if (local.minLotAcres) n++
+    if (local.maxLotAcres) n++
+    if (local.minYearBuilt) n++
+    if (local.maxYearBuilt) n++
+    if (local.stories) n++
+    if (local.minParkingSpaces) n++
+    if (local.daysOnMarketMax) n++
+    if (local.singleStory) n++
+    if (local.garage) n++
+    if (local.basement) n++
+    if (local.basementFinished) n++
+    if (local.noHoa) n++
+    if (local.waterfront) n++
+    if (local.priceReducedOnly) n++
+    if (local.views?.length) n++
+    if (local.features?.length) n++
+    if (local.waterSource) n++
+    if (local.sewerType) n++
+    if (local.terrain?.length) n++
+    if (local.roadAccess) n++
+    if (local.utilities?.length) n++
+    return n
+})
+
+function clearAdvanced() {
+    const advancedKeys: (keyof ListingFilters)[] = [
+        'propertyType',
+        'minSqft',
+        'maxSqft',
+        'minLotAcres',
+        'maxLotAcres',
+        'minYearBuilt',
+        'maxYearBuilt',
+        'stories',
+        'minParkingSpaces',
+        'daysOnMarketMax',
+        'singleStory',
+        'garage',
+        'basement',
+        'basementFinished',
+        'noHoa',
+        'waterfront',
+        'priceReducedOnly',
+        'views',
+        'features',
+        'waterSource',
+        'sewerType',
+        'terrain',
+        'roadAccess',
+        'utilities',
+    ]
+    for (const key of advancedKeys) {
+        ;(local as Record<string, unknown>)[key] = undefined
+    }
+}
 
 // Location mode: "near" (geocode + radius) or "region" (state + city/county).
 // Initialize from existing filter values so refresh / shareable URLs feel right.

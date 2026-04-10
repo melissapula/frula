@@ -18,12 +18,20 @@
                     </h1>
                     <p class="mt-1 text-sm text-slate-500">Member since {{ memberSince }}</p>
                 </div>
-                <NuxtLink
-                    to="/sell"
-                    class="bg-brand hover:bg-brand-600 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white shadow-sm transition"
-                >
-                    + List a new home
-                </NuxtLink>
+                <div class="flex gap-3">
+                    <NuxtLink
+                        to="/browse"
+                        class="hover:border-brand hover:text-brand inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition"
+                    >
+                        Browse listings
+                    </NuxtLink>
+                    <NuxtLink
+                        to="/sell"
+                        class="bg-brand hover:bg-brand-600 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white shadow-sm transition"
+                    >
+                        + List a new home
+                    </NuxtLink>
+                </div>
             </div>
 
             <!-- Quick stats strip -->

@@ -45,12 +45,45 @@
             >
                 Transactions
             </NuxtLink>
-            <NuxtLink
-                to="/account"
-                class="hover:text-brand hidden text-sm font-medium text-slate-600 sm:block"
-            >
-                {{ displayName }}
-            </NuxtLink>
+            <!-- User dropdown -->
+            <div class="relative hidden sm:block" ref="dropdownRef">
+                <button
+                    class="hover:text-brand flex items-center gap-2 text-sm font-medium text-slate-600"
+                    @click="dropdownOpen = !dropdownOpen"
+                >
+                    {{ displayName }}
+                    <svg
+                        class="h-4 w-4 transition"
+                        :class="{ 'rotate-180': dropdownOpen }"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                            clip-rule="evenodd"
+                        />
+                    </svg>
+                </button>
+                <div
+                    v-if="dropdownOpen"
+                    class="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+                >
+                    <NuxtLink
+                        to="/account"
+                        class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        @click="dropdownOpen = false"
+                    >
+                        Account
+                    </NuxtLink>
+                    <button
+                        class="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+                        @click="signOut"
+                    >
+                        Sign out
+                    </button>
+                </div>
+            </div>
             <NuxtLink
                 to="/account"
                 class="bg-brand inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-white"
@@ -82,9 +115,28 @@
 const user = useSupabaseUser()
 const supabase = useSupabaseClient()
 const route = useRoute()
+const router = useRouter()
 const { version: unreadBadgeVersion } = useUnreadBadge()
 const { savedIds } = useSaved()
 const savedCount = computed(() => savedIds.value.size)
+
+// User dropdown
+const dropdownOpen = ref(false)
+const dropdownRef = ref<HTMLElement | null>(null)
+
+function onClickOutside(e: MouseEvent) {
+    if (dropdownRef.value && !dropdownRef.value.contains(e.target as Node)) {
+        dropdownOpen.value = false
+    }
+}
+onMounted(() => document.addEventListener('click', onClickOutside))
+onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
+
+async function signOut() {
+    dropdownOpen.value = false
+    await supabase.auth.signOut()
+    router.push('/')
+}
 
 // Live unread-message count for the badge on the Inbox link.
 // Refreshes whenever the user changes, the route changes (so opening a

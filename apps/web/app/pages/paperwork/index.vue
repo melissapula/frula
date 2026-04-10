@@ -106,8 +106,19 @@
                                 >
                                     {{ stateLabel(g.state) }}
                                 </span>
+                                <template v-if="g.role === 'both'">
+                                    <span
+                                        class="bg-brand-50 text-brand-700 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase"
+                                        >Seller</span
+                                    >
+                                    <span
+                                        class="bg-brand-50 text-brand-700 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase"
+                                        >Buyer</span
+                                    >
+                                </template>
                                 <span
-                                    class="inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase text-slate-600"
+                                    v-else
+                                    class="bg-brand-50 text-brand-700 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase"
                                 >
                                     {{ ROLE_LABELS[g.role] }}
                                 </span>
