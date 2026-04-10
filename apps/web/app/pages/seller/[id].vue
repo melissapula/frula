@@ -129,14 +129,26 @@ const memberSince = computed(() => {
     })
 })
 
+const sellerTitle = computed(() =>
+    profile.value?.full_name
+        ? `${profile.value.full_name} — Seller on Frula Homes`
+        : 'Seller profile — Frula Homes',
+)
+const sellerDesc = computed(() =>
+    profile.value?.full_name
+        ? `View ${profile.value.full_name}'s for-sale-by-owner listings on Frula Homes.`
+        : '',
+)
+
 useSeoMeta({
-    title: () =>
-        profile.value?.full_name
-            ? `${profile.value.full_name} — Seller on Frula Homes`
-            : 'Seller profile — Frula Homes',
-    description: () =>
-        profile.value?.full_name
-            ? `View ${profile.value.full_name}'s for-sale-by-owner listings on Frula Homes.`
-            : '',
+    title: sellerTitle,
+    description: sellerDesc,
+    ogTitle: sellerTitle,
+    ogDescription: sellerDesc,
+    ogType: 'profile',
+    ogSiteName: 'Frula Homes',
+    twitterCard: 'summary',
+    twitterTitle: sellerTitle,
+    twitterDescription: sellerDesc,
 })
 </script>

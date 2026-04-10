@@ -1,0 +1,46 @@
+name: Paperwork Link Health Check
+
+on:
+    schedule:
+        # Run daily at 7:00 AM UTC (2:00 AM Central)
+        - cron: '0 7 * * *'
+    workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+    check-links:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+
+            - name: Check paperwork links
+              run: node scripts/check-paperwork-links.mjs
+
+            - name: Create issue on failure
+              if: failure()
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const { data: issues } = await github.rest.issues.listForRepo({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        labels: 'broken-link',
+                        state: 'open',
+                      });
+                      // Don't create duplicate issues
+                      if (issues.length > 0) {
+                        console.log('Open broken-link issue already exists, skipping.');
+                        return;
+                      }
+                      await github.rest.issues.create({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        title: 'Broken paperwork link(s) detected',
+                        body: `The daily link health check found one or more broken URLs in the paperwork directory.\n\nCheck the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.\n\nTo fix: update the broken URL in \`apps/web/app/data/paperwork/state-resources.ts\` or \`guides.ts\`.`,
+                        labels: ['broken-link'],
+                      });

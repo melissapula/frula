@@ -209,6 +209,17 @@ function goToListing(id: string) {
 
 useSeoMeta({
     title: 'Browse Listings — Frula Homes',
-    description: 'Browse for-sale-by-owner homes nationwide.',
+    description:
+        'Browse for-sale-by-owner homes nationwide. Search by location, price, features, and more.',
+    ogTitle: 'Browse FSBO Listings Nationwide — Frula Homes',
+    ogDescription:
+        'Browse for-sale-by-owner homes nationwide. Search by location, price, features, and more.',
+    ogUrl: 'https://frulahomes.com/browse',
+    ogType: 'website',
+    ogSiteName: 'Frula Homes',
+    twitterCard: 'summary',
+    twitterTitle: 'Browse FSBO Listings Nationwide — Frula Homes',
+    twitterDescription:
+        'Browse for-sale-by-owner homes nationwide. Search by location, price, features, and more.',
 })
 </script>

@@ -360,9 +360,19 @@
 <script setup lang="ts">
 const user = useSupabaseUser()
 
+const siteDescription =
+    "Nationwide For Sale By Owner information platform. List your home, browse listings, find your state's official forms, and stay organized with smart checklists — all without paying agent commissions."
+
 useSeoMeta({
     title: 'Frula Homes — Sell it yourself',
-    description:
-        "Nationwide For Sale By Owner information platform. List your home, browse listings, find your state's official forms, and stay organized with smart checklists — all without paying agent commissions.",
+    description: siteDescription,
+    ogTitle: 'Frula Homes — Sell it yourself',
+    ogDescription: siteDescription,
+    ogUrl: 'https://frulahomes.com',
+    ogType: 'website',
+    ogSiteName: 'Frula Homes',
+    twitterCard: 'summary',
+    twitterTitle: 'Frula Homes — Sell it yourself',
+    twitterDescription: siteDescription,
 })
 </script>

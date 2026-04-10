@@ -622,11 +622,40 @@ async function deleteListing() {
     router.push('/account')
 }
 
+const seoTitle = computed(() =>
+    listing.value
+        ? `${listing.value.title || listing.value.address} — Frula Homes`
+        : 'Listing — Frula Homes',
+)
+const seoDescription = computed(() => {
+    const l = listing.value
+    if (!l) return ''
+    const parts: string[] = []
+    if (l.beds) parts.push(`${l.beds} bed`)
+    if (l.full_baths) parts.push(`${l.full_baths} bath`)
+    if (l.sqft) parts.push(`${formatNumber(l.sqft)} sqft`)
+    const summary = parts.length ? parts.join(' · ') + ' — ' : ''
+    return `${summary}${formatPrice(l.price)} in ${l.city}, ${l.state}. ${l.description?.slice(0, 160) ?? ''}`
+})
+const seoImage = computed(() => photos.value[0]?.url ?? '')
+const seoUrl = computed(() => {
+    const config = useRuntimeConfig()
+    const base = config.public.siteUrl || 'https://frulahomes.com'
+    return `${base}/listing/${listing.value?.id ?? ''}`
+})
+
 useSeoMeta({
-    title: () =>
-        listing.value
-            ? `${listing.value.title || listing.value.address} — Frula Homes`
-            : 'Listing — Frula Homes',
-    description: () => listing.value?.description ?? '',
+    title: seoTitle,
+    description: seoDescription,
+    ogTitle: seoTitle,
+    ogDescription: seoDescription,
+    ogImage: seoImage,
+    ogUrl: seoUrl,
+    ogType: 'website',
+    ogSiteName: 'Frula Homes',
+    twitterCard: 'summary_large_image',
+    twitterTitle: seoTitle,
+    twitterDescription: seoDescription,
+    twitterImage: seoImage,
 })
 </script>
