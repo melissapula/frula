@@ -59,16 +59,77 @@
             </div>
         </div>
 
-        <!-- Messages -->
-        <div class="mx-auto w-full max-w-3xl flex-1 space-y-3 px-4 py-6 md:px-8">
-            <div v-if="pending" class="flex justify-center text-sm text-slate-400">Loading…</div>
+        <!-- First message form (shown when no messages yet) -->
+        <div v-if="!pending && !messages.length" class="mx-auto w-full max-w-3xl px-4 py-8 md:px-8">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+                <h2 class="font-display text-xl font-bold text-slate-900">Contact the seller</h2>
+                <p class="mt-1 text-sm text-slate-500">
+                    Send a message about
+                    <strong>{{ listing?.address }}</strong>
+                    <span v-if="listing">
+                        · {{ listing.city }}, {{ listing.state }} ·
+                        {{ formatPrice(listing.price) }}</span
+                    >
+                </p>
 
-            <div
-                v-else-if="!messages.length"
-                class="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500"
-            >
-                No messages yet. Send the first one below.
+                <form class="mt-6 space-y-4" @submit.prevent="sendFirstMessage">
+                    <div>
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >Your name</label
+                        >
+                        <input
+                            v-model="contactName"
+                            type="text"
+                            required
+                            class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                            :placeholder="user?.user_metadata?.full_name || 'Your name'"
+                        />
+                    </div>
+
+                    <div>
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        >
+                            Phone number
+                            <span class="font-normal normal-case text-slate-400">(optional)</span>
+                        </label>
+                        <input
+                            v-model="contactPhone"
+                            type="tel"
+                            class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                            placeholder="(555) 123-4567"
+                        />
+                    </div>
+
+                    <div>
+                        <label
+                            class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
+                            >Message</label
+                        >
+                        <textarea
+                            v-model="contactMessage"
+                            rows="4"
+                            required
+                            class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
+                            :placeholder="`Hi, I'm interested in ${listing?.address || 'this property'}. Is it still available?`"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        :disabled="sending || !contactMessage.trim() || !contactName.trim()"
+                        class="bg-brand hover:bg-brand-600 w-full rounded-full px-4 py-3 text-sm font-semibold text-white shadow-sm transition disabled:opacity-50"
+                    >
+                        {{ sending ? 'Sending…' : 'Send message' }}
+                    </button>
+                </form>
             </div>
+        </div>
+
+        <!-- Messages (shown after first message is sent) -->
+        <div v-else class="mx-auto w-full max-w-3xl flex-1 space-y-3 px-4 py-6 md:px-8">
+            <div v-if="pending" class="flex justify-center text-sm text-slate-400">Loading…</div>
 
             <div v-else class="space-y-3">
                 <div
@@ -135,8 +196,9 @@
             />
         </div>
 
-        <!-- Composer -->
+        <!-- Composer (hidden when contact form is showing) -->
         <form
+            v-if="messages.length || pending"
             class="sticky bottom-0 border-t border-slate-200 bg-white px-4 py-3 md:px-8"
             @submit.prevent="send"
         >
@@ -189,6 +251,44 @@ const messages = ref<Message[]>([])
 const pending = ref(true)
 const draft = ref('')
 const sending = ref(false)
+
+// First-message contact form
+const contactName = ref(user.value?.user_metadata?.full_name ?? '')
+const contactPhone = ref('')
+const contactMessage = ref('')
+
+async function sendFirstMessage() {
+    const name = contactName.value.trim()
+    const phone = contactPhone.value.trim()
+    const msg = contactMessage.value.trim()
+    if (!name || !msg || !user.value) return
+
+    // Build the message body with contact info
+    const parts = [`${msg}`, '', `— ${name}`]
+    if (phone) parts.push(`Phone: ${phone}`)
+
+    sending.value = true
+    const { data, error } = await supabase
+        .from('messages')
+        .insert({
+            listing_id: listingId.value,
+            sender_id: myId.value,
+            recipient_id: otherUserId.value,
+            body: parts.join('\n'),
+        })
+        .select()
+        .single()
+    sending.value = false
+
+    if (error) {
+        alert(error.message)
+        return
+    }
+    if (data && !messages.value.some((m) => m.id === data.id)) {
+        messages.value.push(data as Message)
+        notify(data.id)
+    }
+}
 
 const { data: listing } = await useAsyncData(`thread-listing-${listingId.value}`, async () => {
     const { data } = await supabase
