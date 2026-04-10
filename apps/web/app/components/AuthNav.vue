@@ -73,6 +73,8 @@
                 Sign up
             </NuxtLink>
         </template>
+        <!-- Mobile hamburger menu (replaces all the sm:hidden links) -->
+        <MobileMenu :unread-count="unreadCount" />
     </div>
 </template>
 
