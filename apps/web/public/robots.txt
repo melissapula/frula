@@ -8,6 +8,8 @@ Allow: /dream-home
 Allow: /paperwork
 Allow: /paperwork/*
 Allow: /listing/*
+Allow: /checklist/*
+Allow: /seller/*
 Allow: /how-we-make-money
 Allow: /privacy
 Allow: /terms
