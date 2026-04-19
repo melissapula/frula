@@ -1,7 +1,7 @@
 <template>
     <main class="min-h-screen bg-slate-50">
         <header class="border-b border-slate-200 bg-white">
-            <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-8">
+            <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
                 <NuxtLink to="/" class="font-display text-brand text-2xl font-bold"
                     >Frula Homes</NuxtLink
                 >
@@ -9,269 +9,315 @@
             </div>
         </header>
 
-        <div class="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12">
-            <div class="mb-8 text-center">
-                <h1 class="font-display text-3xl font-bold text-slate-900 md:text-5xl">
+        <div class="mx-auto max-w-7xl px-4 py-8 md:px-8 md:py-12">
+            <div class="mb-6">
+                <h1 class="font-display text-3xl font-bold text-slate-900 md:text-4xl">
                     Find your dream home
                 </h1>
-                <p class="mx-auto mt-3 max-w-2xl text-slate-600">
-                    Tell us what you're looking for and we'll show you every home in the country
-                    ranked by how well it matches your dreams.
+                <p class="mt-2 max-w-2xl text-slate-600">
+                    Tell us what you're looking for and we'll rank every listing in the country by
+                    how well it matches.
                 </p>
             </div>
 
-            <div class="grid gap-8 lg:grid-cols-[340px_1fr]">
+            <!-- Mobile filter toggle -->
+            <button
+                type="button"
+                class="mb-4 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 md:hidden"
+                @click="filtersOpen = !filtersOpen"
+            >
+                {{ filtersOpen ? 'Hide preferences' : 'Show preferences' }}
+            </button>
+
+            <div class="grid gap-6 md:grid-cols-[280px_1fr]">
                 <!-- ============ INTAKE ============ -->
-                <aside class="lg:sticky lg:top-6 lg:self-start">
-                    <form
-                        class="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-                        @submit.prevent="search"
-                    >
-                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Deal-breakers
-                        </p>
+                <aside :class="['md:block', filtersOpen ? 'block' : 'hidden']">
+                    <div class="lg:sticky lg:top-6 lg:self-start">
+                        <form
+                            class="max-h-[calc(100vh-3rem)] space-y-5 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                            @submit.prevent="search"
+                        >
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Deal-breakers
+                            </p>
 
-                        <div>
-                            <label class="block text-xs font-medium text-slate-600">
-                                Max budget (USD)
-                            </label>
-                            <input
-                                v-model.number="prefs.maxPrice"
-                                type="number"
-                                min="0"
-                                placeholder="e.g. 350000"
-                                class="input mt-1"
-                            />
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-slate-600">State</label>
-                            <select v-model="prefs.state" class="input mt-1">
-                                <option :value="undefined">Anywhere in the US</option>
-                                <option v-for="s in US_STATES" :key="s.code" :value="s.code">
-                                    {{ s.name }}
-                                </option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-slate-600"
-                                >Property type</label
-                            >
-                            <select v-model="prefs.propertyType" class="input mt-1">
-                                <option :value="undefined">Any type</option>
-                                <option value="residential">Residential</option>
-                                <option value="condo">Condo</option>
-                                <option value="multi-family">Multi-family</option>
-                                <option value="land">Land</option>
-                                <option value="commercial">Commercial</option>
-                            </select>
-                        </div>
-
-                        <hr class="border-slate-200" />
-                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Your wish list
-                        </p>
-                        <p class="-mt-3 text-xs text-slate-500">
-                            Pick anything that matters. Each one you choose adds to the match score
-                            — leave blank what you don't care about.
-                        </p>
-
-                        <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-medium text-slate-600"
-                                    >Ideal bedrooms</label
-                                >
+                                <label class="block text-xs font-medium text-slate-600">
+                                    Max budget (USD)
+                                </label>
                                 <input
-                                    v-model.number="prefs.idealBeds"
+                                    v-model.number="prefs.maxPrice"
                                     type="number"
                                     min="0"
-                                    placeholder="e.g. 4"
+                                    placeholder="e.g. 350000"
                                     class="input mt-1"
                                 />
                             </div>
+
                             <div>
                                 <label class="block text-xs font-medium text-slate-600"
-                                    >Ideal bathrooms</label
+                                    >State</label
                                 >
-                                <input
-                                    v-model.number="prefs.idealBaths"
-                                    type="number"
-                                    min="0"
-                                    placeholder="e.g. 2"
-                                    class="input mt-1"
-                                />
+                                <select v-model="prefs.state" class="input mt-1">
+                                    <option :value="undefined">Anywhere in the US</option>
+                                    <option v-for="s in US_STATES" :key="s.code" :value="s.code">
+                                        {{ s.name }}
+                                    </option>
+                                </select>
                             </div>
-                        </div>
 
-                        <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600"
-                                    >Min sqft</label
+                                    >Property type</label
                                 >
-                                <input
-                                    v-model.number="prefs.minSqft"
-                                    type="number"
-                                    min="0"
-                                    class="input mt-1"
-                                />
+                                <select v-model="prefs.propertyType" class="input mt-1">
+                                    <option :value="undefined">Any type</option>
+                                    <option value="residential">Residential</option>
+                                    <option value="condo">Condo</option>
+                                    <option value="multi-family">Multi-family</option>
+                                    <option value="land">Land</option>
+                                    <option value="commercial">Commercial</option>
+                                </select>
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600"
-                                    >Min acres</label
-                                >
-                                <input
-                                    v-model.number="prefs.minAcres"
-                                    type="number"
-                                    min="0"
-                                    step="0.1"
-                                    class="input mt-1"
-                                />
-                            </div>
-                        </div>
 
-                        <div>
-                            <label class="block text-xs font-medium text-slate-600"
-                                >Built after (year)</label
-                            >
-                            <input
-                                v-model.number="prefs.minYearBuilt"
-                                type="number"
-                                placeholder="1990"
-                                class="input mt-1"
-                            />
-                        </div>
+                            <hr class="border-slate-200" />
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Your wish list
+                            </p>
+                            <p class="-mt-3 text-xs text-slate-500">
+                                Pick anything that matters. Each one you choose adds to the match
+                                score — leave blank what you don't care about.
+                            </p>
 
-                        <div class="space-y-2">
-                            <label class="flex items-center gap-2 text-sm text-slate-700">
-                                <input
-                                    v-model="prefs.singleStory"
-                                    type="checkbox"
-                                    class="text-brand focus:ring-brand h-4 w-4 rounded border-slate-300"
-                                />
-                                Single story / no stairs
-                            </label>
-                            <label class="flex items-center gap-2 text-sm text-slate-700">
-                                <input
-                                    v-model="prefs.garage"
-                                    type="checkbox"
-                                    class="text-brand focus:ring-brand h-4 w-4 rounded border-slate-300"
-                                />
-                                Has a garage
-                            </label>
-                            <label class="flex items-center gap-2 text-sm text-slate-700">
-                                <input
-                                    v-model="prefs.basement"
-                                    type="checkbox"
-                                    class="text-brand focus:ring-brand h-4 w-4 rounded border-slate-300"
-                                />
-                                Has a basement
-                            </label>
-                            <label class="flex items-center gap-2 text-sm text-slate-700">
-                                <input
-                                    v-model="prefs.waterfront"
-                                    type="checkbox"
-                                    class="text-brand focus:ring-brand h-4 w-4 rounded border-slate-300"
-                                />
-                                Waterfront
-                            </label>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-slate-600">Views</label>
-                            <div class="mt-1.5 flex flex-wrap gap-1.5">
-                                <button
-                                    v-for="v in VIEW_OPTIONS"
-                                    :key="v.value"
-                                    type="button"
-                                    :class="chip(prefs.views.includes(v.value))"
-                                    @click="toggle('views', v.value)"
-                                >
-                                    {{ v.label }}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-slate-600">Features</label>
-                            <div class="mt-2 space-y-3">
-                                <div v-for="group in FEATURE_GROUPS" :key="group.label">
-                                    <p
-                                        class="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400"
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Ideal bedrooms</label
                                     >
-                                        {{ group.label }}
-                                    </p>
-                                    <div class="flex flex-wrap gap-1.5">
-                                        <button
-                                            v-for="f in group.options"
-                                            :key="f.value"
-                                            type="button"
-                                            :class="chip(prefs.features.includes(f.value))"
-                                            @click="toggle('features', f.value)"
+                                    <input
+                                        v-model.number="prefs.idealBeds"
+                                        type="number"
+                                        min="0"
+                                        placeholder="e.g. 4"
+                                        class="input mt-1"
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Ideal bathrooms</label
+                                    >
+                                    <input
+                                        v-model.number="prefs.idealBaths"
+                                        type="number"
+                                        min="0"
+                                        placeholder="e.g. 2"
+                                        class="input mt-1"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Min sqft</label
+                                    >
+                                    <input
+                                        v-model.number="prefs.minSqft"
+                                        type="number"
+                                        min="0"
+                                        class="input mt-1"
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600"
+                                        >Min acres</label
+                                    >
+                                    <input
+                                        v-model.number="prefs.minAcres"
+                                        type="number"
+                                        min="0"
+                                        step="0.1"
+                                        class="input mt-1"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600"
+                                    >Built after (year)</label
+                                >
+                                <input
+                                    v-model.number="prefs.minYearBuilt"
+                                    type="number"
+                                    placeholder="1990"
+                                    class="input mt-1"
+                                />
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 text-sm text-slate-700">
+                                    <input
+                                        v-model="prefs.singleStory"
+                                        type="checkbox"
+                                        class="text-brand focus:ring-brand h-4 w-4 rounded border-slate-300"
+                                    />
+                                    Single story / no stairs
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-slate-700">
+                                    <input
+                                        v-model="prefs.garage"
+                                        type="checkbox"
+                                        class="text-brand focus:ring-brand h-4 w-4 rounded border-slate-300"
+                                    />
+                                    Has a garage
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-slate-700">
+                                    <input
+                                        v-model="prefs.basement"
+                                        type="checkbox"
+                                        class="text-brand focus:ring-brand h-4 w-4 rounded border-slate-300"
+                                    />
+                                    Has a basement
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-slate-700">
+                                    <input
+                                        v-model="prefs.waterfront"
+                                        type="checkbox"
+                                        class="text-brand focus:ring-brand h-4 w-4 rounded border-slate-300"
+                                    />
+                                    Waterfront
+                                </label>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600"
+                                    >Views</label
+                                >
+                                <div class="mt-1.5 flex flex-wrap gap-1.5">
+                                    <button
+                                        v-for="v in VIEW_OPTIONS"
+                                        :key="v.value"
+                                        type="button"
+                                        :class="chip(prefs.views.includes(v.value))"
+                                        @click="toggle('views', v.value)"
+                                    >
+                                        {{ v.label }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600"
+                                    >Features</label
+                                >
+                                <div class="mt-2 space-y-3">
+                                    <div v-for="group in FEATURE_GROUPS" :key="group.label">
+                                        <p
+                                            class="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400"
                                         >
-                                            {{ f.label }}
-                                        </button>
+                                            {{ group.label }}
+                                        </p>
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <button
+                                                v-for="f in group.options"
+                                                :key="f.value"
+                                                type="button"
+                                                :class="chip(prefs.features.includes(f.value))"
+                                                @click="toggle('features', f.value)"
+                                            >
+                                                {{ f.label }}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <hr class="border-slate-200" />
-                        <div>
-                            <label
-                                class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
-                                >Minimum match: {{ prefs.minMatchPercent }}%</label
-                            >
-                            <input
-                                v-model.number="prefs.minMatchPercent"
-                                type="range"
-                                min="0"
-                                max="100"
-                                step="5"
-                                class="accent-brand mt-2 w-full"
-                            />
-                            <p class="mt-1 text-xs text-slate-500">
-                                Hide matches below this score, and only get emailed about homes that
-                                score this high.
-                            </p>
-                        </div>
-
-                        <div v-if="prefs.propertyType === 'land'">
-                            <label class="block text-xs font-medium text-slate-600">Terrain</label>
-                            <div class="mt-1.5 flex flex-wrap gap-1.5">
-                                <button
-                                    v-for="t in TERRAIN_OPTIONS"
-                                    :key="t.value"
-                                    type="button"
-                                    :class="chip(prefs.terrain.includes(t.value))"
-                                    @click="toggle('terrain', t.value)"
+                            <hr class="border-slate-200" />
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                    >Minimum match: {{ prefs.minMatchPercent }}%</label
                                 >
-                                    {{ t.label }}
+                                <input
+                                    v-model.number="prefs.minMatchPercent"
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    step="5"
+                                    class="accent-brand mt-2 w-full"
+                                />
+                                <p class="mt-1 text-xs text-slate-500">
+                                    Hide matches below this score, and only get emailed about homes
+                                    that score this high.
+                                </p>
+                            </div>
+
+                            <div v-if="prefs.propertyType === 'land'">
+                                <label class="block text-xs font-medium text-slate-600"
+                                    >Terrain</label
+                                >
+                                <div class="mt-1.5 flex flex-wrap gap-1.5">
+                                    <button
+                                        v-for="t in TERRAIN_OPTIONS"
+                                        :key="t.value"
+                                        type="button"
+                                        :class="chip(prefs.terrain.includes(t.value))"
+                                        @click="toggle('terrain', t.value)"
+                                    >
+                                        {{ t.label }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-2 pt-2">
+                                <button
+                                    type="submit"
+                                    :disabled="searching"
+                                    class="bg-brand hover:bg-brand-600 w-full rounded-full px-4 py-3 text-sm font-semibold text-white shadow-sm transition disabled:opacity-60"
+                                >
+                                    {{ searching ? 'Searching…' : 'Find my dream home' }}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="hover:border-brand hover:text-brand w-full rounded-full border border-slate-300 px-4 py-2 text-xs font-medium text-slate-600 transition"
+                                    @click="reset"
+                                >
+                                    Reset
                                 </button>
                             </div>
-                        </div>
-
-                        <div class="flex flex-col gap-2 pt-2">
-                            <button
-                                type="submit"
-                                :disabled="searching"
-                                class="bg-brand hover:bg-brand-600 w-full rounded-full px-4 py-3 text-sm font-semibold text-white shadow-sm transition disabled:opacity-60"
-                            >
-                                {{ searching ? 'Searching…' : 'Find my dream home' }}
-                            </button>
-                            <button
-                                type="button"
-                                class="hover:border-brand hover:text-brand w-full rounded-full border border-slate-300 px-4 py-2 text-xs font-medium text-slate-600 transition"
-                                @click="reset"
-                            >
-                                Reset
-                            </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </aside>
 
                 <!-- ============ RESULTS ============ -->
                 <section>
+                    <!-- Mobile list/map toggle -->
+                    <div
+                        v-if="hasSearched && filteredScored.length"
+                        class="mb-3 flex gap-1 rounded-lg bg-slate-200 p-1 md:hidden"
+                    >
+                        <button
+                            type="button"
+                            :class="[
+                                'flex-1 rounded-md px-3 py-1.5 text-sm font-medium',
+                                view === 'list' ? 'bg-brand text-white' : 'text-slate-600',
+                            ]"
+                            @click="view = 'list'"
+                        >
+                            List
+                        </button>
+                        <button
+                            type="button"
+                            :class="[
+                                'flex-1 rounded-md px-3 py-1.5 text-sm font-medium',
+                                view === 'map' ? 'bg-brand text-white' : 'text-slate-600',
+                            ]"
+                            @click="view = 'map'"
+                        >
+                            Map
+                        </button>
+                    </div>
+
                     <div
                         v-if="searchError"
                         class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
@@ -338,26 +384,65 @@
                             </p>
                         </div>
 
-                        <div v-else class="grid gap-4 sm:grid-cols-2">
-                            <ListingCard
-                                v-for="entry in visible"
-                                :key="entry.listing.id"
-                                :listing="entry.listing"
-                                :match-percent="entry.score"
-                            />
-                        </div>
-
-                        <div
-                            v-if="visibleCount < filteredScored.length"
-                            class="mt-6 flex justify-center"
-                        >
-                            <button
-                                type="button"
-                                class="hover:border-brand hover:text-brand rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition"
-                                @click="visibleCount += 10"
+                        <!-- Cards + Map grid -->
+                        <div v-else class="grid gap-6 lg:grid-cols-[1fr_minmax(0,420px)]">
+                            <!-- Cards column -->
+                            <div
+                                :class="[
+                                    'order-2 lg:order-1',
+                                    view === 'map' ? 'hidden md:block' : '',
+                                ]"
                             >
-                                Show next 10
-                            </button>
+                                <button
+                                    v-if="focusedFromMap"
+                                    type="button"
+                                    class="hover:border-brand hover:text-brand mb-3 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-600"
+                                    @click="clearMapHover"
+                                >
+                                    ← Show all {{ filteredScored.length }} matches
+                                </button>
+                                <div class="grid gap-4 sm:grid-cols-2">
+                                    <ListingCard
+                                        v-for="entry in visibleEntries"
+                                        :key="entry.listing.id"
+                                        :listing="entry.listing"
+                                        :match-percent="entry.score"
+                                        :highlighted="focusedId === entry.listing.id"
+                                        :expanded="focusedFromMap"
+                                        @hover="onCardHover(entry.listing.id, $event)"
+                                    />
+                                </div>
+
+                                <div
+                                    v-if="!focusedFromMap && visibleCount < filteredScored.length"
+                                    class="mt-6 flex justify-center"
+                                >
+                                    <button
+                                        type="button"
+                                        class="hover:border-brand hover:text-brand rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition"
+                                        @click="visibleCount += 10"
+                                    >
+                                        Show next 10
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Map column -->
+                            <div
+                                :class="[
+                                    'order-1 lg:sticky lg:top-4 lg:order-2 lg:self-start',
+                                    view === 'list' ? 'hidden md:block' : '',
+                                ]"
+                            >
+                                <BrowseMap
+                                    :listings="mapListings"
+                                    :hovered-id="hoveredId"
+                                    :pinned-id="pinnedId"
+                                    @select="goToListing"
+                                    @hover="onMapHover"
+                                    @pin="onMapPin"
+                                />
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -375,6 +460,7 @@ import { US_STATES } from '~/composables/useStates'
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
+const router = useRouter()
 
 interface DreamPrefs {
     // Hard filters
@@ -451,6 +537,8 @@ function reset() {
     hasSearched.value = false
     visibleCount.value = 10
     alertSaved.value = false
+    pinnedId.value = null
+    hoveredId.value = null
 }
 
 interface ScoredListing {
@@ -465,15 +553,64 @@ const searching = ref(false)
 const searchError = ref<string | null>(null)
 const hasSearched = ref(false)
 const visibleCount = ref(10)
+const filtersOpen = ref(false)
+const view = ref<'list' | 'map'>('list')
+
+// =====================================================
+// Hover / pin sync (same pattern as browse.vue)
+// =====================================================
+const hoveredId = ref<string | null>(null)
+const hoverSource = ref<'map' | 'card' | null>(null)
+const pinnedId = ref<string | null>(null)
+
+const focusedId = computed(() => pinnedId.value ?? hoveredId.value)
+const focusedFromMap = computed(
+    () => !!pinnedId.value || (hoverSource.value === 'map' && !!hoveredId.value),
+)
+
+function onMapHover(id: string | null) {
+    hoveredId.value = id
+    hoverSource.value = id ? 'map' : null
+}
+
+function onCardHover(listingId: string, id: string | null) {
+    hoveredId.value = id ? listingId : null
+    hoverSource.value = id ? 'card' : null
+}
+
+function onMapPin(id: string | null) {
+    pinnedId.value = id
+}
+
+function clearMapHover() {
+    pinnedId.value = null
+    hoveredId.value = null
+    hoverSource.value = null
+}
+
+function goToListing(id: string) {
+    router.push(`/listing/${id}`)
+}
+
+// =====================================================
+// Scored results + filtering
+// =====================================================
 
 // Apply the user's minimum-match-% gate on top of the scored results.
-// Reactive on `prefs.minMatchPercent` so dragging the slider re-filters
-// instantly without re-running the search.
 const filteredScored = computed(() => scored.value.filter((s) => s.score >= prefs.minMatchPercent))
-const visible = computed(() => filteredScored.value.slice(0, visibleCount.value))
 
-// Reset pagination whenever the threshold changes so users always start
-// from the top of the new (smaller/larger) result set.
+// Listings for the map (all above threshold, not paginated)
+const mapListings = computed(() => filteredScored.value.map((s) => s.listing))
+
+// Visible card entries: map-focus filtering takes priority over pagination
+const visibleEntries = computed(() => {
+    if (focusedFromMap.value && focusedId.value) {
+        return filteredScored.value.filter((s) => s.listing.id === focusedId.value)
+    }
+    return filteredScored.value.slice(0, visibleCount.value)
+})
+
+// Reset pagination whenever the threshold changes
 watch(
     () => prefs.minMatchPercent,
     () => {
@@ -559,6 +696,8 @@ async function search() {
     hasSearched.value = true
     visibleCount.value = 10
     alertSaved.value = false
+    pinnedId.value = null
+    hoveredId.value = null
 
     // Hard filters: only fetch listings that pass the deal-breakers.
     let query = supabase
@@ -593,8 +732,6 @@ async function search() {
     const ranked = listings
         .map((l) => ({ listing: l, ...scoreListing(l) }))
         .sort((a, b) => {
-            // Primary sort: match score desc.
-            // Tiebreaker: cheapest first (helps when many listings tie at 100%).
             if (b.score !== a.score) return b.score - a.score
             return a.listing.price - b.listing.price
         })
