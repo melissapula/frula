@@ -140,6 +140,9 @@ const sellerDesc = computed(() =>
         : '',
 )
 
+const config = useRuntimeConfig()
+const canonicalUrl = computed(() => `${config.public.siteUrl}/seller/${route.params.id}`)
+
 useSeoMeta({
     title: sellerTitle,
     description: sellerDesc,
@@ -150,5 +153,8 @@ useSeoMeta({
     twitterCard: 'summary',
     twitterTitle: sellerTitle,
     twitterDescription: sellerDesc,
+})
+useHead({
+    link: [{ rel: 'canonical', href: canonicalUrl }],
 })
 </script>

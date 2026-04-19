@@ -658,4 +658,7 @@ useSeoMeta({
     twitterDescription: seoDescription,
     twitterImage: seoImage,
 })
+useHead({
+    link: [{ rel: 'canonical', href: seoUrl }],
+})
 </script>

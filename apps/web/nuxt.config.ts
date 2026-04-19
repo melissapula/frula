@@ -15,8 +15,10 @@ export default defineNuxtConfig({
                     content:
                         'Nationwide For Sale By Owner information platform. List your home, browse listings, and find official forms for your state — all without paying agent commissions.',
                 },
+                { name: 'theme-color', content: '#1D9E75' },
             ],
             link: [
+                { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
                 { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
                 { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
                 {
@@ -37,7 +39,6 @@ export default defineNuxtConfig({
             cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
             cloudinaryUploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET,
             siteUrl: process.env.PUBLIC_SITE_URL || 'http://localhost:3000',
-            apiBase: process.env.API_BASE || 'http://localhost:3001',
         },
     },
 
@@ -66,6 +67,22 @@ export default defineNuxtConfig({
             ],
             cookieRedirect: false,
         },
+    },
+
+    routeRules: {
+        // Static public pages — cache at the edge for 1 hour, revalidate in background
+        '/': { swr: 3600 },
+        '/browse': { swr: 600 },
+        '/paperwork': { swr: 86400 },
+        '/paperwork/**': { swr: 86400 },
+        '/how-we-make-money': { swr: 86400 },
+        '/privacy': { swr: 86400 },
+        '/terms': { swr: 86400 },
+        '/checklist/**': { swr: 86400 },
+        // Listing detail pages — cache 10 min, revalidate in background
+        '/listing/**': { swr: 600 },
+        // Seller profiles — cache 10 min
+        '/seller/**': { swr: 600 },
     },
 
     vite: {

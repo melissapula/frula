@@ -232,8 +232,14 @@ const selectedStateResource = computed(() =>
     selectedStateCode.value ? getStateResource(selectedStateCode.value) : null,
 )
 
+const config = useRuntimeConfig()
+const canonicalUrl = computed(() => `${config.public.siteUrl}/paperwork/${slug.value}`)
+
 useSeoMeta({
     title: () => (guide.value ? `${guide.value.title} — Frula Homes` : 'Paperwork guide'),
     description: () => guide.value?.summary ?? '',
+})
+useHead({
+    link: [{ rel: 'canonical', href: canonicalUrl }],
 })
 </script>

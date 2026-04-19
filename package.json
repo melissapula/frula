@@ -6,11 +6,8 @@
         "packages/*"
     ],
     "scripts": {
-        "dev:web": "npm run dev --workspace=web",
-        "dev:api": "npm run start:dev --workspace=api",
-        "dev": "concurrently \"npm:dev:api\" \"npm:dev:web\"",
-        "build:web": "npm run build --workspace=web",
-        "build:api": "npm run build --workspace=api",
+        "dev": "npm run dev --workspace=web",
+        "build": "npm run build --workspace=web",
         "format": "prettier --write \"**/*.{ts,vue,js,json,md,css}\"",
         "format:check": "prettier --check \"**/*.{ts,vue,js,json,md,css}\"",
         "lint": "npm run lint --workspace=web",
@@ -25,9 +22,6 @@
     },
     "lint-staged": {
         "apps/web/**/*.{ts,vue,js}": [
-            "prettier --write"
-        ],
-        "apps/api/**/*.{ts,js}": [
             "prettier --write"
         ],
         "*.{json,md,css,yml,yaml}": [
