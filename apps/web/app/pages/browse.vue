@@ -94,12 +94,32 @@
                                     v-if="!data?.length"
                                     class="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center"
                                 >
-                                    <p class="font-semibold text-slate-700">
-                                        No listings match your filters
-                                    </p>
-                                    <p class="mt-1 text-sm text-slate-500">
-                                        Try adjusting your price range or removing a filter.
-                                    </p>
+                                    <template v-if="hasActiveFilters">
+                                        <p class="font-semibold text-slate-700">
+                                            No listings match your filters
+                                        </p>
+                                        <p class="mt-1 text-sm text-slate-500">
+                                            Try adjusting your price range or removing a filter.
+                                        </p>
+                                    </template>
+                                    <template v-else>
+                                        <p
+                                            class="font-display text-xl font-semibold text-slate-700"
+                                        >
+                                            No listings yet
+                                        </p>
+                                        <p class="mt-2 text-sm text-slate-500">
+                                            Be the first to list your home on Frula Homes — it's
+                                            free, takes a few minutes, and reaches buyers
+                                            nationwide.
+                                        </p>
+                                        <NuxtLink
+                                            to="/sell"
+                                            class="bg-brand hover:bg-brand-600 mt-6 inline-block rounded-full px-6 py-2.5 text-sm font-semibold text-white transition"
+                                        >
+                                            List your home
+                                        </NuxtLink>
+                                    </template>
                                 </div>
                                 <div v-else>
                                     <button
@@ -167,6 +187,37 @@ const hoverSource = ref<'map' | 'card' | null>(null)
 const pinnedId = ref<string | null>(null)
 
 const { data, pending, error } = useListings(filters)
+
+const hasActiveFilters = computed(() => {
+    const f = filters.value
+    return !!(
+        f.near ||
+        f.state ||
+        f.city ||
+        f.propertyType ||
+        f.categories?.length ||
+        f.minPrice ||
+        f.maxPrice ||
+        f.beds ||
+        f.baths ||
+        f.minSqft ||
+        f.maxSqft ||
+        f.minLotAcres ||
+        f.maxLotAcres ||
+        f.minYearBuilt ||
+        f.maxYearBuilt ||
+        f.garage ||
+        f.basement ||
+        f.waterfront ||
+        f.singleStory ||
+        f.noHoa ||
+        f.views?.length ||
+        f.features?.length ||
+        f.terrain?.length ||
+        f.daysOnMarketMax ||
+        f.priceReducedOnly
+    )
+})
 
 // Treat pinned as the source of truth when set; otherwise honor map-originated hover
 const focusedId = computed(() => pinnedId.value ?? hoveredId.value)
