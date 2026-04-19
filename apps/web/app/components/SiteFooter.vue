@@ -87,6 +87,11 @@
                                 >Terms of service</NuxtLink
                             >
                         </li>
+                        <li>
+                            <a href="mailto:hello@frulahomes.com" class="hover:text-brand"
+                                >Contact us</a
+                            >
+                        </li>
                     </ul>
                 </div>
             </div>
