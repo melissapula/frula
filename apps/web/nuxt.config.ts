@@ -35,6 +35,7 @@ export default defineNuxtConfig({
         resendApiKey: process.env.RESEND_API_KEY,
         emailFrom: process.env.EMAIL_FROM || 'Frula Homes <noreply@frulahomes.com>',
         emailReplyTo: process.env.EMAIL_REPLY_TO || '',
+        alertsSecret: process.env.ALERTS_SECRET,
         public: {
             mapboxToken: process.env.MAPBOX_TOKEN,
             cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
