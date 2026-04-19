@@ -375,4 +375,12 @@ useSeoMeta({
     twitterTitle: 'Frula Homes — Sell it yourself',
     twitterDescription: siteDescription,
 })
+
+useJsonLd({
+    '@type': 'Organization',
+    name: 'Frula Homes',
+    url: 'https://frulahomes.com',
+    description: siteDescription,
+    sameAs: ['https://www.instagram.com/frulahomes', 'https://www.facebook.com/frulahomes'],
+})
 </script>

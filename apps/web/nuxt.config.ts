@@ -19,6 +19,7 @@ export default defineNuxtConfig({
             ],
             link: [
                 { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+                { rel: 'manifest', href: '/site.webmanifest' },
                 { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
                 { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
                 {
@@ -39,6 +40,7 @@ export default defineNuxtConfig({
             cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
             cloudinaryUploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET,
             siteUrl: process.env.PUBLIC_SITE_URL || 'http://localhost:3000',
+            sentryDsn: process.env.NUXT_PUBLIC_SENTRY_DSN || '',
         },
     },
 

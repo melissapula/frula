@@ -17,11 +17,13 @@
                 expanded ? 'aspect-[16/9]' : 'aspect-[4/3]',
             ]"
         >
-            <img
+            <NuxtImg
                 v-if="primaryPhoto"
                 :src="primaryPhoto"
                 :alt="listing.title || listing.address"
                 loading="lazy"
+                format="webp"
+                quality="80"
                 class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
             />
             <div v-else class="flex h-full items-center justify-center text-slate-300">

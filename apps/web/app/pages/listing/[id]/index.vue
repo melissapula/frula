@@ -661,4 +661,42 @@ useSeoMeta({
 useHead({
     link: [{ rel: 'canonical', href: seoUrl }],
 })
+
+// Structured data for search engines
+const jsonLd = computed(() => {
+    const l = listing.value
+    if (!l) return null
+    return {
+        '@type': 'RealEstateListing',
+        name: l.title || l.address,
+        description: l.description?.slice(0, 300) ?? '',
+        url: seoUrl.value,
+        image: seoImage.value || undefined,
+        address: {
+            '@type': 'PostalAddress',
+            streetAddress: l.address,
+            addressLocality: l.city,
+            addressRegion: l.state,
+            postalCode: l.zip,
+            addressCountry: 'US',
+        },
+        offers: {
+            '@type': 'Offer',
+            price: l.price,
+            priceCurrency: 'USD',
+        },
+        ...(l.lat && l.lng
+            ? {
+                  geo: {
+                      '@type': 'GeoCoordinates',
+                      latitude: l.lat,
+                      longitude: l.lng,
+                  },
+              }
+            : {}),
+    }
+})
+watchEffect(() => {
+    if (jsonLd.value) useJsonLd(jsonLd.value)
+})
 </script>

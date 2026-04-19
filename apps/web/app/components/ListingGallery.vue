@@ -3,10 +3,13 @@
         <!-- Mobile: swipeable strip -->
         <div class="md:hidden">
             <div class="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100">
-                <img
+                <NuxtImg
                     v-if="active"
                     :src="active.url"
                     :alt="title"
+                    loading="lazy"
+                    format="webp"
+                    quality="80"
                     class="h-full w-full cursor-pointer object-cover"
                     @click="openLightbox(activeIndex)"
                 />
@@ -44,25 +47,34 @@
                 No photos
             </div>
             <div v-else-if="photos.length === 1">
-                <img
+                <NuxtImg
                     :src="photos[0].url"
                     :alt="title"
+                    loading="lazy"
+                    format="webp"
+                    quality="80"
                     class="aspect-[16/9] w-full cursor-pointer rounded-2xl object-cover"
                     @click="openLightbox(0)"
                 />
             </div>
             <div v-else class="relative grid h-[420px] grid-cols-4 gap-2">
-                <img
+                <NuxtImg
                     :src="photos[0].url"
                     :alt="title"
+                    loading="lazy"
+                    format="webp"
+                    quality="80"
                     class="col-span-2 row-span-2 h-full w-full cursor-pointer rounded-l-2xl object-cover"
                     @click="openLightbox(0)"
                 />
-                <img
+                <NuxtImg
                     v-for="(photo, i) in photos.slice(1, 5)"
                     :key="i"
                     :src="photo.url"
                     :alt="title"
+                    loading="lazy"
+                    format="webp"
+                    quality="80"
                     :class="[
                         'h-full w-full cursor-pointer object-cover',
                         i === 1 ? 'rounded-tr-2xl' : '',
