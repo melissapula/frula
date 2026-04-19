@@ -638,9 +638,9 @@ const seoDescription = computed(() => {
     return `${summary}${formatPrice(l.price)} in ${l.city}, ${l.state}. ${l.description?.slice(0, 160) ?? ''}`
 })
 const seoImage = computed(() => photos.value[0]?.url ?? '')
+const seoConfig = useRuntimeConfig()
 const seoUrl = computed(() => {
-    const config = useRuntimeConfig()
-    const base = config.public.siteUrl || 'https://frulahomes.com'
+    const base = seoConfig.public.siteUrl || 'https://frulahomes.com'
     return `${base}/listing/${listing.value?.id ?? ''}`
 })
 
