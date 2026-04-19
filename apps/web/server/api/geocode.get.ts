@@ -6,6 +6,8 @@
  *   → { lat, lng, display_name }
  */
 
+import { checkRateLimit } from '../utils/rateLimit'
+
 interface NominatimResult {
     lat: string
     lon: string
@@ -13,6 +15,16 @@ interface NominatimResult {
 }
 
 export default defineEventHandler(async (event) => {
+    // Rate limit: 10 geocode requests per minute per IP (Nominatim asks for ~1/sec)
+    const ip = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown'
+    const rl = checkRateLimit(`geocode:${ip}`, 10, 60_000)
+    if (!rl.allowed) {
+        throw createError({
+            statusCode: 429,
+            statusMessage: `Too many requests. Try again in ${Math.ceil(rl.retryAfterMs / 1000)}s.`,
+        })
+    }
+
     const q = (getQuery(event).q as string | undefined)?.trim()
     if (!q) {
         throw createError({ statusCode: 400, statusMessage: 'Missing q parameter' })

@@ -13,6 +13,7 @@
  */
 
 import { serverSupabaseUser, serverSupabaseServiceRole } from '#supabase/server'
+import { checkRateLimit } from '../../utils/rateLimit'
 
 interface MessageRow {
     id: string
@@ -50,6 +51,15 @@ export default defineEventHandler(async (event) => {
     const user = await serverSupabaseUser(event)
     if (!user) {
         throw createError({ statusCode: 401, statusMessage: 'Not authenticated' })
+    }
+
+    // Rate limit: 5 emails per minute per user
+    const rl = checkRateLimit(`send:${user.id}`, 5, 60_000)
+    if (!rl.allowed) {
+        throw createError({
+            statusCode: 429,
+            statusMessage: `Too many requests. Try again in ${Math.ceil(rl.retryAfterMs / 1000)}s.`,
+        })
     }
 
     const body = await readBody<{ messageId?: string }>(event)

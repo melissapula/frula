@@ -67,4 +67,10 @@ export default defineNuxtConfig({
             cookieRedirect: false,
         },
     },
+
+    vite: {
+        optimizeDeps: {
+            include: ['@vue/devtools-core', '@vue/devtools-kit', 'mapbox-gl'],
+        },
+    },
 })

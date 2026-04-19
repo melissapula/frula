@@ -54,6 +54,25 @@ export function useCloudinaryUpload() {
                 if (xhr.status >= 200 && xhr.status < 300) {
                     try {
                         const result: CloudinaryUploadResult = JSON.parse(xhr.responseText)
+
+                        // Validate the response is actually from Cloudinary
+                        if (
+                            !result.secure_url?.startsWith('https://res.cloudinary.com/') ||
+                            !result.format ||
+                            !['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif', 'gif'].includes(
+                                result.format.toLowerCase(),
+                            )
+                        ) {
+                            reject(new Error('Invalid upload response'))
+                            return
+                        }
+
+                        // Reject files over 25 MB (belt + suspenders for client-side limit)
+                        if (result.bytes > 25 * 1024 * 1024) {
+                            reject(new Error('File too large (max 25 MB)'))
+                            return
+                        }
+
                         resolve({
                             url: result.secure_url,
                             publicId: result.public_id,

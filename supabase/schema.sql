@@ -326,10 +326,15 @@ CREATE TABLE public.search_alerts (
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.listings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.listing_photos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.listing_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.saved_listings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transaction_checklists ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.listing_plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.search_alerts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cma_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.parcels ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: users can read all, edit own
 CREATE POLICY "Public profiles are viewable" ON public.profiles FOR SELECT USING (true);
@@ -357,3 +362,27 @@ CREATE POLICY "Own saved listings" ON public.saved_listings FOR ALL USING (auth.
 CREATE POLICY "Transaction parties only" ON public.transactions FOR ALL USING (
   auth.uid() = seller_id OR auth.uid() = buyer_id
 );
+
+-- Listing documents: public docs viewable, owners manage their own
+CREATE POLICY "Public documents are viewable" ON public.listing_documents FOR SELECT USING (
+  is_public = TRUE AND listing_id IN (SELECT id FROM public.listings WHERE status = 'active')
+);
+CREATE POLICY "Owners manage documents" ON public.listing_documents FOR ALL USING (
+  auth.uid() = (SELECT user_id FROM public.listings WHERE id = listing_id)
+);
+
+-- Listing plans: tied to listing ownership
+CREATE POLICY "Users manage own listing plans" ON public.listing_plans FOR ALL USING (
+  auth.uid() = (SELECT user_id FROM public.listings WHERE id = listing_id)
+);
+
+-- Search alerts: own only
+CREATE POLICY "Users manage own search alerts" ON public.search_alerts FOR ALL USING (auth.uid() = user_id);
+
+-- CMA reports: listing owners can view
+CREATE POLICY "Owners view own CMA reports" ON public.cma_reports FOR SELECT USING (
+  auth.uid() = (SELECT user_id FROM public.listings WHERE id = listing_id)
+);
+
+-- Parcels: public reference data (read-only for all)
+CREATE POLICY "Parcels are public reference data" ON public.parcels FOR SELECT USING (true);

@@ -21,6 +21,7 @@
  */
 
 import { serverSupabaseClient } from '#supabase/server'
+import { checkRateLimit } from '../utils/rateLimit'
 
 interface ListingRow {
     id: string
@@ -63,6 +64,16 @@ interface NearbyComp {
 }
 
 export default defineEventHandler(async (event) => {
+    // Rate limit: 15 snapshot requests per minute per IP
+    const ip = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown'
+    const rl = checkRateLimit(`snapshot:${ip}`, 15, 60_000)
+    if (!rl.allowed) {
+        throw createError({
+            statusCode: 429,
+            statusMessage: `Too many requests. Try again in ${Math.ceil(rl.retryAfterMs / 1000)}s.`,
+        })
+    }
+
     const query = getQuery(event)
     const listingId = query.listingId as string | undefined
     if (!listingId) {

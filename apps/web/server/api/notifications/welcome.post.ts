@@ -12,6 +12,7 @@
  */
 
 import { serverSupabaseUser, serverSupabaseServiceRole } from '#supabase/server'
+import { checkRateLimit } from '../../utils/rateLimit'
 
 interface ProfileRow {
     id: string
@@ -30,6 +31,15 @@ export default defineEventHandler(async (event) => {
     const user = await serverSupabaseUser(event)
     if (!user) {
         throw createError({ statusCode: 401, statusMessage: 'Not authenticated' })
+    }
+
+    // Rate limit: 3 welcome attempts per hour per user
+    const rl = checkRateLimit(`welcome:${user.id}`, 3, 3_600_000)
+    if (!rl.allowed) {
+        throw createError({
+            statusCode: 429,
+            statusMessage: `Too many requests. Try again later.`,
+        })
     }
 
     const admin = serverSupabaseServiceRole(event)
