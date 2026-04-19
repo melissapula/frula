@@ -48,7 +48,8 @@ function colorFor(type: string | undefined): string {
     return COLORS.homes
 }
 
-onMounted(() => {
+onMounted(async () => {
+    await nextTick()
     if (!token || !mapEl.value || props.lat == null || props.lng == null) return
     mapboxgl.accessToken = token
 

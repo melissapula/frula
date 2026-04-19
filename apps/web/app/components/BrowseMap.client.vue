@@ -287,7 +287,11 @@ function formatPriceShort(n: number): string {
 
 let resizeObserver: ResizeObserver | null = null
 
-onMounted(() => {
+onMounted(async () => {
+    // Wait for the DOM to fully settle — on the initial page load the
+    // container may not have dimensions yet when onMounted fires because
+    // the parent's v-else just appeared.
+    await nextTick()
     if (!token || !mapEl.value) return
     mapboxgl.accessToken = token
     map = new mapboxgl.Map({
