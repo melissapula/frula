@@ -29,11 +29,6 @@
             <div v-else class="flex h-full items-center justify-center text-slate-300">
                 No photo
             </div>
-            <div
-                class="text-brand absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold shadow-sm"
-            >
-                FSBO
-            </div>
             <div class="absolute bottom-3 right-3 z-10">
                 <SaveButton :listing-id="listing.id" variant="icon" />
             </div>

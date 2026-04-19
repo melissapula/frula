@@ -23,10 +23,12 @@ export default defineEventHandler((event) => {
         'Content-Security-Policy',
         [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.mapbox.com https://events.mapbox.com",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://api.mapbox.com https://events.mapbox.com",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://api.mapbox.com",
             "img-src 'self' data: blob: https://res.cloudinary.com https://*.tiles.mapbox.com https://api.mapbox.com",
             "font-src 'self' https://fonts.gstatic.com",
+            'worker-src blob:',
+            'child-src blob:',
             "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://api.cloudinary.com https://nominatim.openstreetmap.org",
             "frame-ancestors 'self'",
             "base-uri 'self'",

@@ -82,7 +82,8 @@ export default defineNuxtConfig({
         '/terms': { swr: 86400 },
         '/checklist/**': { swr: 86400 },
         // Listing detail pages — cache 10 min, revalidate in background
-        '/listing/**': { swr: 600 },
+        // Exclude sub-routes (CMA) to avoid nested cache path issues on Windows
+        '/listing/*/': { swr: 600 },
         // Seller profiles — cache 10 min
         '/seller/**': { swr: 600 },
     },
