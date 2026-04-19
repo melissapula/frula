@@ -11,7 +11,7 @@
         "format": "prettier --write \"**/*.{ts,vue,js,json,md,css}\"",
         "format:check": "prettier --check \"**/*.{ts,vue,js,json,md,css}\"",
         "lint": "npm run lint --workspace=web",
-        "prepare": "husky"
+        "prepare": "husky || true"
     },
     "devDependencies": {
         "concurrently": "^8.2.0",
