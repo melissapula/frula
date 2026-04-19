@@ -42,21 +42,6 @@
                         Browse Listings
                     </NuxtLink>
                 </div>
-                <div v-if="!user" class="mt-6 flex items-center justify-center gap-3">
-                    <NuxtLink
-                        to="/login"
-                        class="hover:text-brand text-sm font-medium text-slate-600"
-                    >
-                        Sign in
-                    </NuxtLink>
-                    <span class="text-slate-300">|</span>
-                    <NuxtLink
-                        to="/signup"
-                        class="text-brand hover:text-brand-600 text-sm font-semibold"
-                    >
-                        Create an account
-                    </NuxtLink>
-                </div>
             </div>
         </section>
 
