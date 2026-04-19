@@ -284,6 +284,49 @@
                     >
                         Sign out
                     </button>
+
+                    <!-- Delete account -->
+                    <div class="rounded-2xl border border-red-200 bg-red-50 p-5">
+                        <p class="text-sm font-semibold text-red-800">Delete account</p>
+                        <p class="mt-1 text-xs text-red-700">
+                            Permanently delete your account, listings, messages, and all associated
+                            data. This cannot be undone.
+                        </p>
+                        <button
+                            v-if="!confirmingDelete"
+                            type="button"
+                            class="mt-3 w-full rounded-full border border-red-300 px-4 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100"
+                            @click="confirmingDelete = true"
+                        >
+                            Delete my account
+                        </button>
+                        <div v-else class="mt-3 space-y-2">
+                            <p class="text-xs font-semibold text-red-800">
+                                Are you sure? This deletes everything permanently.
+                            </p>
+                            <div class="flex gap-2">
+                                <button
+                                    type="button"
+                                    :disabled="deleting"
+                                    class="flex-1 rounded-full bg-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
+                                    @click="deleteAccount"
+                                >
+                                    {{ deleting ? 'Deleting…' : 'Yes, delete everything' }}
+                                </button>
+                                <button
+                                    type="button"
+                                    :disabled="deleting"
+                                    class="flex-1 rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-400"
+                                    @click="confirmingDelete = false"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                            <p v-if="deleteError" class="text-xs text-red-700">
+                                {{ deleteError }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -425,6 +468,29 @@ function relativeTime(iso: string): string {
 async function signOut() {
     await supabase.auth.signOut()
     await router.replace('/')
+}
+
+// =====================================================
+// Delete account
+// =====================================================
+const confirmingDelete = ref(false)
+const deleting = ref(false)
+const deleteError = ref<string | null>(null)
+
+async function deleteAccount() {
+    if (deleting.value) return
+    deleting.value = true
+    deleteError.value = null
+
+    try {
+        await $fetch('/api/account/delete', { method: 'POST' })
+        await supabase.auth.signOut()
+        await router.replace('/')
+    } catch (e: unknown) {
+        const err = e as { data?: { message?: string } }
+        deleteError.value = err.data?.message || 'Something went wrong. Please try again.'
+        deleting.value = false
+    }
 }
 
 useSeoMeta({ title: 'My account — Frula Homes', robots: 'noindex' })
