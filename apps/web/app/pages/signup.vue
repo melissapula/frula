@@ -164,5 +164,5 @@ async function fireWelcome() {
     }
 }
 
-useSeoMeta({ title: 'Sign up — Frula Homes' })
+useSeoMeta({ title: 'Sign up — Frula Homes', robots: 'noindex' })
 </script>

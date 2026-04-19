@@ -606,5 +606,5 @@ function formatTime(iso: string) {
     })
 }
 
-useSeoMeta({ title: 'Conversation — Frula Homes' })
+useSeoMeta({ title: 'Conversation — Frula Homes', robots: 'noindex' })
 </script>

@@ -226,7 +226,7 @@ const groupedPhases = computed(() => {
 useSeoMeta({
     title: 'Paperwork guides — Frula Homes',
     description:
-        'Step-by-step walkthroughs of every document and disclosure you need to buy or sell a home without an agent.',
+        'Directory of official real estate forms, disclosures, and resources for all 50 states. Find what you need to buy or sell a home without an agent.',
 })
 </script>
 

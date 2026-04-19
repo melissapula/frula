@@ -173,6 +173,7 @@ export default defineEventHandler(async (event) => {
                 body: message.body,
                 threadUrl,
                 listingUrl,
+                siteUrl,
             })
             break
         }
@@ -185,6 +186,7 @@ export default defineEventHandler(async (event) => {
                 body: message.body,
                 threadUrl,
                 listingUrl,
+                siteUrl,
             })
             break
         }
@@ -197,6 +199,7 @@ export default defineEventHandler(async (event) => {
                 body: message.body,
                 threadUrl,
                 listingUrl,
+                siteUrl,
             })
         }
     }
@@ -256,6 +259,7 @@ interface TemplateContext {
     body: string
     threadUrl: string
     listingUrl: string
+    siteUrl: string
 }
 
 function emailShell(opts: {
@@ -264,6 +268,7 @@ function emailShell(opts: {
     content: string
     ctaUrl: string
     ctaLabel: string
+    siteUrl: string
 }): string {
     return `
 <!doctype html>
@@ -298,11 +303,11 @@ function emailShell(opts: {
             <tr>
               <td style="padding:20px 36px 32px 36px;border-top:1px solid #e2e8f0;font-size:12px;color:#94a3b8;">
                 You're receiving this because you have an account on Frula Homes.<br>
-                <a href="${escapeHtml(opts.ctaUrl)}" style="color:#94a3b8;">View in browser</a>
+                <a href="${escapeHtml(opts.ctaUrl)}" style="color:#94a3b8;">View in browser</a> · <a href="${escapeHtml(opts.siteUrl)}/account" style="color:#94a3b8;">Email preferences</a>
               </td>
             </tr>
           </table>
-          <p style="margin:16px 0 0 0;font-size:11px;color:#94a3b8;">Frula Homes · Sell it yourself</p>
+          <p style="margin:16px 0 0 0;font-size:11px;color:#94a3b8;">Frula Homes · Bemidji, MN 56601</p>
         </td>
       </tr>
     </table>
@@ -324,6 +329,7 @@ function renderOfferEmail(ctx: TemplateContext): string {
         preheader: `${ctx.senderName} just made an offer on ${ctx.listing.address}.`,
         ctaUrl: ctx.threadUrl,
         ctaLabel: 'View offer & respond',
+        siteUrl: ctx.siteUrl,
         content: `
 <p style="margin:0 0 12px 0;font-size:15px;color:#334155;">${greeting}</p>
 <p style="margin:0 0 12px 0;font-size:15px;color:#334155;">
@@ -347,6 +353,7 @@ function renderViewingEmail(ctx: TemplateContext): string {
         preheader: `${ctx.senderName} requested a viewing at ${ctx.listing.address}.`,
         ctaUrl: ctx.threadUrl,
         ctaLabel: 'View request & respond',
+        siteUrl: ctx.siteUrl,
         content: `
 <p style="margin:0 0 12px 0;font-size:15px;color:#334155;">${greeting}</p>
 <p style="margin:0 0 12px 0;font-size:15px;color:#334155;">
@@ -370,6 +377,7 @@ function renderMessageEmail(ctx: TemplateContext): string {
         preheader: ctx.body.slice(0, 120),
         ctaUrl: ctx.threadUrl,
         ctaLabel: 'Reply in inbox',
+        siteUrl: ctx.siteUrl,
         content: `
 <p style="margin:0 0 12px 0;font-size:15px;color:#334155;">${greeting}</p>
 <p style="margin:0 0 12px 0;font-size:15px;color:#334155;">

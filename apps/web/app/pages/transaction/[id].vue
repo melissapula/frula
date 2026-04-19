@@ -282,5 +282,5 @@ onUnmounted(() => {
     if (realtimeChannel) supabase.removeChannel(realtimeChannel)
 })
 
-useSeoMeta({ title: 'Transaction — Frula Homes' })
+useSeoMeta({ title: 'Transaction — Frula Homes', robots: 'noindex' })
 </script>

@@ -135,5 +135,5 @@ function formatDate(iso: string) {
     })
 }
 
-useSeoMeta({ title: 'My transactions — Frula Homes' })
+useSeoMeta({ title: 'My transactions — Frula Homes', robots: 'noindex' })
 </script>

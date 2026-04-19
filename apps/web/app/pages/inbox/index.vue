@@ -12,6 +12,13 @@
         <div class="mx-auto max-w-4xl px-4 py-8 md:px-8 md:py-12">
             <h1 class="font-display text-3xl font-bold text-slate-900">Inbox</h1>
 
+            <div
+                v-if="actionError"
+                class="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+            >
+                {{ actionError }}
+            </div>
+
             <div v-if="pending" class="mt-8 space-y-3">
                 <div v-for="n in 3" :key="n" class="h-20 animate-pulse rounded-2xl bg-slate-200" />
             </div>
@@ -150,6 +157,7 @@ const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const router = useRouter()
 const { bump: bumpUnreadBadge } = useUnreadBadge()
+const actionError = ref<string | null>(null)
 
 // Helper: replace one thread in the list immutably so Vue reactivity
 // definitely picks up the change. Mutating in place was unreliable here
@@ -220,8 +228,10 @@ async function toggleFlag(thread: Thread) {
     if (error) {
         // eslint-disable-next-line no-console
         console.error('Failed to toggle flag:', error)
+        actionError.value = 'Could not update flag. Please try again.'
         return
     }
+    actionError.value = null
     patchThread(thread, { flagged: next })
 }
 
@@ -234,8 +244,10 @@ async function markUnread(thread: Thread) {
     if (error) {
         // eslint-disable-next-line no-console
         console.error('Failed to mark unread:', error)
+        actionError.value = 'Could not mark as unread. Please try again.'
         return
     }
+    actionError.value = null
     patchThread(thread, {
         unread_count: Math.max(thread.unread_count, 1),
         last_message: { ...thread.last_message, is_read: false },
@@ -259,9 +271,10 @@ async function deleteThread(thread: Thread) {
     if (error) {
         // eslint-disable-next-line no-console
         console.error('Failed to delete thread:', error)
-        alert(`Could not delete: ${error.message}`)
+        actionError.value = 'Could not delete this conversation. Please try again.'
         return
     }
+    actionError.value = null
     threads.value = threads.value.filter(
         (t) => !(t.listing_id === thread.listing_id && t.other_user_id === thread.other_user_id),
     )
@@ -285,5 +298,5 @@ function relativeTime(iso: string): string {
     return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-useSeoMeta({ title: 'Inbox — Frula Homes' })
+useSeoMeta({ title: 'Inbox — Frula Homes', robots: 'noindex' })
 </script>

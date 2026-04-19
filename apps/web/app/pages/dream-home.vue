@@ -273,7 +273,14 @@
                 <!-- ============ RESULTS ============ -->
                 <section>
                     <div
-                        v-if="!hasSearched"
+                        v-if="searchError"
+                        class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+                    >
+                        {{ searchError }}
+                    </div>
+
+                    <div
+                        v-else-if="!hasSearched"
                         class="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center"
                     >
                         <p class="font-display text-xl font-semibold text-slate-700">
@@ -455,6 +462,7 @@ interface ScoredListing {
 
 const scored = ref<ScoredListing[]>([])
 const searching = ref(false)
+const searchError = ref<string | null>(null)
 const hasSearched = ref(false)
 const visibleCount = ref(10)
 
@@ -575,9 +583,11 @@ async function search() {
     if (error) {
         // eslint-disable-next-line no-console
         console.error('Dream home search failed:', error)
+        searchError.value = 'Something went wrong loading results. Please try again.'
         scored.value = []
         return
     }
+    searchError.value = null
 
     const listings = (data ?? []) as unknown as Listing[]
     const ranked = listings

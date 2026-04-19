@@ -109,5 +109,5 @@ async function signIn() {
     await router.replace('/account')
 }
 
-useSeoMeta({ title: 'Sign in — Frula Homes' })
+useSeoMeta({ title: 'Sign in — Frula Homes', robots: 'noindex' })
 </script>

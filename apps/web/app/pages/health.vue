@@ -42,5 +42,5 @@ const { data, error, pending } = await useAsyncData('checklist-templates', async
     return data
 })
 
-useSeoMeta({ title: 'Health Check — Frula Homes' })
+useSeoMeta({ title: 'Health Check — Frula Homes', robots: 'noindex' })
 </script>

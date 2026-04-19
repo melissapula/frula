@@ -127,5 +127,5 @@ async function submit() {
     sent.value = true
 }
 
-useSeoMeta({ title: 'Forgot password — Frula Homes' })
+useSeoMeta({ title: 'Forgot password — Frula Homes', robots: 'noindex' })
 </script>

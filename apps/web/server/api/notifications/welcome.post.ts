@@ -183,7 +183,8 @@ function renderWelcomeEmail(opts: { firstName: string | null; siteUrl: string })
             <tr>
               <td style="padding:20px 36px 32px 36px;border-top:1px solid #e2e8f0;font-size:12px;color:#94a3b8;">
                 <strong>Frula Homes</strong> — Sell it yourself.<br>
-                <a href="${escapeHtml(opts.siteUrl)}/how-we-make-money" style="color:#94a3b8;">How we make money</a> · <a href="${escapeHtml(opts.siteUrl)}/privacy" style="color:#94a3b8;">Privacy</a>
+                <a href="${escapeHtml(opts.siteUrl)}/how-we-make-money" style="color:#94a3b8;">How we make money</a> · <a href="${escapeHtml(opts.siteUrl)}/privacy" style="color:#94a3b8;">Privacy</a> · <a href="${escapeHtml(opts.siteUrl)}/account" style="color:#94a3b8;">Email preferences</a><br>
+                Bemidji, MN 56601
               </td>
             </tr>
           </table>

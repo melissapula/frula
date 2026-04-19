@@ -427,5 +427,5 @@ async function signOut() {
     await router.replace('/')
 }
 
-useSeoMeta({ title: 'My account — Frula Homes' })
+useSeoMeta({ title: 'My account — Frula Homes', robots: 'noindex' })
 </script>

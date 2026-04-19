@@ -117,5 +117,5 @@ async function submit() {
     setTimeout(() => router.replace('/account'), 1500)
 }
 
-useSeoMeta({ title: 'Set new password — Frula Homes' })
+useSeoMeta({ title: 'Set new password — Frula Homes', robots: 'noindex' })
 </script>

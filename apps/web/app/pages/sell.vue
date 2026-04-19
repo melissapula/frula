@@ -723,7 +723,7 @@ async function submit() {
     await router.push(`/listing/${listingId}`)
 }
 
-useSeoMeta({ title: 'List your home — Frula Homes' })
+useSeoMeta({ title: 'List your home — Frula Homes', robots: 'noindex' })
 </script>
 
 <style scoped>

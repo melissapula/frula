@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: false })
+useSeoMeta({ title: 'Confirming — Frula Homes', robots: 'noindex' })
 
 const user = useSupabaseUser()
 const router = useRouter()

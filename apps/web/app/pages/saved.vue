@@ -28,6 +28,13 @@
             </div>
 
             <div
+                v-else-if="loadError"
+                class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+            >
+                {{ loadError }}
+            </div>
+
+            <div
                 v-else-if="!savedListings.length"
                 class="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center"
             >
@@ -81,6 +88,7 @@ watchEffect(() => {
 
 const savedListings = ref<Listing[]>([])
 const pending = ref(true)
+const loadError = ref<string | null>(null)
 
 async function loadListings() {
     if (!user.value) {
@@ -114,8 +122,10 @@ async function loadListings() {
     if (error) {
         // eslint-disable-next-line no-console
         console.error('Failed to load saved listings:', error)
+        loadError.value = 'Failed to load your saved listings. Please try again.'
         savedListings.value = []
     } else {
+        loadError.value = null
         savedListings.value = (data ?? []) as unknown as Listing[]
     }
     pending.value = false
@@ -129,5 +139,5 @@ watch(savedIds, (next) => {
     savedListings.value = savedListings.value.filter((l) => next.has(l.id))
 })
 
-useSeoMeta({ title: 'Saved listings — Frula Homes' })
+useSeoMeta({ title: 'Saved listings — Frula Homes', robots: 'noindex' })
 </script>
