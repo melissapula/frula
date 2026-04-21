@@ -196,6 +196,7 @@
                             <Fact label="Stories" :value="listing.stories" />
                             <Fact label="Bedrooms" :value="listing.beds" />
                             <Fact label="Full baths" :value="listing.full_baths" />
+                            <Fact label="3/4 baths" :value="listing.three_quarter_baths" />
                             <Fact label="Half baths" :value="listing.half_baths" />
                             <Fact
                                 label="Garage"
@@ -411,7 +412,7 @@ const {
         .select(
             `
         id, user_id, status, address, city, state, zip, county, lat, lng,
-        property_type, price, sqft, lot_size, lot_unit, beds, full_baths, half_baths,
+        property_type, price, sqft, lot_size, lot_unit, beds, full_baths, three_quarter_baths, half_baths,
         year_built, garage, garage_stalls, parking_spaces, single_story, stories,
         basement, basement_finished,
         waterfront, water_body_name, view_types, features,
@@ -441,9 +442,10 @@ const photos = computed(() => {
 const totalBathLabel = computed(() => {
     if (!listing.value) return null
     const f = listing.value.full_baths ?? 0
+    const tq = listing.value.three_quarter_baths ?? 0
     const h = listing.value.half_baths ?? 0
-    if (!f && !h) return null
-    return h ? `${f}.${h >= 1 ? 5 : 0}` : `${f}`
+    if (!f && !tq && !h) return null
+    return `${f + tq + h}`
 })
 
 const daysOnMarket = computed(() => {

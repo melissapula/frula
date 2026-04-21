@@ -92,13 +92,21 @@
                             />
                         </Field>
                     </div>
-                    <div class="grid gap-4 sm:grid-cols-3">
+                    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         <Field label="Bedrooms">
                             <input v-model.number="form.beds" type="number" min="0" class="input" />
                         </Field>
                         <Field label="Full baths">
                             <input
                                 v-model.number="form.full_baths"
+                                type="number"
+                                min="0"
+                                class="input"
+                            />
+                        </Field>
+                        <Field label="3/4 baths">
+                            <input
+                                v-model.number="form.three_quarter_baths"
                                 type="number"
                                 min="0"
                                 class="input"
@@ -447,6 +455,7 @@ const form = reactive({
     year_built: undefined as number | undefined,
     beds: undefined as number | undefined,
     full_baths: undefined as number | undefined,
+    three_quarter_baths: undefined as number | undefined,
     half_baths: undefined as number | undefined,
     sqft: undefined as number | undefined,
     lot_size: undefined as number | undefined,
@@ -566,7 +575,7 @@ onMounted(async () => {
         .from('listings')
         .select(
             `id, user_id, address, city, state, zip, county, property_type,
-             year_built, beds, full_baths, half_baths, sqft, lot_size,
+             year_built, beds, full_baths, three_quarter_baths, half_baths, sqft, lot_size,
              garage_stalls, parking_spaces, single_story, stories,
              basement, basement_finished, price, title, description, highlights,
              waterfront, water_body_name, view_types, features,
@@ -596,6 +605,7 @@ onMounted(async () => {
         year_built: data.year_built ?? undefined,
         beds: data.beds ?? undefined,
         full_baths: data.full_baths ?? undefined,
+        three_quarter_baths: data.three_quarter_baths ?? undefined,
         half_baths: data.half_baths ?? undefined,
         sqft: data.sqft ?? undefined,
         lot_size: data.lot_size ?? undefined,
@@ -693,6 +703,7 @@ async function submit() {
         lot_size: form.lot_size ?? null,
         beds: form.beds ?? null,
         full_baths: form.full_baths ?? null,
+        three_quarter_baths: form.three_quarter_baths ?? null,
         half_baths: form.half_baths ?? null,
         year_built: form.year_built ?? null,
         garage: (form.garage_stalls ?? 0) > 0,

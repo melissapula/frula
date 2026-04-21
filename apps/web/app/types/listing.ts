@@ -18,6 +18,7 @@ export interface Listing {
     lot_unit?: 'acres' | 'sqft'
     beds: number | null
     full_baths: number | null
+    three_quarter_baths?: number | null
     half_baths: number | null
     year_built: number | null
     garage: boolean

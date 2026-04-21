@@ -72,6 +72,7 @@ CREATE TABLE public.listings (
   lot_unit            TEXT DEFAULT 'acres' CHECK (lot_unit IN ('acres','sqft')),
   beds                INTEGER,
   full_baths          INTEGER,
+  three_quarter_baths INTEGER,
   half_baths          INTEGER,
   year_built          INTEGER,
   garage              BOOLEAN DEFAULT FALSE,

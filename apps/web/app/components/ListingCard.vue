@@ -145,9 +145,10 @@ const primaryPhoto = computed(() => {
 
 const totalBaths = computed(() => {
     const f = props.listing.full_baths ?? 0
+    const tq = props.listing.three_quarter_baths ?? 0
     const h = props.listing.half_baths ?? 0
-    if (!f && !h) return null
-    return h ? `${f}.${h >= 1 ? 5 : 0}` : `${f}`
+    if (!f && !tq && !h) return null
+    return `${f + tq + h}`
 })
 
 const distanceLabel = computed(() => formatDistance(props.listing.distance_meters))
