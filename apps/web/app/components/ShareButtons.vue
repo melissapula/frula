@@ -14,7 +14,7 @@
             <button
                 v-if="canNativeShare"
                 type="button"
-                class="bg-brand hover:bg-brand-600 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold text-white shadow-sm transition"
+                class="bg-brand hover:bg-brand-600 inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition"
                 @click="nativeShare"
             >
                 📤 Share…
@@ -24,7 +24,7 @@
                 :href="facebookUrl"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-1.5 rounded-full bg-[#1877F2] px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90"
+                class="inline-flex items-center gap-1.5 rounded-full bg-[#1877F2] px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:opacity-90"
             >
                 <span aria-hidden="true">f</span>
                 Facebook
@@ -34,7 +34,7 @@
                 :href="twitterUrl"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90"
+                class="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:opacity-90"
             >
                 <span aria-hidden="true">𝕏</span>
                 X / Twitter
@@ -42,21 +42,21 @@
 
             <a
                 :href="smsUrl"
-                class="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90"
+                class="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:opacity-90"
             >
                 💬 Text
             </a>
 
             <a
                 :href="emailUrl"
-                class="hover:border-brand hover:text-brand inline-flex items-center gap-1.5 rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 transition"
+                class="inline-flex items-center gap-1.5 rounded-full bg-amber-500 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:opacity-90"
             >
                 ✉️ Email
             </a>
 
             <button
                 type="button"
-                class="hover:border-brand hover:text-brand inline-flex items-center gap-1.5 rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 transition"
+                class="inline-flex items-center gap-1.5 rounded-full bg-slate-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:opacity-90"
                 @click="copyLink"
             >
                 {{ copied ? '✓ Copied!' : '🔗 Copy link' }}
@@ -74,10 +74,6 @@ const props = defineProps<{
     price: number
 }>()
 
-// Build the canonical share URL. On the server we don't have window, so we
-// use the configured siteUrl from runtimeConfig as the fallback. On the
-// client, window.location.href is most accurate (handles preview deploys,
-// custom domains, etc.).
 const config = useRuntimeConfig()
 const siteUrl = computed(() => {
     if (typeof window !== 'undefined') {
@@ -95,32 +91,38 @@ const formattedPrice = computed(() =>
 )
 
 const shareTitle = computed(() => `${props.address} — ${formattedPrice.value} on Frula Homes`)
-const shareText = computed(
+
+// Short text without URL (for platforms that handle URL separately)
+const shortText = computed(
     () =>
-        `Check out this home for sale by owner: ${props.address}, ${props.city}, ${props.state} — ${formattedPrice.value}. No agent commissions.\n\n${siteUrl.value}`,
+        `Check out this home for sale by owner: ${props.address}, ${props.city}, ${props.state} — ${formattedPrice.value}. No agent commissions.`,
 )
 
-// URL builders for each network's share endpoint
+// Full text with URL (for platforms that need it inline)
+const fullText = computed(() => `${shortText.value}\n\n${siteUrl.value}`)
+
+// Facebook handles URL separately via the u= param
 const facebookUrl = computed(
     () => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl.value)}`,
 )
+
+// Twitter handles URL separately via the url= param
 const twitterUrl = computed(
     () =>
-        `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText.value)}&url=${encodeURIComponent(siteUrl.value)}`,
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(shortText.value)}&url=${encodeURIComponent(siteUrl.value)}`,
 )
-const smsUrl = computed(
-    () => `sms:?&body=${encodeURIComponent(`${shareText.value} ${siteUrl.value}`)}`,
-)
+
+// SMS needs the URL in the body
+const smsUrl = computed(() => `sms:?&body=${encodeURIComponent(fullText.value)}`)
+
+// Email needs the URL in the body with proper line breaks
 const emailUrl = computed(() => {
     const subject = encodeURIComponent(shareTitle.value)
-    const body = encodeURIComponent(`${shareText.value}\r\n\r\nView listing:\r\n${siteUrl.value}`)
+    const body = encodeURIComponent(`${shortText.value}\r\n\r\nView listing:\r\n${siteUrl.value}`)
     return `mailto:?subject=${subject}&body=${body}`
 })
 
-// Web Share API — only available on most mobile browsers and a few desktop
-// ones (Safari, Edge). When present, it gives users their OS-native share
-// sheet (AirDrop, WhatsApp, Signal, etc.) which is way more useful than
-// hardcoded buttons. Detect support and only show the button if available.
+// Web Share API
 const canNativeShare = ref(false)
 onMounted(() => {
     canNativeShare.value = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
@@ -131,11 +133,11 @@ async function nativeShare() {
     try {
         await navigator.share({
             title: shareTitle.value,
-            text: shareText.value,
+            text: shortText.value,
             url: siteUrl.value,
         })
     } catch {
-        // User cancelled or share failed — silently ignore
+        // User cancelled or share failed
     }
 }
 
@@ -147,7 +149,6 @@ async function copyLink() {
         copied.value = true
         setTimeout(() => (copied.value = false), 2000)
     } catch {
-        // Clipboard API blocked (rare) — fall back to a prompt
         window.prompt('Copy this link:', siteUrl.value)
     }
 }
