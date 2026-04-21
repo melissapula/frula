@@ -58,21 +58,24 @@
         >
             <button
                 type="button"
-                class="bg-brand hover:bg-brand-600 px-2 py-2.5 text-xs font-bold text-white transition"
+                aria-label="Accept offer"
+                class="bg-brand hover:bg-brand-600 px-2 py-3 text-xs font-bold text-white transition"
                 @click="$emit('accept')"
             >
                 Accept
             </button>
             <button
                 type="button"
-                class="bg-white px-2 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
+                aria-label="Counter offer"
+                class="bg-white px-2 py-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                 @click="$emit('counter')"
             >
                 Counter
             </button>
             <button
                 type="button"
-                class="bg-white px-2 py-2.5 text-xs font-bold text-red-600 transition hover:bg-red-50"
+                aria-label="Decline offer"
+                class="bg-white px-2 py-3 text-xs font-bold text-red-600 transition hover:bg-red-50"
                 @click="$emit('decline')"
             >
                 Decline

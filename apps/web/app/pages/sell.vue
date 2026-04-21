@@ -368,12 +368,19 @@
                     <PhotoUploader v-model="photos" />
                 </Section>
 
-                <!-- Errors / submit -->
+                <!-- Errors / warnings -->
                 <div
                     v-if="error"
                     class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
                 >
                     {{ error }}
+                </div>
+                <div
+                    v-if="geoWarning"
+                    class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
+                >
+                    We couldn't pinpoint this address on the map. Your listing is still published,
+                    but it won't appear in map search until the address is corrected.
                 </div>
 
                 <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -490,6 +497,7 @@ const highlightsText = ref('')
 const photos = ref<{ url: string; publicId?: string }[]>([])
 const submitting = ref(false)
 const error = ref<string | null>(null)
+const geoWarning = ref(false)
 
 // Load existing listing on mount if editing.
 onMounted(async () => {
@@ -608,6 +616,7 @@ async function submit() {
     } catch (e) {
         // eslint-disable-next-line no-console
         console.warn('Geocoding failed for new listing:', e)
+        geoWarning.value = true
     }
 
     const payload = {
@@ -720,7 +729,18 @@ async function submit() {
         }
     }
 
-    await router.push(`/listing/${listingId}`)
+    // Brief success feedback before redirect
+    error.value = null
+    submitting.value = false
+    const successEl = document.createElement('div')
+    successEl.className =
+        'fixed top-4 left-1/2 -translate-x-1/2 z-50 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg'
+    successEl.textContent = 'Listing published!'
+    document.body.appendChild(successEl)
+    setTimeout(() => {
+        successEl.remove()
+        router.push(`/listing/${listingId}`)
+    }, 1500)
 }
 
 useSeoMeta({ title: 'List your home — Frula Homes', robots: 'noindex' })

@@ -21,6 +21,16 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
 import { type DreamPrefs, scoreDreamListing } from '../../utils/dreamScore'
 
+/** Constant-time string comparison to prevent timing attacks on the secret. */
+function timingSafeEqual(a: string, b: string): boolean {
+    if (a.length !== b.length) return false
+    let result = 0
+    for (let i = 0; i < a.length; i++) {
+        result |= a.charCodeAt(i) ^ b.charCodeAt(i)
+    }
+    return result === 0
+}
+
 interface AlertRow {
     id: string
     user_id: string
@@ -69,10 +79,11 @@ interface ScoredMatch {
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
 
-    // Auth: shared secret, not user auth
+    // Auth: shared secret, not user auth (timing-safe comparison)
     const authHeader = getHeader(event, 'authorization')
-    const token = authHeader?.replace('Bearer ', '')
-    if (!config.alertsSecret || token !== config.alertsSecret) {
+    const token = authHeader?.replace('Bearer ', '') ?? ''
+    const secret = config.alertsSecret as string
+    if (!secret || !token || token.length !== secret.length || !timingSafeEqual(token, secret)) {
         throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
     }
 

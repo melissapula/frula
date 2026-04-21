@@ -1,24 +1,54 @@
-# 🏠 FSBO Platform
+# Frula Homes
 
-> For Sale By Owner — built for real people, not real estate agents.
+> Sell your home. Keep the commission.
 
-A full-stack FSBO listing platform with built-in CMA (Comparable Market Analysis),
-smart transaction checklists, and optional paperwork support.
+**Frula Homes** is a nationwide For Sale By Owner (FSBO) informational
+platform built for people who want to sell their home without paying
+agent commissions. Free to list, free to browse, no commission — ever.
+
+**Live at [frulahomes.com](https://frulahomes.com)**
 
 ---
 
-## Stack
+## What It Does
 
-| Layer    | Tech                          |
-| -------- | ----------------------------- |
-| Frontend | Nuxt 3 + TypeScript           |
-| Backend  | NestJS + TypeScript           |
-| Database | Supabase (Postgres + PostGIS) |
-| Auth     | Supabase Auth                 |
-| Storage  | Cloudinary                    |
-| Maps     | Mapbox GL JS                  |
-| Email    | Resend                        |
-| Payments | Stripe (Phase 2)              |
+- **Listing platform** — any seller in any state can list for free, with
+  photo uploads, map search, and comprehensive filters
+- **Dream Home Finder** — buyers describe their ideal home and every
+  listing in the country is match-scored and ranked
+- **Structured offers & viewings** — buyers send offers with price,
+  financing, and contingencies; sellers accept/counter/decline
+- **Buyer/seller messaging** — direct inbox with real-time updates and
+  email notifications
+- **Market Snapshot** — ZIP-level median home values from Zillow ZHVI
+  with nearby Frula listings for context
+- **Paperwork directory** — links to official forms for all 50 states +
+  DC, organized by transaction phase
+- **Smart checklists** — seller prep and buyer guide checklists with
+  progress tracking
+
+## What It Does NOT Do
+
+Frula Homes is an **informational platform**, not a brokerage. No
+licensed services, no representation, no document preparation, no
+walkthroughs of how to fill out legal forms. We provide links to
+official resources, checklists, and communication tools.
+
+---
+
+## Tech Stack
+
+| Layer       | Tech                                 |
+| ----------- | ------------------------------------ |
+| Frontend    | Nuxt 3 + TypeScript + Tailwind CSS   |
+| Database    | Supabase (Postgres + PostGIS + Auth) |
+| Storage     | Cloudinary (photo uploads)           |
+| Maps        | Mapbox GL JS                         |
+| Geocoding   | Nominatim / OpenStreetMap            |
+| Email       | Resend (transactional)               |
+| Market data | Zillow Research ZHVI                 |
+| Hosting     | Cloudflare Pages                     |
+| Monitoring  | Sentry                               |
 
 ---
 
@@ -27,91 +57,78 @@ smart transaction checklists, and optional paperwork support.
 ```
 fsbo-platform/
 ├── apps/
-│   ├── web/          # Nuxt 3 frontend
-│   └── api/          # NestJS backend
-├── packages/
-│   └── shared/       # Shared types/utilities
+│   └── web/              # Nuxt 3 app (frontend + server routes)
+│       ├── app/
+│       │   ├── pages/    # All routes
+│       │   ├── components/
+│       │   ├── composables/
+│       │   └── plugins/
+│       ├── server/
+│       │   ├── api/      # Nitro server routes
+│       │   ├── middleware/# Security headers
+│       │   ├── routes/   # Sitemap
+│       │   └── utils/    # Rate limiter, scoring
+│       └── public/       # Static assets, favicon, manifest
 ├── supabase/
-│   ├── schema.sql    # Run first — creates all tables
-│   ├── functions.sql # Run second — PostGIS functions
-│   └── seed.sql      # Run third — MN checklist templates
-└── .env.example      # Copy to .env and fill in values
+│   ├── schema.sql        # Core tables + RLS policies
+│   ├── functions.sql     # PostGIS helpers
+│   ├── seed.sql          # Checklist templates
+│   └── migrations/       # Incremental schema changes
+├── scripts/
+│   └── ingest-zillow-zhvi.mjs  # ZIP market data loader
+└── .env.example
 ```
 
 ---
 
 ## Getting Started
 
-### 1. Supabase Setup
+### 1. Supabase
 
-1. Create a free project at [supabase.com](https://supabase.com)
-2. Go to SQL Editor and run in order:
-    - `supabase/schema.sql`
-    - `supabase/functions.sql`
-    - `supabase/seed.sql`
-3. Copy your `SUPABASE_URL` and keys from Project Settings → API
+Create a project at [supabase.com](https://supabase.com), then run
+in the SQL Editor (in order):
 
-### 2. Environment Variables
+1. `supabase/schema.sql`
+2. `supabase/functions.sql`
+3. `supabase/seed.sql`
+4. All files in `supabase/migrations/` (any order)
 
-```bash
-cp .env.example .env
-# Fill in your Supabase, Cloudinary, Mapbox, etc. keys
-```
-
-### 3. Install Dependencies
+### 2. Environment
 
 ```bash
-yarn install
+cp .env.example apps/web/.env
+# Fill in Supabase, Cloudinary, Mapbox, Resend keys
 ```
 
-### 4. Start Development
+### 3. Install & Run
 
 ```bash
-# Start both API and web simultaneously
-yarn dev
-
-# Or individually:
-yarn dev:api   # NestJS on :3001
-yarn dev:web   # Nuxt on :3000
+npm install
+npm run dev
 ```
 
-### 5. API Docs
+App runs at `http://localhost:3000`.
 
-Visit `http://localhost:3001/docs` for Swagger UI
+### 4. Zillow Data (optional)
+
+Populate ZIP-level market data for the Market Snapshot feature:
+
+```bash
+set -a && source apps/web/.env && set +a && node scripts/ingest-zillow-zhvi.mjs
+```
 
 ---
 
-## MN Parcel Data Import
+## Deployment
 
-1. Download statewide parcel data from [gisdata.mn.gov](https://gisdata.mn.gov)
-2. Go to: Layers → Cadastral → MN Statewide Parcel Dataset
-3. Download the CSV for your target counties
-4. Use the admin import endpoint:
-    ```
-    POST /api/parcels/import
-    Content-Type: multipart/form-data
-    ```
+Deployed to **Cloudflare Pages** with automatic builds on push to `main`.
 
----
-
-## Key Features
-
-- ✅ Property listings (residential, land, commercial, multi-family)
-- ✅ Photo uploads via Cloudinary
-- ✅ Map-based search with Mapbox
-- ✅ CMA engine using MN public parcel data + PostGIS
-- ✅ AI-generated CMA narrative (Claude API)
-- ✅ Transaction checklists for buyer + seller (MN-specific)
-- ✅ Document guides for MN paperwork
-- ✅ Buyer/seller messaging
-- ✅ Saved listings + search alerts
-- 🔜 Stripe payment tiers
-- 🔜 Admin dashboard
-- 🔜 Email notifications (Resend)
-- 🔜 Multi-state expansion
+- Build command: `npm run build`
+- Root directory: `apps/web`
+- Environment variables set in Cloudflare Pages dashboard
 
 ---
 
 ## License
 
-Private — not open source (yet 😄)
+Private repository. All rights reserved.

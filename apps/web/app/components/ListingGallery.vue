@@ -22,7 +22,8 @@
                 <button
                     v-if="photos.length > 1"
                     type="button"
-                    class="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-slate-700 shadow-md hover:bg-white"
+                    aria-label="Previous photo"
+                    class="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-3 text-slate-700 shadow-md hover:bg-white"
                     @click="prev"
                 >
                     ‹
@@ -30,7 +31,8 @@
                 <button
                     v-if="photos.length > 1"
                     type="button"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-slate-700 shadow-md hover:bg-white"
+                    aria-label="Next photo"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-3 text-slate-700 shadow-md hover:bg-white"
                     @click="next"
                 >
                     ›
