@@ -52,16 +52,15 @@
                 </p>
             </div>
 
-            <!-- Draft content banner -->
+            <!-- Informational note for guides pending professional review -->
             <div
                 v-if="guide.reviewedBy?.includes('Placeholder')"
-                class="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+                class="mb-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700"
             >
-                <p class="font-semibold">⚠️ Draft content</p>
+                <p class="font-semibold">Informational overview</p>
                 <p class="mt-1">
-                    This entry is a working draft and hasn't been reviewed by a licensed
-                    professional yet. Always use the official source linked below as your
-                    authoritative reference.
+                    This guide provides general context about this document type. For the official
+                    version applicable to your state, use the source linked below.
                 </p>
             </div>
 

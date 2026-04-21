@@ -499,8 +499,68 @@ const submitting = ref(false)
 const error = ref<string | null>(null)
 const geoWarning = ref(false)
 
-// Load existing listing on mount if editing.
+// =====================================================
+// Draft auto-save (new listings only, not edits)
+// =====================================================
+const DRAFT_KEY = 'frula-sell-draft'
+
+function saveDraft() {
+    if (editingId.value || !import.meta.client) return
+    try {
+        localStorage.setItem(
+            DRAFT_KEY,
+            JSON.stringify({ form: { ...form }, highlightsText: highlightsText.value }),
+        )
+    } catch {
+        // Storage full or unavailable — ignore
+    }
+}
+
+function loadDraft() {
+    if (editingId.value || !import.meta.client) return
+    try {
+        const raw = localStorage.getItem(DRAFT_KEY)
+        if (!raw) return
+        const draft = JSON.parse(raw)
+        if (draft.form) Object.assign(form, draft.form)
+        if (draft.highlightsText) highlightsText.value = draft.highlightsText
+    } catch {
+        // Corrupted draft — ignore
+    }
+}
+
+function clearDraft() {
+    if (import.meta.client) localStorage.removeItem(DRAFT_KEY)
+}
+
+// Save draft on every form change (debounced by Vue's reactivity batching)
+watch([() => ({ ...form }), highlightsText], saveDraft, { deep: true })
+
+// Warn before leaving with unsaved changes
+const formDirty = computed(() => {
+    return !!(
+        form.address ||
+        form.city ||
+        form.title ||
+        form.description ||
+        form.price ||
+        photos.value.length
+    )
+})
+
+if (import.meta.client) {
+    const beforeUnload = (e: BeforeUnloadEvent) => {
+        if (formDirty.value && !submitting.value) {
+            e.preventDefault()
+        }
+    }
+    onMounted(() => window.addEventListener('beforeunload', beforeUnload))
+    onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
+}
+
+// Load existing listing on mount if editing, or restore draft.
 onMounted(async () => {
+    if (!editingId.value) loadDraft()
     if (!editingId.value || !user.value) return
     const { data, error: loadErr } = await supabase
         .from('listings')
@@ -737,6 +797,7 @@ async function submit() {
         'fixed top-4 left-1/2 -translate-x-1/2 z-50 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg'
     successEl.textContent = 'Listing published!'
     document.body.appendChild(successEl)
+    clearDraft()
     setTimeout(() => {
         successEl.remove()
         router.push(`/listing/${listingId}`)

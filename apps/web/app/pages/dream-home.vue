@@ -618,11 +618,12 @@ const visibleEntries = computed(() => {
     return filteredScored.value.slice(0, visibleCount.value)
 })
 
-// Reset pagination whenever the threshold changes
+// Reset pagination and scroll to top whenever the threshold changes
 watch(
     () => prefs.minMatchPercent,
     () => {
         visibleCount.value = 10
+        if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' })
     },
 )
 

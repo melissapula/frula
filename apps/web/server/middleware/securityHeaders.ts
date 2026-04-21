@@ -23,7 +23,10 @@ export default defineEventHandler((event) => {
         'Content-Security-Policy',
         [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://api.mapbox.com https://events.mapbox.com",
+            `script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : ''} blob: https://api.mapbox.com https://events.mapbox.com`.replace(
+                /  +/g,
+                ' ',
+            ),
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://api.mapbox.com",
             "img-src 'self' data: blob: https://res.cloudinary.com https://*.tiles.mapbox.com https://api.mapbox.com",
             "font-src 'self' https://fonts.gstatic.com",
