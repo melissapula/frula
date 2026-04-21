@@ -178,10 +178,39 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const dragOver = ref(false)
 const errorMessage = ref<string | null>(null)
 
+// When the parent v-model changes externally (e.g., edit mode loading existing
+// photos after mount), sync those into our internal entries. Skip if the change
+// came from our own syncOut to avoid infinite loops.
+let syncingOut = false
+watch(
+    photos,
+    (next) => {
+        if (syncingOut) return
+        const urls = new Set(entries.value.map((e) => e.url))
+        const incoming = next ?? []
+        // Only re-sync if the external value has URLs we don't already have
+        if (incoming.length && incoming.some((p) => !urls.has(p.url))) {
+            entries.value = incoming.map((p, i) => ({
+                localId: `existing-${i}-${p.url}`,
+                url: p.url,
+                publicId: p.publicId ?? null,
+                uploading: false,
+                compressing: false,
+                progress: 100,
+            }))
+        }
+    },
+    { deep: true },
+)
+
 function syncOut() {
+    syncingOut = true
     photos.value = entries.value
         .filter((e) => e.url && !e.uploading)
         .map((e) => ({ url: e.url!, publicId: e.publicId ?? undefined }))
+    nextTick(() => {
+        syncingOut = false
+    })
 }
 
 function onFileChange(e: Event) {
