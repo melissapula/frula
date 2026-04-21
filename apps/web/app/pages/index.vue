@@ -1,20 +1,30 @@
 <template>
     <main class="relative">
-        <!-- Sign in / Sign up (top-right, logged-out only) -->
-        <div v-if="!user" class="fixed right-4 top-4 z-50 flex items-center gap-3 md:right-8">
-            <NuxtLink to="/login" class="text-sm font-medium text-slate-600 hover:text-slate-900"
-                >Sign in</NuxtLink
-            >
-            <NuxtLink
-                to="/signup"
-                class="bg-brand hover:bg-brand-600 rounded-full px-4 py-2 text-sm font-semibold text-white"
-                >Sign up</NuxtLink
-            >
+        <!-- Top nav bar -->
+        <div
+            class="fixed left-0 right-0 top-0 z-50 flex items-center justify-between px-4 py-3 md:px-8"
+        >
+            <NuxtLink to="/" class="flex items-center gap-2">
+                <img src="/logo.png" alt="Frula Homes" class="h-10 w-auto" />
+            </NuxtLink>
+            <div v-if="!user" class="flex items-center gap-3">
+                <NuxtLink
+                    to="/login"
+                    class="text-sm font-medium text-slate-600 hover:text-slate-900"
+                    >Sign in</NuxtLink
+                >
+                <NuxtLink
+                    to="/signup"
+                    class="bg-brand hover:bg-brand-600 rounded-full px-4 py-2 text-sm font-semibold text-white"
+                    >Sign up</NuxtLink
+                >
+            </div>
         </div>
 
         <!-- Hero -->
         <section class="from-brand-50 bg-gradient-to-b to-white px-6 pb-20 pt-16 md:pb-28 md:pt-24">
             <div class="mx-auto max-w-5xl text-center">
+                <img src="/logo.png" alt="Frula Homes" class="mx-auto mb-6 h-28 w-auto md:h-36" />
                 <p class="text-brand-600 mb-4 text-sm font-medium uppercase tracking-widest">
                     For Sale By Owner — Nationwide
                 </p>
