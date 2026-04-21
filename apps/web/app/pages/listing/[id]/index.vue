@@ -39,7 +39,7 @@
             <ListingGallery :photos="photos" :title="listing.title || listing.address" />
 
             <!-- Title block -->
-            <div class="mt-6 grid gap-8 md:grid-cols-[1fr_320px]">
+            <div class="mt-8 grid gap-8 md:grid-cols-[1fr_320px]">
                 <div>
                     <h1 class="font-display text-3xl font-bold text-slate-900 md:text-4xl">
                         {{ listing.title || listing.address }}
@@ -291,8 +291,8 @@
                     </div>
                 </div>
 
-                <!-- Sticky sidebar -->
-                <aside class="space-y-4 md:sticky md:top-6 md:self-start">
+                <!-- Sidebar -->
+                <aside class="space-y-4 md:sticky md:top-20 md:self-start">
                     <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div class="font-display text-3xl font-bold text-slate-900">
                             {{ formatPrice(listing.price) }}
