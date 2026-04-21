@@ -111,10 +111,11 @@ const twitterUrl = computed(
 const smsUrl = computed(
     () => `sms:?&body=${encodeURIComponent(`${shareText.value} ${siteUrl.value}`)}`,
 )
-const emailUrl = computed(
-    () =>
-        `mailto:?subject=${encodeURIComponent(shareTitle.value)}&body=${encodeURIComponent(`${shareText.value}\n\n${siteUrl.value}`)}`,
-)
+const emailUrl = computed(() => {
+    const subject = encodeURIComponent(shareTitle.value)
+    const body = encodeURIComponent(`${shareText.value}\r\n\r\nView listing:\r\n${siteUrl.value}`)
+    return `mailto:?subject=${subject}&body=${body}`
+})
 
 // Web Share API — only available on most mobile browsers and a few desktop
 // ones (Safari, Edge). When present, it gives users their OS-native share
