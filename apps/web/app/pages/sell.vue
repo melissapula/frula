@@ -758,7 +758,14 @@ async function submit() {
         // Replace photos: delete existing rows then re-insert in current order.
         // Cloudinary assets aren't deleted (they're cheap and the user might
         // re-add them); we only manage the DB pointers.
-        await supabase.from('listing_photos').delete().eq('listing_id', listingId)
+        const { error: delPhotoErr } = await supabase
+            .from('listing_photos')
+            .delete()
+            .eq('listing_id', listingId)
+        if (delPhotoErr) {
+            // eslint-disable-next-line no-console
+            console.error('Failed to delete old photos:', delPhotoErr)
+        }
     } else {
         // ----- INSERT new listing -----
         const { data: listing, error: insertError } = await supabase
@@ -785,15 +792,16 @@ async function submit() {
         listingId = listing.id
     }
 
+    // eslint-disable-next-line no-console
+    console.log(`Saving ${photoUrls.length} photos for listing ${listingId}`)
     if (photoUrls.length) {
-        const { error: photoError } = await supabase.from('listing_photos').insert(
-            photoUrls.map((url, i) => ({
-                listing_id: listingId,
-                url,
-                sort_order: i,
-                is_primary: i === 0,
-            })),
-        )
+        const photoRows = photoUrls.map((url, i) => ({
+            listing_id: listingId,
+            url,
+            sort_order: i,
+            is_primary: i === 0,
+        }))
+        const { error: photoError } = await supabase.from('listing_photos').insert(photoRows)
         if (photoError) {
             // eslint-disable-next-line no-console
             console.error('Photo insert failed:', photoError)
