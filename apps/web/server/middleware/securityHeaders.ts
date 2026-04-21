@@ -29,7 +29,7 @@ export default defineEventHandler((event) => {
             "font-src 'self' https://fonts.gstatic.com",
             'worker-src blob:',
             'child-src blob:',
-            "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://api.cloudinary.com https://nominatim.openstreetmap.org",
+            "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://api.cloudinary.com https://nominatim.openstreetmap.org https://*.sentry.io",
             "frame-ancestors 'self'",
             "base-uri 'self'",
             "form-action 'self'",

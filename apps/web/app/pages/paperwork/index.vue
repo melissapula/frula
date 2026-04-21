@@ -223,10 +223,16 @@ const groupedPhases = computed(() => {
     })).filter((group) => group.guides.length > 0)
 })
 
+const paperworkDesc =
+    'Directory of official real estate forms, disclosures, and resources for all 50 states. Find what you need to buy or sell a home without an agent.'
 useSeoMeta({
     title: 'Paperwork guides — Frula Homes',
-    description:
-        'Directory of official real estate forms, disclosures, and resources for all 50 states. Find what you need to buy or sell a home without an agent.',
+    description: paperworkDesc,
+    ogTitle: 'Paperwork guides — Frula Homes',
+    ogDescription: paperworkDesc,
+    ogType: 'website',
+    ogSiteName: 'Frula Homes',
+    twitterCard: 'summary',
 })
 </script>
 

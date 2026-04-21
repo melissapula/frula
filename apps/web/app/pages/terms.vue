@@ -16,17 +16,6 @@
             </h1>
             <p class="mt-2 text-sm text-slate-500">Last updated: April 9, 2026</p>
 
-            <!-- Pre-launch notice -->
-            <div
-                class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900"
-            >
-                <p class="font-semibold">⚠️ Pre-launch placeholder</p>
-                <p class="mt-1">
-                    These terms are a working draft and will be reviewed by an attorney before Frula
-                    Homes accepts real users. Don't rely on this version as a binding agreement.
-                </p>
-            </div>
-
             <div class="prose prose-slate mt-8 max-w-none text-slate-700">
                 <h2 class="font-display mt-8 text-2xl font-bold text-slate-900">
                     The short version
@@ -164,5 +153,9 @@
 useSeoMeta({
     title: 'Terms of Service — Frula Homes',
     description: 'The rules for using Frula Homes — what we provide, what you agree to.',
+    ogTitle: 'Terms of Service — Frula Homes',
+    ogDescription: 'The rules for using Frula Homes — what we provide, what you agree to.',
+    ogType: 'website',
+    ogSiteName: 'Frula Homes',
 })
 </script>

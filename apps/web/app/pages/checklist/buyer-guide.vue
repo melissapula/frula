@@ -127,9 +127,15 @@
 const user = useSupabaseUser()
 const { def, progress, toggle, isChecked } = useEducationalChecklist('buyer-guide')
 
+const buyerGuideDesc =
+    'An interactive checklist to help homebuyers evaluate properties and navigate the buying process.'
 useSeoMeta({
     title: "Buyer's Guide Checklist — Frula Homes",
-    description:
-        'An interactive checklist to help homebuyers evaluate properties and navigate the buying process.',
+    description: buyerGuideDesc,
+    ogTitle: "Buyer's Guide Checklist — Frula Homes",
+    ogDescription: buyerGuideDesc,
+    ogType: 'website',
+    ogSiteName: 'Frula Homes',
+    twitterCard: 'summary',
 })
 </script>

@@ -127,9 +127,15 @@
 const user = useSupabaseUser()
 const { def, progress, toggle, isChecked } = useEducationalChecklist('seller-prep')
 
+const sellerPrepDesc =
+    'An interactive checklist to help you prepare your home for a successful for-sale-by-owner listing.'
 useSeoMeta({
     title: 'Seller Prep Checklist — Frula Homes',
-    description:
-        'An interactive checklist to help you prepare your home for a successful for-sale-by-owner listing.',
+    description: sellerPrepDesc,
+    ogTitle: 'Seller Prep Checklist — Frula Homes',
+    ogDescription: sellerPrepDesc,
+    ogType: 'website',
+    ogSiteName: 'Frula Homes',
+    twitterCard: 'summary',
 })
 </script>

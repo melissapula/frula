@@ -315,9 +315,14 @@ function formatMonth(iso: string): string {
     return new Date(iso).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 }
 
+const cmaDesc =
+    'Informational market context for this for-sale-by-owner listing — drawn from public data and nearby Frula listings.'
 useSeoMeta({
     title: 'Market Snapshot — Frula Homes',
-    description:
-        'Informational market context for this for-sale-by-owner listing — drawn from public data and nearby Frula listings.',
+    description: cmaDesc,
+    ogTitle: 'Market Snapshot — Frula Homes',
+    ogDescription: cmaDesc,
+    ogType: 'website',
+    ogSiteName: 'Frula Homes',
 })
 </script>

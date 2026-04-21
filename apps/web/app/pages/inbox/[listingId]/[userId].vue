@@ -123,6 +123,9 @@
                     >
                         {{ sending ? 'Sending…' : 'Send message' }}
                     </button>
+                    <p v-if="sendError" class="mt-2 text-xs text-red-700">
+                        {{ sendError }}
+                    </p>
                 </form>
             </div>
         </div>
@@ -218,6 +221,9 @@
                     Send
                 </button>
             </div>
+            <p v-if="sendError" class="px-4 text-xs text-red-700 md:px-8">
+                {{ sendError }}
+            </p>
         </form>
     </main>
 </template>
@@ -251,6 +257,7 @@ const messages = ref<Message[]>([])
 const pending = ref(true)
 const draft = ref('')
 const sending = ref(false)
+const sendError = ref<string | null>(null)
 
 // First-message contact form
 const contactName = ref(user.value?.user_metadata?.full_name ?? '')
@@ -281,7 +288,7 @@ async function sendFirstMessage() {
     sending.value = false
 
     if (error) {
-        alert(error.message)
+        sendError.value = error.message || 'Failed to send message. Please try again.'
         return
     }
     if (data && !messages.value.some((m) => m.id === data.id)) {
@@ -324,7 +331,7 @@ async function startTransaction() {
     const buyerId = sellerId === myId.value ? otherUserId.value : myId.value
     if (sellerId === buyerId) {
         startingTxn.value = false
-        alert("You can't start a transaction with yourself.")
+        sendError.value = "You can't start a transaction with yourself."
         return
     }
 
@@ -341,7 +348,7 @@ async function startTransaction() {
 
     if (txnErr || !txn) {
         startingTxn.value = false
-        alert(txnErr?.message || 'Could not start transaction.')
+        sendError.value = txnErr?.message || 'Could not start transaction.'
         return
     }
 
@@ -477,10 +484,11 @@ async function send() {
         .single()
     sending.value = false
     if (error) {
-        alert(error.message)
+        sendError.value = error.message || 'Failed to send message. Please try again.'
         return
     }
     draft.value = ''
+    sendError.value = null
     if (data && !messages.value.some((m) => m.id === data.id)) {
         messages.value.push(data as Message)
         // Fire the email notification (non-blocking, fails silently)

@@ -16,18 +16,6 @@
             </h1>
             <p class="mt-2 text-sm text-slate-500">Last updated: April 9, 2026</p>
 
-            <!-- Pre-launch notice -->
-            <div
-                class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900"
-            >
-                <p class="font-semibold">⚠️ Pre-launch placeholder</p>
-                <p class="mt-1">
-                    This policy is a working draft and will be reviewed by an attorney before Frula
-                    Homes accepts real users. If you're reading this in production, please let us
-                    know — it shouldn't be live yet.
-                </p>
-            </div>
-
             <div class="prose prose-slate mt-8 max-w-none text-slate-700">
                 <h2 class="font-display mt-8 text-2xl font-bold text-slate-900">
                     The short version
@@ -153,5 +141,9 @@
 useSeoMeta({
     title: 'Privacy Policy — Frula Homes',
     description: 'How Frula Homes collects, uses, and protects your information.',
+    ogTitle: 'Privacy Policy — Frula Homes',
+    ogDescription: 'How Frula Homes collects, uses, and protects your information.',
+    ogType: 'website',
+    ogSiteName: 'Frula Homes',
 })
 </script>

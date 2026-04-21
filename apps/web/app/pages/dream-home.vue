@@ -766,10 +766,18 @@ async function saveAlert() {
     alertSaved.value = true
 }
 
+const dreamDesc =
+    'Tell Frula Homes what you want and see every for-sale-by-owner listing in the country ranked by how well it matches your dreams.'
 useSeoMeta({
     title: 'Find your dream home — Frula Homes',
-    description:
-        'Tell Frula Homes what you want and see every for-sale-by-owner listing in the country ranked by how well it matches your dreams.',
+    description: dreamDesc,
+    ogTitle: 'Find your dream home — Frula Homes',
+    ogDescription: dreamDesc,
+    ogType: 'website',
+    ogSiteName: 'Frula Homes',
+    twitterCard: 'summary',
+    twitterTitle: 'Find your dream home — Frula Homes',
+    twitterDescription: dreamDesc,
 })
 </script>
 

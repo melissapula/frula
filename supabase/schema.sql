@@ -238,7 +238,7 @@ CREATE TABLE public.saved_listings (
 -- =============================================
 CREATE TABLE public.transactions (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  listing_id        UUID NOT NULL REFERENCES public.listings(id),
+  listing_id        UUID NOT NULL REFERENCES public.listings(id) ON DELETE CASCADE,
   seller_id         UUID NOT NULL REFERENCES public.profiles(id),
   buyer_id          UUID REFERENCES public.profiles(id),
 
@@ -298,7 +298,7 @@ CREATE TABLE public.transaction_checklists (
 -- =============================================
 CREATE TABLE public.listing_plans (
   id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  listing_id          UUID NOT NULL REFERENCES public.listings(id),
+  listing_id          UUID NOT NULL REFERENCES public.listings(id) ON DELETE CASCADE,
   user_id             UUID NOT NULL REFERENCES public.profiles(id),
   plan                TEXT NOT NULL CHECK (plan IN ('basic','standard','premium')),
   amount_cents        INTEGER NOT NULL,

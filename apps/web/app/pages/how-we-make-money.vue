@@ -242,9 +242,17 @@
 </template>
 
 <script setup lang="ts">
+const moneyDesc =
+    'Listing on Frula Homes is free forever. We make money through optional seller visibility boosts and a curated directory of vetted service providers — never commissions, never hidden fees.'
 useSeoMeta({
     title: 'How Frula Homes makes money — Frula Homes',
-    description:
-        'Listing on Frula Homes is free forever. We make money through optional seller visibility boosts and a curated directory of vetted service providers — never commissions, never hidden fees.',
+    description: moneyDesc,
+    ogTitle: 'How Frula Homes makes money — Frula Homes',
+    ogDescription: moneyDesc,
+    ogType: 'website',
+    ogSiteName: 'Frula Homes',
+    twitterCard: 'summary',
+    twitterTitle: 'How Frula Homes makes money',
+    twitterDescription: moneyDesc,
 })
 </script>

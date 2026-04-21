@@ -16,6 +16,9 @@ export default defineNuxtConfig({
                         'Nationwide For Sale By Owner information platform. List your home, browse listings, and find official forms for your state — all without paying agent commissions.',
                 },
                 { name: 'theme-color', content: '#1D9E75' },
+                { property: 'og:image', content: 'https://frulahomes.com/og-image.png' },
+                { property: 'og:site_name', content: 'Frula Homes' },
+                { name: 'twitter:card', content: 'summary' },
             ],
             link: [
                 { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
