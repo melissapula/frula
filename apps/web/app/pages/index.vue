@@ -212,12 +212,13 @@
                         <div class="rounded-2xl border border-slate-200 bg-white p-6">
                             <div class="text-2xl">💬</div>
                             <h4 class="font-display mt-3 text-base font-bold text-slate-900">
-                                Real transaction tools
+                                Built-in messaging + offers
                             </h4>
                             <p class="mt-2 text-sm leading-relaxed text-slate-600">
-                                Structured offers, viewing requests, buyer-seller messaging, and
-                                smart checklists — all built in. Most FSBO sites are just listing
-                                boards that dump you into email once you get interest.
+                                Buyers and sellers talk directly through Frula — no agent filtering
+                                your conversations. Send structured offers with real terms, schedule
+                                viewings, and get email + in-app notifications on every update. Most
+                                FSBO sites just dump you into email.
                             </p>
                         </div>
 
@@ -306,28 +307,36 @@
                 </p>
                 <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     <FeatureCard
-                        title="Nationwide Listings"
-                        description="Browse or list for-sale-by-owner homes in all 50 states. Map, filters, photos, and direct buyer-seller messaging."
+                        title="Nationwide Listings + Map"
+                        description="List your home or browse FSBO listings in all 50 states. Interactive map, photo galleries, advanced filters, and save favorites with one tap."
                     />
                     <FeatureCard
                         title="Dream Home Finder"
-                        description="Describe your perfect home once. We rank every listing nationwide by how well it matches — sorted by score."
+                        description="Tell us your ideal beds, views, waterfront, lot size — anything. We score and rank every listing in the country by how well it matches. Get emailed when new matches appear."
                     />
                     <FeatureCard
-                        title="Market Estimates"
-                        description="Comparable sales data drawn from public records, clearly labeled as seller estimates — not appraisals."
+                        title="Direct Messaging"
+                        description="Message sellers directly — no agent in the middle. Your inbox shows conversations by listing, with real-time notifications and email alerts so you never miss a response."
+                    />
+                    <FeatureCard
+                        title="Structured Offers & Viewings"
+                        description="Send a real offer with price, financing, earnest money, and contingencies. Request showings with a date picker. Sellers accept, counter, or decline right from their inbox."
                     />
                     <FeatureCard
                         title="Paperwork Directory"
-                        description="Find the official forms, disclosures, and consumer resources for your state — sourced straight from each state's real estate commission."
+                        description="Official forms, disclosures, and consumer resources for all 50 states — linked directly from each state's real estate commission. No sketchy third-party copies."
                     />
                     <FeatureCard
-                        title="Transaction Checklists"
-                        description="Smart checklists that keep buyers and sellers on track from accepted offer through closing day."
+                        title="Market Snapshot"
+                        description="See ZIP-level home values, price trends, and nearby listings so you can price with context. Informational market data, clearly labeled — not an appraisal."
                     />
                     <FeatureCard
-                        title="Offers & Viewings"
-                        description="Send structured offers and schedule showings directly through the platform. No back-and-forth by text."
+                        title="Smart Checklists"
+                        description="Interactive seller prep and buyer guide checklists keep you on track from listing day through closing. Know what to do next at every step."
+                    />
+                    <FeatureCard
+                        title="No Commission, No Catch"
+                        description="Free to list. Free to browse. Free to message, make offers, and schedule viewings. We'll never charge a commission or percentage of your sale. Ever."
                     />
                 </div>
                 <p class="mx-auto mt-10 max-w-2xl text-center text-xs italic text-slate-500">
