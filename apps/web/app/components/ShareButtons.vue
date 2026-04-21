@@ -97,7 +97,7 @@ const formattedPrice = computed(() =>
 const shareTitle = computed(() => `${props.address} — ${formattedPrice.value} on Frula Homes`)
 const shareText = computed(
     () =>
-        `Check out this home for sale by owner: ${props.address}, ${props.city}, ${props.state} — ${formattedPrice.value}. No agent commissions.`,
+        `Check out this home for sale by owner: ${props.address}, ${props.city}, ${props.state} — ${formattedPrice.value}. No agent commissions.\n\n${siteUrl.value}`,
 )
 
 // URL builders for each network's share endpoint
