@@ -4,8 +4,8 @@
         <div
             class="fixed left-0 right-0 top-0 z-50 flex items-center justify-between px-4 py-3 md:px-8"
         >
-            <NuxtLink to="/" class="flex items-center gap-2">
-                <img src="/logo.png" alt="Frula Homes" class="h-10 w-auto" />
+            <NuxtLink to="/" class="font-display text-brand text-xl font-bold">
+                Frula Homes
             </NuxtLink>
             <div v-if="!user" class="flex items-center gap-3">
                 <NuxtLink
@@ -24,7 +24,6 @@
         <!-- Hero -->
         <section class="from-brand-50 bg-gradient-to-b to-white px-6 pb-20 pt-16 md:pb-28 md:pt-24">
             <div class="mx-auto max-w-5xl text-center">
-                <img src="/logo.png" alt="Frula Homes" class="mx-auto mb-6 h-28 w-auto md:h-36" />
                 <p class="text-brand-600 mb-4 text-sm font-medium uppercase tracking-widest">
                     For Sale By Owner — Nationwide
                 </p>
