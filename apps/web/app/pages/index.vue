@@ -356,6 +356,39 @@
             </div>
         </section>
 
+        <!-- Why Frula exists -->
+        <section class="from-brand-50 bg-gradient-to-b to-white px-6 py-20 md:py-24">
+            <div class="mx-auto max-w-3xl text-center">
+                <p class="text-brand-600 mb-3 text-xs font-semibold uppercase tracking-widest">
+                    Why Frula exists
+                </p>
+                <h2 class="font-display text-3xl font-bold text-slate-900 md:text-4xl">
+                    Built for sellers, not middlemen.
+                </h2>
+                <div
+                    class="mt-6 space-y-5 text-left text-base leading-relaxed text-slate-600 md:text-lg"
+                >
+                    <p>
+                        Real estate commissions cost the average U.S. seller tens of thousands of
+                        dollars. Most of that money flows into a structure that hasn't meaningfully
+                        changed in a century.
+                    </p>
+                    <p>
+                        Frula Homes is an alternative — a clean listing platform, official forms for
+                        every state, smart checklists, and direct buyer-seller messaging. All free,
+                        always.
+                    </p>
+                    <p>
+                        We're not a brokerage. We don't take commissions. We don't charge closing
+                        fees. We don't sell your data or run banner ads. Frula is built by one
+                        person on evenings and weekends, because sellers deserve better tools and a
+                        fairer deal.
+                    </p>
+                </div>
+                <p class="font-display mt-8 text-lg text-slate-500">— Missa, Frula Homes</p>
+            </div>
+        </section>
+
         <SiteFooter />
     </main>
 </template>
