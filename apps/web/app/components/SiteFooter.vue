@@ -61,6 +61,11 @@
                             >
                         </li>
                         <li>
+                            <NuxtLink to="/how-commissions-work" class="hover:text-brand"
+                                >How commissions work</NuxtLink
+                            >
+                        </li>
+                        <li>
                             <NuxtLink to="/account" class="hover:text-brand">Your account</NuxtLink>
                         </li>
                     </ul>
