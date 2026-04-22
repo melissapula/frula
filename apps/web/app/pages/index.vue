@@ -167,6 +167,12 @@
                         <strong>$8,000 to $12,000</strong> you can potentially negotiate off the
                         price, keep in your pocket, or put toward closing costs.
                     </p>
+                    <NuxtLink
+                        to="/how-commissions-work"
+                        class="text-brand-600 hover:text-brand-700 decoration-brand/30 hover:decoration-brand mt-4 inline-flex items-center text-sm font-semibold underline decoration-2 underline-offset-4"
+                    >
+                        See how commissions actually flow →
+                    </NuxtLink>
                 </div>
 
                 <!-- What makes Frula different from other FSBO sites -->
