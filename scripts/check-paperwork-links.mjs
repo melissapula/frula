@@ -24,10 +24,7 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // Parse state resources to extract URLs
-const stateResourcesPath = resolve(
-    __dirname,
-    '../apps/web/app/data/paperwork/state-resources.ts',
-)
+const stateResourcesPath = resolve(__dirname, '../apps/web/app/data/paperwork/state-resources.ts')
 const stateContent = readFileSync(stateResourcesPath, 'utf-8')
 
 // Extract all URLs from state-resources.ts
@@ -48,9 +45,15 @@ while ((match = stateNameRegex.exec(stateContent)) !== null) {
 // Federal/concept guide URLs
 const FEDERAL_URLS = [
     { label: 'EPA Lead Paint Disclosure', url: 'https://www.epa.gov/lead/real-estate-disclosure' },
-    { label: 'CFPB Closing Disclosure', url: 'https://www.consumerfinance.gov/owning-a-home/closing-disclosure/' },
+    {
+        label: 'CFPB Closing Disclosure',
+        url: 'https://www.consumerfinance.gov/owning-a-home/closing-disclosure/',
+    },
     { label: 'IRS Form 1099-S', url: 'https://www.irs.gov/forms-pubs/about-form-1099-s' },
-    { label: 'HUD Fair Housing Act', url: 'https://www.hud.gov/program_offices/fair_housing_equal_opp/fair_housing_act_overview' },
+    {
+        label: 'HUD Fair Housing Act',
+        url: 'https://www.hud.gov/program_offices/fair_housing_equal_opp/fair_housing_act_overview',
+    },
 ]
 
 // Build full link list

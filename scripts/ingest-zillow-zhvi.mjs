@@ -86,12 +86,13 @@ header.forEach((col, i) => {
 })
 dateCols.sort((a, b) => a.date.localeCompare(b.date))
 const latestCol = dateCols[dateCols.length - 1]
-const yearAgoCol = dateCols.find((d) => {
-    const latestDate = new Date(latestCol.date)
-    const target = new Date(latestDate)
-    target.setFullYear(target.getFullYear() - 1)
-    return d.date === target.toISOString().slice(0, 10)
-}) ?? dateCols[Math.max(0, dateCols.length - 13)]
+const yearAgoCol =
+    dateCols.find((d) => {
+        const latestDate = new Date(latestCol.date)
+        const target = new Date(latestDate)
+        target.setFullYear(target.getFullYear() - 1)
+        return d.date === target.toISOString().slice(0, 10)
+    }) ?? dateCols[Math.max(0, dateCols.length - 13)]
 
 console.log(`✓ Latest data month: ${latestCol.date}`)
 console.log(`✓ Year-ago column:   ${yearAgoCol.date}`)
@@ -138,9 +139,7 @@ const BATCH = 1000
 let written = 0
 for (let i = 0; i < records.length; i += BATCH) {
     const chunk = records.slice(i, i + BATCH)
-    const { error } = await supabase
-        .from('zip_market_data')
-        .upsert(chunk, { onConflict: 'zip' })
+    const { error } = await supabase.from('zip_market_data').upsert(chunk, { onConflict: 'zip' })
     if (error) {
         console.error(`❌ Upsert failed at batch ${i}:`, error.message)
         process.exit(1)

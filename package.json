@@ -27,5 +27,8 @@
         "*.{json,md,css,yml,yaml}": [
             "prettier --write"
         ]
+    },
+    "dependencies": {
+        "@mfp-design-system/tokens": "^0.1.0"
     }
 }
