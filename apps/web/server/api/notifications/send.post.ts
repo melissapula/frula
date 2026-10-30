@@ -99,9 +99,9 @@ export default defineEventHandler(async (event) => {
             .maybeSingle<ProfileRow>(),
         admin
             .from('profiles')
-            .select('id, email, full_name')
+            .select('id, full_name')
             .eq('id', message.sender_id)
-            .maybeSingle<ProfileRow>(),
+            .maybeSingle<Pick<ProfileRow, 'id' | 'full_name'>>(),
         admin
             .from('listings')
             .select('id, address, city, state, price')
@@ -119,7 +119,7 @@ export default defineEventHandler(async (event) => {
         return { sent: false, reason: 'Missing recipient or listing' }
     }
 
-    const senderName = sender?.full_name || sender?.email?.split('@')[0] || 'A buyer'
+    const senderName = sender?.full_name || 'A buyer'
     const siteUrl = config.public.siteUrl
     const threadUrl = `${siteUrl}/inbox/${listing.id}/${message.sender_id}`
     const listingUrl = `${siteUrl}/listing/${listing.id}`

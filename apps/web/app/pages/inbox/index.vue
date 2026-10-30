@@ -68,11 +68,7 @@
                                             title="Flagged"
                                             >🚩</span
                                         >
-                                        {{
-                                            thread.other_user?.full_name ||
-                                            thread.other_user?.email ||
-                                            'Unknown user'
-                                        }}
+                                        {{ thread.other_user?.full_name || 'Unknown user' }}
                                     </p>
                                     <p class="flex-none text-xs text-slate-500">
                                         {{ relativeTime(thread.last_message.created_at) }}
@@ -198,7 +194,7 @@ const { data: threads, pending } = await useAsyncData<Thread[]>('inbox', async (
             .from('listings')
             .select('id, address, city, state, price, listing_photos(url, is_primary)')
             .in('id', listingIds),
-        supabase.from('profiles').select('id, full_name, email').in('id', userIds),
+        supabase.from('profiles').select('id, full_name').in('id', userIds),
     ])
 
     const listingsMap = new Map((listingsRes.data ?? []).map((l) => [l.id, l]))
@@ -258,7 +254,7 @@ async function markUnread(thread: Thread) {
 async function deleteThread(thread: Thread) {
     if (!user.value || !threads.value) return
     const ok = window.confirm(
-        `Delete this entire conversation with ${thread.other_user?.full_name || thread.other_user?.email || 'this user'}? This cannot be undone.`,
+        `Delete this entire conversation with ${thread.other_user?.full_name || 'this user'}? This cannot be undone.`,
     )
     if (!ok) return
     const { error } = await supabase

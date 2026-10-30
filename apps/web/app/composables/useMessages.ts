@@ -58,7 +58,6 @@ export interface Thread {
     other_user: {
         id: string
         full_name: string | null
-        email: string
     } | null
 }
 

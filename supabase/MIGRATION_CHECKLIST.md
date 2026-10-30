@@ -64,12 +64,16 @@ and `IF EXISTS` guards.
     user writes. ⚠️ Must run after the RLS patches above, so the open
     read policies stay dropped.
 
+19. **`migrations/20261030_profiles_column_privileges.sql`** — Limits
+    browser access to public profile columns. ⚠️ Must run last, after
+    the migration above.
+
 ## Seed data (optional, for testing)
 
-19. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
+20. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
     (MN). Uses the first profile as owner.
 
-20. **`seed_listings.sql`** — Larger seed set if it exists.
+21. **`seed_listings.sql`** — Larger seed set if it exists.
 
 ## Post-migration: Zillow ZHVI ingestion (optional)
 
