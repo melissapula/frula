@@ -39,6 +39,10 @@
                         and prices of any homes you list. Active listings are public by design.
                     </li>
                     <li>
+                        Your name appears on your public seller page while you have an active
+                        listing, and to people you message or transact with.
+                    </li>
+                    <li>
                         <strong>Messages, offers, and viewing requests</strong> you send through the
                         platform. These are visible to the other party in the conversation.
                     </li>

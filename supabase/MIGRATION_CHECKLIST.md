@@ -57,12 +57,19 @@ and `IF EXISTS` guards.
 16. **`messages_rls.sql`** — Additional message RLS policies.
 17. **`transactions_rls.sql`** — Transaction RLS policies.
 
+## Profile privacy (run last, after the RLS patches)
+
+18. **`migrations/20261030_profiles_names_and_rows.sql`** — Backfills
+    profile names, restricts which profiles can be read, and removes
+    user writes. ⚠️ Must run after the RLS patches above, so the open
+    read policies stay dropped.
+
 ## Seed data (optional, for testing)
 
-18. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
+19. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
     (MN). Uses the first profile as owner.
 
-19. **`seed_listings.sql`** — Larger seed set if it exists.
+20. **`seed_listings.sql`** — Larger seed set if it exists.
 
 ## Post-migration: Zillow ZHVI ingestion (optional)
 

@@ -26,14 +26,3 @@ CREATE POLICY "Recipients can mark as read"
     TO authenticated
     USING (recipient_id = auth.uid())
     WITH CHECK (recipient_id = auth.uid());
-
--- Allow authenticated users to read public profile fields of other users
--- (needed to display sender name + avatar in message threads)
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Profiles are readable by authenticated users" ON public.profiles;
-CREATE POLICY "Profiles are readable by authenticated users"
-    ON public.profiles
-    FOR SELECT
-    TO authenticated
-    USING (true);

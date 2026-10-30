@@ -26,6 +26,9 @@
                             autocomplete="name"
                             class="focus:border-brand focus:ring-brand mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1"
                         />
+                        <p class="mt-1 text-xs text-slate-500">
+                            Shown on your seller page if you list a home, and to people you message.
+                        </p>
                     </div>
 
                     <div>
