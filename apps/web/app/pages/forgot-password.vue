@@ -31,6 +31,8 @@
                         />
                     </div>
 
+                    <NuxtTurnstile v-if="siteKey" ref="turnstile" v-model="captchaToken" />
+
                     <div
                         v-if="error"
                         class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
@@ -106,6 +108,9 @@ const email = ref('')
 const loading = ref(false)
 const error = ref<string | null>(null)
 const sent = ref(false)
+const siteKey = useRuntimeConfig().public.turnstile?.siteKey
+const captchaToken = ref<string>()
+const turnstile = ref<{ reset: () => void }>()
 
 async function submit() {
     error.value = null
@@ -118,10 +123,14 @@ async function submit() {
 
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.value, {
         redirectTo,
+        ...captchaOptions(captchaToken.value),
     })
     loading.value = false
+    // Turnstile tokens are single use: get a fresh one after every attempt.
+    captchaToken.value = undefined
+    turnstile.value?.reset()
     if (resetError) {
-        error.value = resetError.message
+        error.value = isCaptchaError(resetError) ? CAPTCHA_MESSAGE : resetError.message
         return
     }
     sent.value = true

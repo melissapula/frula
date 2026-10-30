@@ -18,12 +18,12 @@ export default defineEventHandler((event) => {
 
     // Content Security Policy
     // Allows: self, Cloudinary images, Mapbox tiles/scripts, Google Fonts,
-    // Supabase API, Resend, inline styles (needed for Tailwind/email)
+    // Supabase API, Resend, Turnstile, inline styles (needed for Tailwind/email)
     headers.setHeader(
         'Content-Security-Policy',
         [
             "default-src 'self'",
-            `script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : ''} blob: https://api.mapbox.com https://events.mapbox.com`.replace(
+            `script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : ''} blob: https://api.mapbox.com https://events.mapbox.com https://challenges.cloudflare.com`.replace(
                 /  +/g,
                 ' ',
             ),
@@ -32,6 +32,7 @@ export default defineEventHandler((event) => {
             "font-src 'self' https://fonts.gstatic.com",
             'worker-src blob:',
             'child-src blob:',
+            'frame-src https://challenges.cloudflare.com',
             "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://api.cloudinary.com https://nominatim.openstreetmap.org https://*.sentry.io",
             "frame-ancestors 'self'",
             "base-uri 'self'",
