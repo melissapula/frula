@@ -143,13 +143,18 @@ async function nativeShare() {
 
 // Copy-link with visual feedback
 const copied = ref(false)
+const dialog = useDialog()
 async function copyLink() {
     try {
         await navigator.clipboard.writeText(siteUrl.value)
         copied.value = true
         setTimeout(() => (copied.value = false), 2000)
     } catch {
-        window.prompt('Copy this link:', siteUrl.value)
+        await dialog.prompt({
+            title: 'Copy this link',
+            initialValue: siteUrl.value,
+            confirmLabel: 'Done',
+        })
     }
 }
 </script>

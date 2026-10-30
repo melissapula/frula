@@ -241,6 +241,7 @@ definePageMeta({ layout: false })
 
 const route = useRoute()
 const supabase = useSupabaseClient()
+const dialog = useDialog()
 const user = useSupabaseUser()
 const router = useRouter()
 
@@ -531,12 +532,12 @@ async function dropSystemMessage(body: string) {
 }
 
 async function acceptOffer(m: Message) {
-    if (
-        !confirm(
-            'Accept this offer? This will start a transaction and unlock the post-offer checklists.',
-        )
-    )
-        return
+    const ok = await dialog.confirm({
+        title: 'Accept this offer?',
+        message: 'This will start a transaction and unlock the post-offer checklists.',
+        confirmLabel: 'Accept offer',
+    })
+    if (!ok) return
 
     if (!(await respondToMessage(m.id, 'accepted'))) return
 
@@ -578,8 +579,13 @@ async function onCounterSent() {
 }
 
 async function declineOffer(m: Message) {
-    const reason =
-        window.prompt("Optional: tell the buyer why you're declining (leave blank to skip)") ?? ''
+    const reason = await dialog.prompt({
+        title: 'Decline this offer?',
+        message: "Optional: tell the buyer why you're declining (leave blank to skip).",
+        confirmLabel: 'Decline offer',
+        isDestructive: true,
+    })
+    if (reason === null) return
     if (!(await respondToMessage(m.id, 'declined'))) return
     const offerPrice = (m.payload as OfferPayload | null)?.offer_price
     await dropSystemMessage(
@@ -597,8 +603,13 @@ async function confirmViewing(m: Message) {
 }
 
 async function declineViewing(m: Message) {
-    const reason =
-        window.prompt('Optional: suggest another time or explain why (leave blank to skip)') ?? ''
+    const reason = await dialog.prompt({
+        title: 'Decline this viewing?',
+        message: 'Optional: suggest another time or explain why (leave blank to skip).',
+        confirmLabel: 'Decline viewing',
+        isDestructive: true,
+    })
+    if (reason === null) return
     if (!(await respondToMessage(m.id, 'declined'))) return
     await dropSystemMessage(
         `✗ Viewing request declined.${reason.trim() ? `\n\n${reason.trim()}` : ''}`,

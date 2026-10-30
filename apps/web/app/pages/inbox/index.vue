@@ -150,6 +150,7 @@ import { useUnreadBadge } from '~/composables/useUnreadBadge'
 definePageMeta({ layout: false })
 
 const supabase = useSupabaseClient()
+const dialog = useDialog()
 const user = useSupabaseUser()
 const router = useRouter()
 const { bump: bumpUnreadBadge } = useUnreadBadge()
@@ -253,9 +254,12 @@ async function markUnread(thread: Thread) {
 
 async function deleteThread(thread: Thread) {
     if (!user.value || !threads.value) return
-    const ok = window.confirm(
-        `Delete this entire conversation with ${thread.other_user?.full_name || 'this user'}? This cannot be undone.`,
-    )
+    const ok = await dialog.confirm({
+        title: 'Delete this conversation?',
+        message: `This deletes the entire conversation with ${thread.other_user?.full_name || 'this user'}. This cannot be undone.`,
+        confirmLabel: 'Delete conversation',
+        isDestructive: true,
+    })
     if (!ok) return
     const { error } = await supabase
         .from('messages')
