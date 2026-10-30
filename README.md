@@ -119,6 +119,20 @@ set -a && source apps/web/.env && set +a && node scripts/ingest-zillow-zhvi.mjs
 
 ---
 
+## Testing
+
+```bash
+npm test            # run once
+npm run test:watch  # re-run on change
+```
+
+The tests in `tests/db/` apply the repo's SQL to PGlite, which is real Postgres running inside
+Node, so they need no Docker, network or secrets. The setup fakes the Supabase parts: the `anon` and
+`authenticated` roles, `auth.users`, `auth.uid()` and default grants. A pass shows what the repo's
+SQL does under those fakes, not what production has.
+
+---
+
 ## Deployment
 
 Deployed to **Cloudflare Pages** with automatic builds on push to `main`.

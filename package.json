@@ -11,17 +11,24 @@
         "format": "prettier --write \"**/*.{ts,vue,js,json,md,css}\"",
         "format:check": "prettier --check \"**/*.{ts,vue,js,json,md,css}\"",
         "lint": "npm run lint --workspace=web",
+        "test": "vitest run",
+        "test:watch": "vitest",
         "prepare": "husky || true"
     },
     "devDependencies": {
+        "@electric-sql/pglite": "^0.5.13",
         "concurrently": "^8.2.0",
         "husky": "^9.1.7",
         "lint-staged": "^15.2.10",
         "prettier": "^3.4.2",
-        "prettier-plugin-tailwindcss": "^0.6.9"
+        "prettier-plugin-tailwindcss": "^0.6.9",
+        "vitest": "^5.0.5"
     },
     "lint-staged": {
         "apps/web/**/*.{ts,vue,js}": [
+            "prettier --write"
+        ],
+        "tests/**/*.ts": [
             "prettier --write"
         ],
         "*.{json,md,css,yml,yaml}": [
