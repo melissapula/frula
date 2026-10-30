@@ -503,21 +503,21 @@ async function send() {
 const counterModalOpen = ref(false)
 const counterContext = ref<{ recipientId: string; initialPrice: number } | null>(null)
 
-async function patchMessagePayload(messageId: string, patch: Record<string, unknown>) {
-    // Reactively update local state first so the UI feels instant
-    const msg = messages.value.find((m) => m.id === messageId)
-    if (msg && msg.payload) {
-        msg.payload = { ...msg.payload, ...patch } as typeof msg.payload
-    }
-    const newPayload = msg?.payload
-    const { error } = await supabase
-        .from('messages')
-        .update({ payload: newPayload })
-        .eq('id', messageId)
+async function respondToMessage(messageId: string, status: string): Promise<boolean> {
+    const { data, error } = await supabase.rpc('respond_to_message', {
+        message_id: messageId,
+        new_status: status,
+    })
     if (error) {
         // eslint-disable-next-line no-console
-        console.error('Failed to update message payload:', error)
+        console.error('Failed to save response:', error)
+        sendError.value = 'Could not save your response. Reload the page and try again.'
+        return false
     }
+    const msg = messages.value.find((m) => m.id === messageId)
+    if (msg) msg.payload = data as unknown as Message['payload']
+    sendError.value = null
+    return true
 }
 
 async function dropSystemMessage(body: string) {
@@ -538,7 +538,7 @@ async function acceptOffer(m: Message) {
     )
         return
 
-    await patchMessagePayload(m.id, { status: 'accepted' })
+    if (!(await respondToMessage(m.id, 'accepted'))) return
 
     // Reuse the existing transaction-creation flow if one doesn't already exist
     if (!existingTransactionId.value) {
@@ -574,13 +574,13 @@ async function onCounterSent() {
                 m.recipient_id === myId.value &&
                 (m.payload as OfferPayload | null)?.status === 'pending',
         )
-    if (original) await patchMessagePayload(original.id, { status: 'countered' })
+    if (original) await respondToMessage(original.id, 'countered')
 }
 
 async function declineOffer(m: Message) {
     const reason =
         window.prompt("Optional: tell the buyer why you're declining (leave blank to skip)") ?? ''
-    await patchMessagePayload(m.id, { status: 'declined' })
+    if (!(await respondToMessage(m.id, 'declined'))) return
     const offerPrice = (m.payload as OfferPayload | null)?.offer_price
     await dropSystemMessage(
         `✗ Offer${offerPrice ? ` of ${formatPrice(offerPrice)}` : ''} declined.${
@@ -590,7 +590,7 @@ async function declineOffer(m: Message) {
 }
 
 async function confirmViewing(m: Message) {
-    await patchMessagePayload(m.id, { status: 'confirmed' })
+    if (!(await respondToMessage(m.id, 'confirmed'))) return
     const payload = m.payload as ViewingPayload | null
     const dateStr = payload?.date_primary ? ` for ${payload.date_primary}` : ''
     await dropSystemMessage(`✅ Viewing confirmed${dateStr}.`)
@@ -599,7 +599,7 @@ async function confirmViewing(m: Message) {
 async function declineViewing(m: Message) {
     const reason =
         window.prompt('Optional: suggest another time or explain why (leave blank to skip)') ?? ''
-    await patchMessagePayload(m.id, { status: 'declined' })
+    if (!(await respondToMessage(m.id, 'declined'))) return
     await dropSystemMessage(
         `✗ Viewing request declined.${reason.trim() ? `\n\n${reason.trim()}` : ''}`,
     )

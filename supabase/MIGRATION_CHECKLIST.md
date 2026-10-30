@@ -65,15 +65,21 @@ and `IF EXISTS` guards.
     read policies stay dropped.
 
 19. **`migrations/20261030_profiles_column_privileges.sql`** — Limits
-    browser access to public profile columns. ⚠️ Must run last, after
-    the migration above.
+    browser access to public profile columns. ⚠️ Must run after the
+    migration above.
+
+## Message integrity (run after profile privacy)
+
+20. **`migrations/20261030_messages_respond_function.sql`** — Adds
+    `respond_to_message()`, which saves offer and viewing responses.
+    ⚠️ Must run before the client that calls it is deployed.
 
 ## Seed data (optional, for testing)
 
-20. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
+21. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
     (MN). Uses the first profile as owner.
 
-21. **`seed_listings.sql`** — Larger seed set if it exists.
+22. **`seed_listings.sql`** — Larger seed set if it exists.
 
 ## Post-migration: Zillow ZHVI ingestion (optional)
 
