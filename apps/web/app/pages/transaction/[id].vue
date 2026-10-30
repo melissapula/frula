@@ -128,7 +128,7 @@ const listing = ref<{
     price: number
     listing_photos: { url: string; is_primary: boolean }[]
 } | null>(null)
-const profiles = ref<Record<string, { full_name: string | null; email: string }>>({})
+const profiles = ref<Record<string, { full_name: string | null }>>({})
 const pending = ref(true)
 const loadError = ref<string | null>(null)
 
@@ -153,7 +153,7 @@ function counterpartyName(role: 'seller' | 'buyer') {
     const id = role === 'seller' ? transaction.value.seller_id : transaction.value.buyer_id
     if (!id) return ''
     const profile = profiles.value[id]
-    return profile?.full_name || profile?.email || (role === 'seller' ? 'Seller' : 'Buyer')
+    return profile?.full_name || (role === 'seller' ? 'Seller' : 'Buyer')
 }
 
 async function loadAll() {
@@ -197,7 +197,7 @@ async function loadAll() {
     if (userIds.length) {
         const { data: profileRows } = await supabase
             .from('profiles')
-            .select('id, full_name, email')
+            .select('id, full_name')
             .in('id', userIds)
         profiles.value = Object.fromEntries((profileRows ?? []).map((p) => [p.id, p]))
     }
