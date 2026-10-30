@@ -60,6 +60,8 @@
                         <p class="mt-1 text-xs text-slate-500">At least 6 characters.</p>
                     </div>
 
+                    <NuxtTurnstile v-if="siteKey" ref="turnstile" v-model="captchaToken" />
+
                     <div
                         v-if="error"
                         class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
@@ -107,6 +109,9 @@ const password = ref('')
 const loading = ref(false)
 const error = ref<string | null>(null)
 const success = ref<string | null>(null)
+const siteKey = useRuntimeConfig().public.turnstile?.siteKey
+const captchaToken = ref<string>()
+const turnstile = ref<{ reset: () => void }>()
 
 // If the user is already logged in (e.g. navigating back to /signup),
 // redirect immediately. But skip during signup flow so fireWelcome()
@@ -130,12 +135,16 @@ async function signUp() {
         options: {
             data: { full_name: fullName.value },
             emailRedirectTo,
+            ...captchaOptions(captchaToken.value),
         },
     })
     loading.value = false
+    // Turnstile tokens are single use: get a fresh one after every attempt.
+    captchaToken.value = undefined
+    turnstile.value?.reset()
 
     if (signUpError) {
-        error.value = signUpError.message
+        error.value = isCaptchaError(signUpError) ? CAPTCHA_MESSAGE : signUpError.message
         return
     }
 

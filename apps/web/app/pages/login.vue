@@ -51,6 +51,8 @@
                         />
                     </div>
 
+                    <NuxtTurnstile v-if="siteKey" ref="turnstile" v-model="captchaToken" />
+
                     <div
                         v-if="error"
                         class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
@@ -89,6 +91,9 @@ const email = ref('')
 const password = ref('')
 const loading = ref(false)
 const error = ref<string | null>(null)
+const siteKey = useRuntimeConfig().public.turnstile?.siteKey
+const captchaToken = ref<string>()
+const turnstile = ref<{ reset: () => void }>()
 
 watchEffect(() => {
     if (user.value) router.replace('/account')
@@ -100,10 +105,14 @@ async function signIn() {
     const { error: signInError } = await supabase.auth.signInWithPassword({
         email: email.value,
         password: password.value,
+        options: captchaOptions(captchaToken.value),
     })
     loading.value = false
+    // Turnstile tokens are single use: get a fresh one after every attempt.
+    captchaToken.value = undefined
+    turnstile.value?.reset()
     if (signInError) {
-        error.value = signInError.message
+        error.value = isCaptchaError(signInError) ? CAPTCHA_MESSAGE : signInError.message
         return
     }
     await router.replace('/account')

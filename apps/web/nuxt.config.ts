@@ -3,7 +3,13 @@ export default defineNuxtConfig({
     compatibilityDate: '2025-07-15',
     devtools: { enabled: true },
 
-    modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@vueuse/nuxt', '@nuxt/image'],
+    modules: [
+        '@nuxtjs/tailwindcss',
+        '@nuxtjs/supabase',
+        '@vueuse/nuxt',
+        '@nuxt/image',
+        '@nuxtjs/turnstile',
+    ],
 
     app: {
         head: {
@@ -77,6 +83,12 @@ export default defineNuxtConfig({
             ],
             cookieRedirect: false,
         },
+    },
+
+    // The real site key comes from NUXT_PUBLIC_TURNSTILE_SITE_KEY at runtime.
+    // Supabase Auth verifies the token, so there is no secretKey here.
+    turnstile: {
+        siteKey: '',
     },
 
     routeRules: {
