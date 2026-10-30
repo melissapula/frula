@@ -25,6 +25,7 @@ export const APPLIED_FILES: readonly string[] = [
     'migrations/20260421_three_quarter_baths.sql',
     'migrations/20261030_profiles_names_and_rows.sql',
     'migrations/20261030_profiles_column_privileges.sql',
+    'migrations/20261030_messages_respond_function.sql',
 ]
 
 export const SKIPPED_FILES: readonly { file: string; reason: string }[] = [
