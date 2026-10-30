@@ -108,6 +108,7 @@ definePageMeta({ layout: false })
 const route = useRoute()
 const router = useRouter()
 const supabase = useSupabaseClient()
+const dialog = useDialog()
 const user = useSupabaseUser()
 
 watchEffect(() => {
@@ -230,7 +231,7 @@ async function toggleItem(checklist: TransactionChecklist, item: ChecklistItem) 
         .eq('id', checklist.id)
 
     if (error) {
-        alert('Could not save: ' + error.message)
+        await dialog.alert({ title: 'Could not save', message: error.message })
         await loadAll()
         return
     }

@@ -401,6 +401,7 @@ import { formatPrice } from '~/composables/useListings'
 
 const route = useRoute()
 const supabase = useSupabaseClient()
+const dialog = useDialog()
 
 const {
     data: listing,
@@ -610,15 +611,18 @@ function openViewing() {
 const deleting = ref(false)
 async function deleteListing() {
     if (!listing.value || !isOwnListing.value) return
-    const ok = window.confirm(
-        `Permanently delete this listing for ${listing.value.address}? This cannot be undone.`,
-    )
+    const ok = await dialog.confirm({
+        title: 'Delete this listing?',
+        message: `This permanently deletes the listing for ${listing.value.address}. This cannot be undone.`,
+        confirmLabel: 'Delete listing',
+        isDestructive: true,
+    })
     if (!ok) return
     deleting.value = true
     const { error: delErr } = await supabase.from('listings').delete().eq('id', listing.value.id)
     if (delErr) {
         deleting.value = false
-        window.alert(`Could not delete listing: ${delErr.message}`)
+        await dialog.alert({ title: 'Could not delete listing', message: delErr.message })
         return
     }
     router.push('/account')
