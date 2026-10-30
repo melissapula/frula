@@ -74,12 +74,17 @@ and `IF EXISTS` guards.
     `respond_to_message()`, which saves offer and viewing responses.
     ⚠️ Must run before the client that calls it is deployed.
 
+21. **`migrations/20261030_messages_lock_writes.sql`** — Limits direct
+    message updates to `is_read` and `flagged`, and validates inserts.
+    ⚠️ Run only after the client that uses `respond_to_message()` is
+    deployed. An older client can no longer save responses.
+
 ## Seed data (optional, for testing)
 
-21. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
+22. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
     (MN). Uses the first profile as owner.
 
-22. **`seed_listings.sql`** — Larger seed set if it exists.
+23. **`seed_listings.sql`** — Larger seed set if it exists.
 
 ## Post-migration: Zillow ZHVI ingestion (optional)
 

@@ -26,6 +26,7 @@ export const APPLIED_FILES: readonly string[] = [
     'migrations/20261030_profiles_names_and_rows.sql',
     'migrations/20261030_profiles_column_privileges.sql',
     'migrations/20261030_messages_respond_function.sql',
+    'migrations/20261030_messages_lock_writes.sql',
 ]
 
 export const SKIPPED_FILES: readonly { file: string; reason: string }[] = [

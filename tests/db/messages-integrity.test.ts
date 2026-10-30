@@ -19,8 +19,43 @@ const RESPONDENTS: [string, Role, string | null][] = [
     ['anon', 'anon', null],
 ]
 
+const PARTIES: [string, string][] = [
+    ['sender', BUYER],
+    ['recipient', SELLER],
+]
+
+const LOCKED_COLUMNS: [string, string][] = [
+    ['body', `'forged'`],
+    ['payload', `'{"status": "accepted", "offer_price": 1}'`],
+    ['recipient_id', `'${STRANGER}'`],
+    ['sender_id', `'${STRANGER}'`],
+    ['listing_id', `'${ACTIVE_LISTING}'`],
+    ['kind', `'text'`],
+    ['created_at', `'2020-01-01'`],
+]
+
+const INBOX_COLUMNS: [string, string][] = [
+    ['is_read', 'true'],
+    ['flagged', 'true'],
+]
+
+const LOCKED_BY_PARTY = PARTIES.flatMap(([party, userId]) =>
+    LOCKED_COLUMNS.map(([column, value]) => [party, column, userId, value] as const),
+)
+
 const expectDenied = (result: QueryResult) =>
     expect(isDenied(result), JSON.stringify(result)).toBe(true)
+
+// Kept apart from isDenied, which means a missing privilege rather than a failed policy check.
+const isBlocked = (result: QueryResult) => /row-level security/.test(result.error ?? '')
+
+const expectBlocked = (result: QueryResult) =>
+    expect(isBlocked(result), JSON.stringify(result)).toBe(true)
+
+const updateColumn = (column: string, value: string) =>
+    `UPDATE public.messages SET ${column} = ${value} WHERE id = '${OFFER}' RETURNING id`
+
+const deleteOffer = `DELETE FROM public.messages WHERE id = '${OFFER}' RETURNING id`
 
 const respond = (messageId: string, status: string) =>
     `SELECT public.respond_to_message('${messageId}', '${status}') AS payload`
@@ -168,6 +203,84 @@ describe('message integrity', () => {
             )
 
             expect(result.rows).toHaveLength(1)
+        })
+    })
+
+    describe('forged updates', () => {
+        it.each(LOCKED_BY_PARTY)('%s cannot change %s', async (_name, column, userId, value) => {
+            expectDenied(await as(db, 'authenticated', userId, updateColumn(column, value)))
+        })
+
+        it.each([...LOCKED_COLUMNS, ...INBOX_COLUMNS])(
+            'anon cannot update %s',
+            async (column, value) => {
+                expectDenied(await as(db, 'anon', null, updateColumn(column, value)))
+            },
+        )
+
+        it.each(INBOX_COLUMNS)('stranger updates no rows: %s', async (column, value) => {
+            const result = await as(db, 'authenticated', STRANGER, updateColumn(column, value))
+
+            expect(result.rows).toEqual([])
+        })
+    })
+
+    describe('deletes by outsiders', () => {
+        it.each(RESPONDENTS.slice(1))('%s deletes no rows', async (_name, role, userId) => {
+            const result = await as(db, role, userId, deleteOffer)
+
+            expect(result.rows).toEqual([])
+        })
+    })
+
+    describe('forged inserts', () => {
+        it.each([
+            ['a buyer claiming the seller', BUYER, SELLER, BUYER],
+            ['a recipient claiming the sender', SELLER, BUYER, SELLER],
+            ['a stranger claiming the buyer', STRANGER, BUYER, SELLER],
+        ])('blocks %s', async (_name, userId, senderId, recipientId) => {
+            const sql = insertMessage(senderId, recipientId)
+
+            expectBlocked(await as(db, 'authenticated', userId, sql))
+        })
+
+        it.each([
+            ['an accepted offer', `'offer', '{"status": "accepted"}'`],
+            ['a confirmed viewing', `'viewing_request', '{"status": "confirmed"}'`],
+            ['an offer with no payload', `'offer', NULL`],
+            ['a viewing with no payload', `'viewing_request', NULL`],
+            ['a text message with a payload', `'text', '{"status": "pending"}'`],
+        ])('blocks %s', async (_name, extra) => {
+            const sql = insertMessage(BUYER, SELLER, extra)
+
+            expectBlocked(await as(db, 'authenticated', BUYER, sql))
+        })
+
+        // RETURNING would add the SELECT policy's check, which hides a gap in the INSERT policy.
+        it('blocks a stranger claiming the buyer when nothing is returned', async () => {
+            const sql = `INSERT INTO public.messages (listing_id, sender_id, recipient_id, body)
+                VALUES ('${ACTIVE_LISTING}', '${BUYER}', '${SELLER}', 'hello')`
+
+            expectBlocked(await as(db, 'authenticated', STRANGER, sql))
+        })
+
+        it('blocks anon', async () => {
+            expectBlocked(await as(db, 'anon', null, insertMessage(BUYER, SELLER)))
+        })
+    })
+
+    // Account deletion (audit item 5) relies on the service role keeping these.
+    describe('service role', () => {
+        it('can update a message', async () => {
+            const result = await as(db, 'service_role', null, updateColumn('body', `'edited'`))
+
+            expect(result.rows).toEqual([{ id: OFFER }])
+        })
+
+        it('can delete a message', async () => {
+            const result = await as(db, 'service_role', null, deleteOffer)
+
+            expect(result.rows).toEqual([{ id: OFFER }])
         })
     })
 })
