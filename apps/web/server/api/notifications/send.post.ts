@@ -10,6 +10,9 @@
  * recipient profiles even though the requester wouldn't normally have
  * access). For that reason it MUST validate that the caller is the
  * sender of the message — otherwise anyone could spam emails to anyone.
+ *
+ * Each message notifies at most once: a database claim stops replays, and a
+ * failed email is not retried.
  */
 
 import { serverSupabaseUser, serverSupabaseServiceRole } from '#supabase/server'
@@ -117,6 +120,19 @@ export default defineEventHandler(async (event) => {
         // Silently no-op rather than 500 — listing or profile may have been
         // deleted. We don't want to break the message-send flow.
         return { sent: false, reason: 'Missing recipient or listing' }
+    }
+
+    // Claimed before sending, so a Resend failure loses this email rather than risking a duplicate.
+    const { data: claimed, error: claimErr } = await admin.rpc('claim_message_notification', {
+        message_id: message.id,
+    })
+    if (claimErr) {
+        // eslint-disable-next-line no-console
+        console.error('Notification claim failed:', claimErr)
+        throw createError({ statusCode: 500, statusMessage: 'Could not send notification' })
+    }
+    if (!claimed) {
+        return { sent: false, reason: 'Already notified' }
     }
 
     const senderName = sender?.full_name || 'A buyer'

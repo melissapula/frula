@@ -5,6 +5,7 @@ import { FAKE_SERVICES_PORT } from './test-env'
 // supabase-js names the cookie after the first part of the host: 127 for 127.0.0.1.
 const SESSION_COOKIE = 'sb-127-auth-token'
 const ONE_HOUR_IN_SECONDS = 3600
+const CLAIM_PATH = '/rest/v1/rpc/claim_message_notification'
 
 type Row = Record<string, unknown>
 type Table = 'messages' | 'profiles' | 'listings'
@@ -55,7 +56,9 @@ export const startFakeServices = async () => {
     const calls: RecordedCall[] = []
     const users = new Set<string>()
     const tables: Record<Table, Row[]> = { messages: [], profiles: [], listings: [] }
+    const claimedMessages = new Set<string>()
     let isResendFailing = false
+    let isClaimFailing = false
 
     const handle = async (request: IncomingMessage, response: ServerResponse) => {
         const url = new URL(request.url ?? '/', 'http://fake')
@@ -82,6 +85,14 @@ export const startFakeServices = async () => {
                 200,
                 tables[table as Table].filter((row) => row.id === id),
             )
+        }
+
+        if (request.method === 'POST' && url.pathname === CLAIM_PATH) {
+            if (isClaimFailing) return reply(response, 500, { message: 'claim failed' })
+            const messageId = (body as { message_id: string }).message_id
+            const isFirstClaim = !claimedMessages.has(messageId)
+            claimedMessages.add(messageId)
+            return reply(response, 200, isFirstClaim)
         }
 
         if (request.method === 'POST' && url.pathname === '/rest/v1/notifications') {
@@ -114,6 +125,9 @@ export const startFakeServices = async () => {
         seed: (table: Table, row: Row) => tables[table].push(row),
         failResend: (isFailing: boolean) => {
             isResendFailing = isFailing
+        },
+        failClaim: (isFailing: boolean) => {
+            isClaimFailing = isFailing
         },
         callsTo: (path: string, method = 'POST') =>
             calls.filter((call) => call.path === path && call.method === method),

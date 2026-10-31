@@ -83,7 +83,14 @@ and `IF EXISTS` guards.
     can be messaged to a listing's owner or someone who has written to
     the sender, and adds `claim_message_notification()`. ⚠️ Must run
     before the route that calls the claim is merged, or all notification
-    emails stop.
+    emails stop. One-time catch-up, once that route is deployed, because
+    messages sent in between were notified by the old route but kept
+    `notified_at` NULL (the 5 minutes leaves in-flight messages alone):
+
+    ```sql
+    update public.messages set notified_at = created_at
+    where notified_at is null and created_at < now() - interval '5 minutes';
+    ```
 
 ## Seed data (optional, for testing)
 
