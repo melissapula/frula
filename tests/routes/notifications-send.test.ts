@@ -121,4 +121,53 @@ describe('POST /api/notifications/send', async () => {
         expect(await response.json()).toEqual({ sent: false, reason: 'Resend API error' })
         expect(bellRowsFor(recipientId)).toHaveLength(1)
     })
+
+    it('sends nothing more when a messageId is replayed', async () => {
+        const { senderId, recipientId, messageId, recipientEmail } = seedMessage()
+        const cookie = sessionCookieFor(senderId)
+
+        await postRoute({ messageId }, cookie)
+        const replay = await postRoute({ messageId }, cookie)
+
+        expect(await replay.json()).toEqual({ sent: false, reason: 'Already notified' })
+        expect(bellRowsFor(recipientId)).toHaveLength(1)
+        expect(emailsTo(recipientEmail)).toHaveLength(1)
+    })
+
+    // The fake models the claim, so this proves the route obeys it. Atomicity is the database's.
+    it('sends one email when two calls arrive together', async () => {
+        const { senderId, recipientId, messageId, recipientEmail } = seedMessage()
+        const cookie = sessionCookieFor(senderId)
+
+        await Promise.all([postRoute({ messageId }, cookie), postRoute({ messageId }, cookie)])
+
+        expect(bellRowsFor(recipientId)).toHaveLength(1)
+        expect(emailsTo(recipientEmail)).toHaveLength(1)
+    })
+
+    it('returns 500 with no email or bell row when the claim fails', async () => {
+        const { senderId, recipientId, messageId, recipientEmail } = seedMessage()
+        fake.failClaim(true)
+
+        const response = await postRoute({ messageId }, sessionCookieFor(senderId))
+        fake.failClaim(false)
+
+        expect(response.status).toBe(500)
+        expect(bellRowsFor(recipientId)).toHaveLength(0)
+        expect(emailsTo(recipientEmail)).toHaveLength(0)
+    })
+
+    it('does not retry an email that Resend failed to send', async () => {
+        const { senderId, recipientId, messageId, recipientEmail } = seedMessage()
+        const cookie = sessionCookieFor(senderId)
+        fake.failResend(true)
+
+        await postRoute({ messageId }, cookie)
+        fake.failResend(false)
+        const retry = await postRoute({ messageId }, cookie)
+
+        expect(await retry.json()).toEqual({ sent: false, reason: 'Already notified' })
+        expect(bellRowsFor(recipientId)).toHaveLength(1)
+        expect(emailsTo(recipientEmail)).toHaveLength(1)
+    })
 })
