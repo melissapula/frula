@@ -45,6 +45,7 @@ export default defineNuxtConfig({
     runtimeConfig: {
         // Server-only secrets (never exposed to the browser)
         resendApiKey: process.env.RESEND_API_KEY,
+        resendApiUrl: process.env.RESEND_API_URL || 'https://api.resend.com',
         emailFrom: process.env.EMAIL_FROM || 'Frula Homes <noreply@frulahomes.com>',
         emailReplyTo: process.env.EMAIL_REPLY_TO || '',
         alertsSecret: process.env.ALERTS_SECRET,
