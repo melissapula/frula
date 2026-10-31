@@ -206,7 +206,7 @@ export default defineEventHandler(async (event) => {
 
     // Fire the email via Resend's REST API
     try {
-        await $fetch('https://api.resend.com/emails', {
+        await $fetch(`${config.resendApiUrl}/emails`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${config.resendApiKey}`,
