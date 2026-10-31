@@ -79,12 +79,18 @@ and `IF EXISTS` guards.
     ⚠️ Run only after the client that uses `respond_to_message()` is
     deployed. An older client can no longer save responses.
 
+22. **`migrations/20261030_messages_recipient_rule.sql`** — Limits who
+    can be messaged to a listing's owner or someone who has written to
+    the sender, and adds `claim_message_notification()`. ⚠️ Must run
+    before the route that calls the claim is merged, or all notification
+    emails stop.
+
 ## Seed data (optional, for testing)
 
-22. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
+23. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
     (MN). Uses the first profile as owner.
 
-23. **`seed_listings.sql`** — Larger seed set if it exists.
+24. **`seed_listings.sql`** — Larger seed set if it exists.
 
 ## Post-migration: Zillow ZHVI ingestion (optional)
 

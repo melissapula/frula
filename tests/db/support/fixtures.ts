@@ -7,7 +7,8 @@ export const TXN_A = '00000000-0000-0000-0000-000000000004'
 export const TXN_B = '00000000-0000-0000-0000-000000000005'
 
 export const ACTIVE_LISTING = '10000000-0000-0000-0000-000000000001'
-const DRAFT_LISTING = '10000000-0000-0000-0000-000000000002'
+export const DRAFT_LISTING = '10000000-0000-0000-0000-000000000002'
+export const SOLD_LISTING = '10000000-0000-0000-0000-000000000003'
 
 const PEOPLE = [
     { id: SELLER, name: 'Sam Seller', email: 'sam@example.com' },
@@ -30,7 +31,8 @@ export async function seedPeople(db: PGlite): Promise<void> {
       UPDATE public.profiles SET phone = '555-0100' WHERE id = '${SELLER}';
       INSERT INTO public.listings (id, user_id, status, address, city, zip, price) VALUES
         ('${ACTIVE_LISTING}', '${SELLER}', 'active', '1 Main', 'Town', '00000', 1),
-        ('${DRAFT_LISTING}', '${TXN_A}', 'draft', '2 Main', 'Town', '00000', 1);
+        ('${DRAFT_LISTING}', '${TXN_A}', 'draft', '2 Main', 'Town', '00000', 1),
+        ('${SOLD_LISTING}', '${SELLER}', 'sold', '3 Main', 'Town', '00000', 1);
       INSERT INTO public.messages (listing_id, sender_id, recipient_id, body) VALUES
         ('${ACTIVE_LISTING}', '${BUYER}', '${SELLER}', 'hi');
       INSERT INTO public.transactions (listing_id, seller_id, buyer_id) VALUES
