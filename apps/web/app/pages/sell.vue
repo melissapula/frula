@@ -426,13 +426,6 @@
                 >
                     {{ error }}
                 </div>
-                <div
-                    v-if="geoWarning"
-                    class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
-                >
-                    We couldn't pinpoint this address on the map. Your listing is still published,
-                    but it won't appear in map search until the address is corrected.
-                </div>
 
                 <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                     <NuxtLink
@@ -472,6 +465,12 @@ import {
     validateAddress,
 } from '~/utils/address'
 import {
+    type CoordinateMatch,
+    coordinatesForSave,
+    isSameAddress,
+    planGeocode,
+} from '~/utils/coordinates'
+import {
     VIEW_OPTIONS,
     FEATURE_GROUPS,
     TERRAIN_OPTIONS,
@@ -486,8 +485,10 @@ const UNIQUE_VIOLATION = '23505'
 const CHECK_VIOLATION = '23514'
 const ADDRESS_FORMAT_MESSAGE =
     "Some address details aren't in a format we accept. Check the street, city, state and ZIP."
+const GEOCODE_NOT_FOUND = 404
 
 const supabase = useSupabaseClient()
+const dialog = useDialog()
 const user = useSupabaseUser()
 const router = useRouter()
 const route = useRoute()
@@ -561,7 +562,11 @@ const highlightsText = ref('')
 const photos = ref<{ url: string; publicId?: string }[]>([])
 const submitting = ref(false)
 const error = ref<string | null>(null)
-const geoWarning = ref(false)
+
+// What the listing had when the edit loaded. Kept out of `form` so drafts and the payload don't
+// carry them; they only decide whether submit re-geocodes.
+const originalAddress = ref<AddressFields | null>(null)
+const hasExistingPin = ref(false)
 
 // =====================================================
 // Draft auto-save (new listings only, not edits)
@@ -629,7 +634,7 @@ onMounted(async () => {
     const { data, error: loadErr } = await supabase
         .from('listings')
         .select(
-            `id, user_id, address, city, state, zip, county, property_type,
+            `id, user_id, address, city, state, zip, county, lat, lng, property_type,
              year_built, beds, full_baths, three_quarter_baths, half_baths, sqft, lot_size,
              garage_stalls, parking_spaces, single_story, stories,
              basement, basement_finished, price, title, description, highlights,
@@ -683,6 +688,8 @@ onMounted(async () => {
         sewer_type: data.sewer_type ?? undefined,
         hoa_fee: data.hoa_fee ?? undefined,
     })
+    originalAddress.value = normalizeAddress(form)
+    hasExistingPin.value = data.lat != null && data.lng != null
     highlightsText.value = (data.highlights ?? []).join('\n')
     photos.value = (
         (data.listing_photos ?? []) as { url: string; sort_order: number; is_primary: boolean }[]
@@ -734,6 +741,26 @@ const submitButtonTitle = computed(() => {
     return isShowingError ? 'Fix the highlighted fields first' : 'Fill in all required fields first'
 })
 
+/** Asks before saving without a map pin. A 404 means no geocoder matched; anything else is an outage. */
+function confirmPublishWithoutPin(isNotFound: boolean): Promise<boolean> {
+    const consequence = "It will publish without a map pin and won't show in map search."
+    return dialog.confirm(
+        isNotFound
+            ? {
+                  title: "We couldn't find this address on the map",
+                  message: `${consequence} Check the street, city and ZIP, or publish anyway.`,
+                  confirmLabel: 'Publish without a pin',
+                  cancelLabel: 'Check the address',
+              }
+            : {
+                  title: "The map lookup isn't available right now",
+                  message: `${consequence} Try again in a minute, or publish anyway.`,
+                  confirmLabel: 'Publish without a pin',
+                  cancelLabel: 'Go back',
+              },
+    )
+}
+
 async function submit() {
     if (!user.value) return
     // Re-entrancy guard. Even if the button is somehow clicked twice (slow
@@ -751,23 +778,31 @@ async function submit() {
 
     const photoUrls = photos.value.map((p) => p.url)
 
-    // Geocode the address so the new listing shows up on the browse map.
-    // Failure is non-fatal — the listing will still publish, just without
-    // a pin until the user (or an admin) corrects it.
+    // Place the address on the map before saving. An unchanged, already-pinned edit skips the
+    // lookup so it keeps its pin. When nothing matches, the seller chooses to publish without a
+    // pin or go back, except on an unchanged edit that was already unpinned.
     const { address, city, state, zip } = normalizedAddress.value
-    let lat: number | null = null
-    let lng: number | null = null
-    try {
-        const q = `${address}, ${city}, ${state} ${zip}`
-        const geo = await $fetch<{ lat: number; lng: number }>('/api/geocode', {
-            params: { q },
-        })
-        lat = geo.lat
-        lng = geo.lng
-    } catch (e) {
-        // eslint-disable-next-line no-console
-        console.warn('Geocoding failed for new listing:', e)
-        geoWarning.value = true
+    const situation = {
+        isEdit: !!editingId.value,
+        isAddressChanged:
+            !originalAddress.value ||
+            !isSameAddress(originalAddress.value, normalizedAddress.value),
+        hasExistingPin: hasExistingPin.value,
+    }
+    let match: CoordinateMatch | null = null
+    if (planGeocode(situation) === 'geocode') {
+        try {
+            match = await $fetch<CoordinateMatch>('/api/geocode', {
+                params: { q: `${address}, ${city}, ${state} ${zip}`, kind: 'address' },
+            })
+        } catch (e) {
+            const isNotFound = (e as { statusCode?: number }).statusCode === GEOCODE_NOT_FOUND
+            const isAlreadyUnpinned = situation.isEdit && !situation.isAddressChanged
+            if (!isAlreadyUnpinned && !(await confirmPublishWithoutPin(isNotFound))) {
+                submitting.value = false
+                return
+            }
+        }
     }
 
     const payload = {
@@ -776,8 +811,7 @@ async function submit() {
         state,
         zip,
         county: form.county || null,
-        lat,
-        lng,
+        ...coordinatesForSave({ ...situation, match }),
         property_type: form.property_type,
         price: form.price,
         sqft: form.sqft ?? null,
