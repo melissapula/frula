@@ -481,6 +481,12 @@ import {
 
 definePageMeta({ layout: false })
 
+// Postgres error codes that supabase-js passes through on `error.code`.
+const UNIQUE_VIOLATION = '23505'
+const CHECK_VIOLATION = '23514'
+const ADDRESS_FORMAT_MESSAGE =
+    "Some address details aren't in a format we accept. Check the street, city, state and ZIP."
+
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const router = useRouter()
@@ -820,9 +826,13 @@ async function submit() {
             .single()
         if (updErr || !updated) {
             submitting.value = false
-            if (updErr?.code === '23505') {
+            if (updErr?.code === UNIQUE_VIOLATION) {
                 error.value =
                     'Another active listing already exists at this address. Edit that one instead of duplicating it.'
+            } else if (updErr?.code === CHECK_VIOLATION) {
+                // eslint-disable-next-line no-console
+                console.error('Listing update failed a check constraint:', updErr.message)
+                error.value = ADDRESS_FORMAT_MESSAGE
             } else {
                 error.value = updErr?.message || 'Could not save your changes.'
             }
@@ -856,9 +866,13 @@ async function submit() {
 
         if (insertError || !listing) {
             submitting.value = false
-            if (insertError?.code === '23505') {
+            if (insertError?.code === UNIQUE_VIOLATION) {
                 error.value =
                     'This address is already listed as active. If you need to update the existing listing, edit it from your account page instead of creating a new one.'
+            } else if (insertError?.code === CHECK_VIOLATION) {
+                // eslint-disable-next-line no-console
+                console.error('Listing insert failed a check constraint:', insertError.message)
+                error.value = ADDRESS_FORMAT_MESSAGE
             } else {
                 error.value = insertError?.message || 'Something went wrong creating your listing.'
             }
