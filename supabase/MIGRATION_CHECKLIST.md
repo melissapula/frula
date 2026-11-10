@@ -92,12 +92,42 @@ and `IF EXISTS` guards.
     where notified_at is null and created_at < now() - interval '5 minutes';
     ```
 
+## Listing address rules (run after message integrity)
+
+23. **`migrations/20261111_listings_address_checks.sql`** — Adds `CHECK`
+    constraints for ZIP format, state code, no comma in the city, no
+    padding on street or city, and a 100-character street. ⚠️ Deploy the
+    sell form that normalizes addresses first. Then run the one-time fix
+    below, and run the migration only once the select returns no rows.
+    Step 1 has to return the 3 known rows before a 0-row result means
+    anything:
+
+    ```sql
+    -- 1. Dry run: expect exactly 3 rows (57627130…, dc28eed8…, b30b70a9…).
+    select id, address, city, zip, state from public.listings
+    where address <> btrim(address) or city <> btrim(city)
+       or address ~ ',\s*$' or city ~ ','
+       or zip !~ '^\d{5}(-\d{4})?$' or char_length(address) > 100
+       or state not in ('AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA',
+         'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS',
+         'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA',
+         'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY');
+
+    -- 2. Fix.
+    update public.listings set address = btrim(rtrim(address, ', ')), city = btrim(rtrim(city, ', '))
+    where address <> btrim(rtrim(address, ', ')) or city <> btrim(rtrim(city, ', '));
+    update public.listings set city = 'Tecopa'
+    where id::text like 'b30b70a9%' and city = 'Tecopa, CA';
+
+    -- 3. Re-run the dry run: expect 0 rows. Then run the migration.
+    ```
+
 ## Seed data (optional, for testing)
 
-23. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
+24. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
     (MN). Uses the first profile as owner.
 
-24. **`seed_listings.sql`** — Larger seed set if it exists.
+25. **`seed_listings.sql`** — Larger seed set if it exists.
 
 ## Post-migration: Zillow ZHVI ingestion (optional)
 
