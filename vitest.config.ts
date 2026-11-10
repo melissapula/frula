@@ -26,6 +26,8 @@ export default defineConfig({
                     include: ['tests/routes/**/*.test.ts'],
                     // Runs first so no real credentials are in place when Nuxt loads.
                     setupFiles: ['tests/routes/support/test-env.ts'],
+                    // Every file starts the fake services on the same fixed port.
+                    fileParallelism: false,
                 },
             },
         ],

@@ -15,6 +15,10 @@ const FAKE_ENV = {
     RESEND_API_URL: FAKE_SERVICES_URL,
     NUXT_RESEND_API_KEY: 'fake-resend-key',
     NUXT_RESEND_API_URL: FAKE_SERVICES_URL,
+    CENSUS_GEOCODER_URL: FAKE_SERVICES_URL,
+    NUXT_CENSUS_GEOCODER_URL: FAKE_SERVICES_URL,
+    NOMINATIM_URL: FAKE_SERVICES_URL,
+    NUXT_NOMINATIM_URL: FAKE_SERVICES_URL,
 }
 
 Object.assign(process.env, FAKE_ENV)
@@ -24,6 +28,8 @@ for (const name of [
     'NUXT_PUBLIC_SUPABASE_URL',
     'RESEND_API_URL',
     'NUXT_RESEND_API_URL',
+    'NUXT_CENSUS_GEOCODER_URL',
+    'NUXT_NOMINATIM_URL',
 ]) {
     if (!process.env[name]?.startsWith('http://127.0.0.1')) {
         throw new Error(`${name} must point at the local fake`)
