@@ -6,9 +6,53 @@ import { FAKE_SERVICES_PORT } from './test-env'
 const SESSION_COOKIE = 'sb-127-auth-token'
 const ONE_HOUR_IN_SECONDS = 3600
 const CLAIM_PATH = '/rest/v1/rpc/claim_message_notification'
+export const CENSUS_PATH = '/geocoder/locations/onelineaddress'
+export const NOMINATIM_PATH = '/search'
+
+// Different points, so a test can tell which geocoder answered.
+export const CENSUS_MATCH = {
+    lat: 28.4766,
+    lng: -82.5226,
+    display_name: '13109 LOLA DR, SPRING HILL, FL, 34609',
+}
+export const NOMINATIM_MATCH = {
+    lat: 47.4736,
+    lng: -94.8803,
+    display_name: 'Bemidji, Beltrami County, Minnesota, United States',
+}
 
 type Row = Record<string, unknown>
 type Table = 'messages' | 'profiles' | 'listings'
+export type GeocoderResult = 'match' | 'none' | 'down'
+
+// Shapes copied from the Census Geocoding Services API docs and Nominatim's /search format=json.
+const censusBody = (result: GeocoderResult, address: string) => ({
+    result: {
+        input: { address: { address }, benchmark: { benchmarkName: 'Public_AR_Current' } },
+        addressMatches:
+            result === 'match'
+                ? [
+                      {
+                          matchedAddress: CENSUS_MATCH.display_name,
+                          coordinates: { x: CENSUS_MATCH.lng, y: CENSUS_MATCH.lat },
+                          tigerLine: { tigerLineId: '1', side: 'L' },
+                          addressComponents: {},
+                      },
+                  ]
+                : [],
+    },
+})
+
+const nominatimBody = (result: GeocoderResult) =>
+    result === 'match'
+        ? [
+              {
+                  lat: String(NOMINATIM_MATCH.lat),
+                  lon: String(NOMINATIM_MATCH.lng),
+                  display_name: NOMINATIM_MATCH.display_name,
+              },
+          ]
+        : []
 
 export interface RecordedCall {
     method: string
@@ -59,6 +103,8 @@ export const startFakeServices = async () => {
     const claimedMessages = new Set<string>()
     let isResendFailing = false
     let isClaimFailing = false
+    let censusResult: GeocoderResult = 'match'
+    let nominatimResult: GeocoderResult = 'match'
 
     const handle = async (request: IncomingMessage, response: ServerResponse) => {
         const url = new URL(request.url ?? '/', 'http://fake')
@@ -105,6 +151,22 @@ export const startFakeServices = async () => {
                 : reply(response, 200, { id: randomUUID() })
         }
 
+        if (request.method === 'GET' && url.pathname === CENSUS_PATH) {
+            return censusResult === 'down'
+                ? reply(response, 503, { message: 'census is down' })
+                : reply(
+                      response,
+                      200,
+                      censusBody(censusResult, url.searchParams.get('address') ?? ''),
+                  )
+        }
+
+        if (request.method === 'GET' && url.pathname === NOMINATIM_PATH) {
+            return nominatimResult === 'down'
+                ? reply(response, 503, { message: 'nominatim is down' })
+                : reply(response, 200, nominatimBody(nominatimResult))
+        }
+
         return reply(response, 404, { message: 'no fake for this call' })
     }
 
@@ -128,6 +190,12 @@ export const startFakeServices = async () => {
         },
         failClaim: (isFailing: boolean) => {
             isClaimFailing = isFailing
+        },
+        setCensusResult: (result: GeocoderResult) => {
+            censusResult = result
+        },
+        setNominatimResult: (result: GeocoderResult) => {
+            nominatimResult = result
         },
         callsTo: (path: string, method = 'POST') =>
             calls.filter((call) => call.path === path && call.method === method),
