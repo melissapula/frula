@@ -5,6 +5,13 @@ export default defineConfig({
         projects: [
             {
                 test: {
+                    name: 'unit',
+                    environment: 'node',
+                    include: ['tests/unit/**/*.test.ts'],
+                },
+            },
+            {
+                test: {
                     name: 'db',
                     environment: 'node',
                     include: ['tests/db/**/*.test.ts'],

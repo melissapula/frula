@@ -24,40 +24,83 @@
             <form class="mt-8 space-y-8" @submit.prevent="submit">
                 <!-- Address -->
                 <Section title="Address">
-                    <Field label="Street address" required>
+                    <Field
+                        v-slot="{ errorId, invalid }"
+                        label="Street address"
+                        required
+                        :error="shownAddressError('address')"
+                    >
                         <input
                             v-model="form.address"
                             type="text"
                             required
+                            maxlength="100"
+                            autocomplete="address-line1"
                             placeholder="123 Main St"
                             class="input"
+                            :aria-invalid="invalid || undefined"
+                            :aria-describedby="errorId"
+                            @blur="touched.address = true"
                         />
                     </Field>
                     <div class="grid gap-4 sm:grid-cols-3">
-                        <Field label="City" required>
+                        <Field
+                            v-slot="{ errorId, invalid }"
+                            label="City"
+                            required
+                            :error="shownAddressError('city')"
+                        >
                             <input
                                 v-model="form.city"
                                 type="text"
                                 required
+                                autocomplete="address-level2"
                                 placeholder="City"
                                 class="input"
+                                :aria-invalid="invalid || undefined"
+                                :aria-describedby="errorId"
+                                @blur="touched.city = true"
                             />
                         </Field>
-                        <Field label="State" required>
-                            <select v-model="form.state" required class="input">
+                        <Field
+                            v-slot="{ errorId, invalid }"
+                            label="State"
+                            required
+                            :error="shownAddressError('state')"
+                        >
+                            <select
+                                v-model="form.state"
+                                required
+                                autocomplete="address-level1"
+                                class="input"
+                                :aria-invalid="invalid || undefined"
+                                :aria-describedby="errorId"
+                                @blur="touched.state = true"
+                            >
                                 <option value="">Select…</option>
                                 <option v-for="s in US_STATES" :key="s.code" :value="s.code">
                                     {{ s.name }}
                                 </option>
                             </select>
                         </Field>
-                        <Field label="ZIP" required>
+                        <Field
+                            v-slot="{ errorId, invalid }"
+                            label="ZIP"
+                            required
+                            :error="shownAddressError('zip')"
+                        >
                             <input
                                 v-model="form.zip"
                                 type="text"
                                 required
+                                inputmode="numeric"
+                                maxlength="10"
+                                autocomplete="postal-code"
                                 placeholder="12345"
                                 class="input"
+                                :aria-invalid="invalid || undefined"
+                                :aria-describedby="errorId"
+                                @blur="touched.zip = true"
                             />
                         </Field>
                     </div>
@@ -401,7 +444,7 @@
                     <button
                         type="submit"
                         :disabled="submitting || !canSubmit"
-                        :title="canSubmit ? '' : 'Fill in all required fields first'"
+                        :title="submitButtonTitle"
                         class="bg-brand hover:bg-brand-600 rounded-full px-8 py-3 text-sm font-semibold text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {{
@@ -422,6 +465,12 @@
 
 <script setup lang="ts">
 import { US_STATES } from '~/composables/useStates'
+import {
+    type AddressFields,
+    hasAddressErrors,
+    normalizeAddress,
+    validateAddress,
+} from '~/utils/address'
 import {
     VIEW_OPTIONS,
     FEATURE_GROUPS,
@@ -640,19 +689,43 @@ onMounted(async () => {
         .map((p) => ({ url: p.url }))
 })
 
+// Address rules run on the cleaned values, which are also what gets saved.
+const normalizedAddress = computed(() => normalizeAddress(form))
+const addressErrors = computed(() => validateAddress(normalizedAddress.value))
+
+// Errors stay hidden until a field loses focus or a submit is tried, so a
+// restored draft or an edit doesn't open full of red.
+const touched = reactive<Record<keyof AddressFields, boolean>>({
+    address: false,
+    city: false,
+    state: false,
+    zip: false,
+})
+const hasTriedSubmit = ref(false)
+
+function shownAddressError(field: keyof AddressFields): string | undefined {
+    if (!touched[field] && !hasTriedSubmit.value) return undefined
+    return addressErrors.value[field]
+}
+
 // Required-field gate for the submit button. Mirrors the `required` attribute
 // on the inputs but disables the button up front so users can't even click
 // it (and double-click their way into duplicate listings).
 const canSubmit = computed(() => {
     return (
-        form.address.trim().length > 0 &&
-        form.city.trim().length > 0 &&
-        form.state.trim().length > 0 &&
-        form.zip.trim().length > 0 &&
+        !hasAddressErrors(addressErrors.value) &&
         !!form.property_type &&
         typeof form.price === 'number' &&
         form.price > 0
     )
+})
+
+const ADDRESS_FIELDS: (keyof AddressFields)[] = ['address', 'city', 'state', 'zip']
+
+const submitButtonTitle = computed(() => {
+    if (canSubmit.value) return ''
+    const isShowingError = ADDRESS_FIELDS.some((field) => shownAddressError(field))
+    return isShowingError ? 'Fix the highlighted fields first' : 'Fill in all required fields first'
 })
 
 async function submit() {
@@ -660,6 +733,7 @@ async function submit() {
     // Re-entrancy guard. Even if the button is somehow clicked twice (slow
     // network, double-click, Enter key + click), only the first call proceeds.
     if (submitting.value) return
+    hasTriedSubmit.value = true
     if (!canSubmit.value) return
     error.value = null
     submitting.value = true
@@ -674,10 +748,11 @@ async function submit() {
     // Geocode the address so the new listing shows up on the browse map.
     // Failure is non-fatal — the listing will still publish, just without
     // a pin until the user (or an admin) corrects it.
+    const { address, city, state, zip } = normalizedAddress.value
     let lat: number | null = null
     let lng: number | null = null
     try {
-        const q = `${form.address}, ${form.city}, ${form.state} ${form.zip}`
+        const q = `${address}, ${city}, ${state} ${zip}`
         const geo = await $fetch<{ lat: number; lng: number }>('/api/geocode', {
             params: { q },
         })
@@ -690,10 +765,10 @@ async function submit() {
     }
 
     const payload = {
-        address: form.address,
-        city: form.city,
-        state: form.state,
-        zip: form.zip,
+        address,
+        city,
+        state,
+        zip,
         county: form.county || null,
         lat,
         lng,
