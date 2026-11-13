@@ -50,7 +50,9 @@ export default defineEventHandler(async (event) => {
     }
 
     // ChoreQuest uses this sign-in, so it stays. The function left a blank profile behind.
-    if (isSignInDeletable === false) {
+    // Only a clear true deletes it: an unexpected answer keeps the sign-in rather than risk
+    // erasing a ChoreQuest account.
+    if (isSignInDeletable !== true) {
         return { deleted: true, signInKept: true }
     }
 

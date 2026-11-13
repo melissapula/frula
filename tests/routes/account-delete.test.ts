@@ -80,6 +80,19 @@ describe('POST /api/account/delete', async () => {
         expect(authDeletesFor(userId)).toHaveLength(0)
     })
 
+    // Deleting the sign-in is the step that can erase a ChoreQuest account, so only a clear true
+    // allows it.
+    it('keeps the sign-in when closing the account gives no answer', async () => {
+        const userId = fake.addUser()
+        fake.setCloseAccountResult('no-answer')
+
+        const response = await postRoute(sessionCookieFor(userId))
+
+        expect(response.status).toBe(200)
+        expect(await response.json()).toEqual({ deleted: true, signInKept: true })
+        expect(authDeletesFor(userId)).toHaveLength(0)
+    })
+
     it('returns 500 and skips the auth delete when closing the account fails', async () => {
         const userId = fake.addUser()
         fake.setCloseAccountResult('error')

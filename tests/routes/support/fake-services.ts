@@ -27,7 +27,8 @@ type Row = Record<string, unknown>
 type Table = 'messages' | 'profiles' | 'listings'
 export type GeocoderResult = 'match' | 'none' | 'down'
 // close_frula_account returns true when the sign-in can go and false when ChoreQuest uses it.
-export type CloseAccountResult = 'deleted' | 'kept' | 'error'
+// 'no-answer' stands for a null result, which the real function never returns.
+export type CloseAccountResult = 'deleted' | 'kept' | 'no-answer' | 'error'
 
 // Shapes copied from the Census Geocoding Services API docs and Nominatim's /search format=json.
 const censusBody = (result: GeocoderResult, address: string) => ({
@@ -150,7 +151,11 @@ export const startFakeServices = async () => {
         if (request.method === 'POST' && url.pathname === CLOSE_ACCOUNT_PATH) {
             return closeAccountResult === 'error'
                 ? reply(response, 500, { message: 'close failed' })
-                : reply(response, 200, closeAccountResult === 'deleted')
+                : reply(
+                      response,
+                      200,
+                      closeAccountResult === 'no-answer' ? null : closeAccountResult === 'deleted',
+                  )
         }
 
         const adminUserId = url.pathname.match(/^\/auth\/v1\/admin\/users\/([^/]+)$/)?.[1]
