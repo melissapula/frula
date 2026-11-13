@@ -38,11 +38,18 @@ function readSchemaFile(file: string): string {
     return file === 'schema.sql' ? withoutPostgis(sql) : sql
 }
 
-export async function createTestDatabase(): Promise<PGlite> {
+export interface TestDatabaseOptions {
+    // Files from APPLIED_FILES to leave out, so a test can show what the schema did before them.
+    without?: readonly string[]
+}
+
+export async function createTestDatabase({
+    without = [],
+}: TestDatabaseOptions = {}): Promise<PGlite> {
     const db = new PGlite()
     await db.exec(SUPABASE_STAND_IN)
 
-    for (const file of APPLIED_FILES) {
+    for (const file of APPLIED_FILES.filter((name) => !without.includes(name))) {
         try {
             await db.exec(readSchemaFile(file))
         } catch (error) {
@@ -65,6 +72,26 @@ export async function as(
         await db.query(`SELECT set_config('request.jwt.sub', $1, true)`, [userId ?? ''])
         await db.exec(`SET LOCAL ROLE ${role}`)
         const { rows } = await db.query<Record<string, unknown>>(sql)
+        return { rows }
+    } catch (error) {
+        return { error: error instanceof Error ? error.message : String(error) }
+    } finally {
+        await db.exec('ROLLBACK')
+    }
+}
+
+// Runs a delete and then a read in one transaction, and rolls both back. Runs as the database
+// owner rather than through as(): Supabase deletes auth.users as its own auth admin role, which
+// the stand-in doesn't model, and foreign key actions don't depend on the caller's role anyway.
+export async function readAfterDelete(
+    db: PGlite,
+    deleteSql: string,
+    readSql: string,
+): Promise<QueryResult> {
+    await db.exec('BEGIN')
+    try {
+        await db.exec(deleteSql)
+        const { rows } = await db.query<Record<string, unknown>>(readSql)
         return { rows }
     } catch (error) {
         return { error: error instanceof Error ? error.message : String(error) }
