@@ -9,7 +9,21 @@
             </div>
         </header>
 
-        <div class="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12">
+        <!-- Shown after a delete that kept a sign-in ChoreQuest uses. The person is signed out, but
+             the page stays put: the auth redirect only runs on navigation. -->
+        <div v-if="isSignInKept" class="mx-auto max-w-xl px-4 py-12 text-center md:py-16">
+            <p class="text-base text-slate-700">
+                Your Frula data is deleted. Your sign-in stays because ChoreQuest uses it.
+            </p>
+            <NuxtLink
+                to="/"
+                class="bg-brand hover:bg-brand-600 mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white shadow-sm transition"
+            >
+                Go to the home page
+            </NuxtLink>
+        </div>
+
+        <div v-else class="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12">
             <!-- Welcome header -->
             <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -476,6 +490,7 @@ async function signOut() {
 const confirmingDelete = ref(false)
 const deleting = ref(false)
 const deleteError = ref<string | null>(null)
+const isSignInKept = ref(false)
 
 async function deleteAccount() {
     if (deleting.value) return
@@ -483,8 +498,12 @@ async function deleteAccount() {
     deleteError.value = null
 
     try {
-        await $fetch('/api/account/delete', { method: 'POST' })
+        const { signInKept } = await $fetch('/api/account/delete', { method: 'POST' })
         await supabase.auth.signOut()
+        if (signInKept) {
+            isSignInKept.value = true
+            return
+        }
         await router.replace('/')
     } catch (e: unknown) {
         const err = e as { data?: { message?: string } }

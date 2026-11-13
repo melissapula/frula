@@ -6,6 +6,8 @@ import { FAKE_SERVICES_PORT } from './test-env'
 const SESSION_COOKIE = 'sb-127-auth-token'
 const ONE_HOUR_IN_SECONDS = 3600
 const CLAIM_PATH = '/rest/v1/rpc/claim_message_notification'
+export const CLOSE_ACCOUNT_PATH = '/rest/v1/rpc/close_frula_account'
+export const authUserPath = (userId: string) => `/auth/v1/admin/users/${userId}`
 export const CENSUS_PATH = '/geocoder/locations/onelineaddress'
 export const NOMINATIM_PATH = '/search'
 
@@ -24,6 +26,9 @@ export const NOMINATIM_MATCH = {
 type Row = Record<string, unknown>
 type Table = 'messages' | 'profiles' | 'listings'
 export type GeocoderResult = 'match' | 'none' | 'down'
+// close_frula_account returns true when the sign-in can go and false when ChoreQuest uses it.
+// 'no-answer' stands for a null result, which the real function never returns.
+export type CloseAccountResult = 'deleted' | 'kept' | 'no-answer' | 'error'
 
 // Shapes copied from the Census Geocoding Services API docs and Nominatim's /search format=json.
 const censusBody = (result: GeocoderResult, address: string) => ({
@@ -103,6 +108,8 @@ export const startFakeServices = async () => {
     const claimedMessages = new Set<string>()
     let isResendFailing = false
     let isClaimFailing = false
+    let closeAccountResult: CloseAccountResult = 'deleted'
+    let isAuthDeleteFailing = false
     let censusResult: GeocoderResult = 'match'
     let nominatimResult: GeocoderResult = 'match'
 
@@ -139,6 +146,23 @@ export const startFakeServices = async () => {
             const isFirstClaim = !claimedMessages.has(messageId)
             claimedMessages.add(messageId)
             return reply(response, 200, isFirstClaim)
+        }
+
+        if (request.method === 'POST' && url.pathname === CLOSE_ACCOUNT_PATH) {
+            return closeAccountResult === 'error'
+                ? reply(response, 500, { message: 'close failed' })
+                : reply(
+                      response,
+                      200,
+                      closeAccountResult === 'no-answer' ? null : closeAccountResult === 'deleted',
+                  )
+        }
+
+        const adminUserId = url.pathname.match(/^\/auth\/v1\/admin\/users\/([^/]+)$/)?.[1]
+        if (request.method === 'DELETE' && adminUserId) {
+            if (isAuthDeleteFailing) return reply(response, 500, { message: 'auth delete failed' })
+            users.delete(adminUserId)
+            return reply(response, 200, fakeUser(adminUserId))
         }
 
         if (request.method === 'POST' && url.pathname === '/rest/v1/notifications') {
@@ -191,6 +215,12 @@ export const startFakeServices = async () => {
         failClaim: (isFailing: boolean) => {
             isClaimFailing = isFailing
         },
+        setCloseAccountResult: (result: CloseAccountResult) => {
+            closeAccountResult = result
+        },
+        failAuthDelete: (isFailing: boolean) => {
+            isAuthDeleteFailing = isFailing
+        },
         setCensusResult: (result: GeocoderResult) => {
             censusResult = result
         },
@@ -199,6 +229,8 @@ export const startFakeServices = async () => {
         },
         callsTo: (path: string, method = 'POST') =>
             calls.filter((call) => call.path === path && call.method === method),
+        // Every call's method and path, in the order the fakes received them.
+        callOrder: () => calls.map((call) => `${call.method} ${call.path}`),
         stop: () => new Promise((resolve) => server.close(resolve)),
     }
 }
