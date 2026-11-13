@@ -122,12 +122,44 @@ and `IF EXISTS` guards.
     -- 3. Re-run the dry run: expect 0 rows. Then run the migration.
     ```
 
+## Account deletion (run after listing address rules)
+
+24. **`migrations/20261113_profile_delete_actions.sql`** — Gives the six
+    keys that point at `profiles` a delete action, so deleting a profile
+    or an `auth.users` row no longer fails on messages, transactions,
+    checklists or listing plans. ⚠️ This widens what an `auth.users`
+    delete removes, including deletes made from ChoreQuest: the user's
+    messages in both directions, their checklists and listing plans, and
+    transactions naming them as seller. Transactions where they were the
+    buyer stay, with `buyer_id` set to null. Run it at a quiet time; each
+    re-added key scans its table.
+
+    ```sql
+    -- 1. Before: expect these six with confdeltype = 'a', next to the keys
+    --    that already cascade. Stop if any of the six has another name.
+    --    messages_recipient_id_fkey, messages_sender_id_fkey,
+    --    transactions_buyer_id_fkey, transactions_seller_id_fkey,
+    --    transaction_checklists_user_id_fkey, listing_plans_user_id_fkey
+    select conname, conrelid::regclass, confdeltype
+    from pg_constraint
+    where confrelid = 'public.profiles'::regclass and contype = 'f'
+    order by conrelid::regclass::text, conname;
+    -- confdeltype: a = no action, c = cascade, n = set null
+
+    -- 2. Run the migration.
+
+    -- 3. Re-run the select. Expect 'c' for both message keys,
+    --    transactions_seller_id_fkey, transaction_checklists_user_id_fkey
+    --    and listing_plans_user_id_fkey, 'n' for transactions_buyer_id_fkey,
+    --    and exactly one key per column (no 'a' key left beside a new one).
+    ```
+
 ## Seed data (optional, for testing)
 
-24. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
+25. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
     (MN). Uses the first profile as owner.
 
-25. **`seed_listings.sql`** — Larger seed set if it exists.
+26. **`seed_listings.sql`** — Larger seed set if it exists.
 
 ## Post-migration: Zillow ZHVI ingestion (optional)
 
