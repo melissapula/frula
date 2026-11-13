@@ -154,12 +154,38 @@ and `IF EXISTS` guards.
     --    and exactly one key per column (no 'a' key left beside a new one).
     ```
 
+25. **`migrations/20261114_close_frula_account.sql`** — Adds
+    `public.close_frula_account(uuid)`, which deletes a user's Frula
+    data and returns whether their sign-in may be deleted. It returns
+    `false`, and leaves a blank profile, when ChoreQuest's `chore.users`
+    has the user, because deleting the shared `auth.users` row would
+    erase their ChoreQuest account (audit item 20). Only the service
+    role can call it. ⚠️ Required before deploying the delete route that
+    calls it: without the function, every account delete fails.
+
+    ```sql
+    -- 1. Run the migration.
+
+    -- 2. Read back: expect false, false, true.
+    select has_function_privilege('anon', 'public.close_frula_account(uuid)', 'execute') as anon,
+           has_function_privilege('authenticated', 'public.close_frula_account(uuid)', 'execute') as authed,
+           has_function_privilege('service_role', 'public.close_frula_account(uuid)', 'execute') as service;
+
+    -- 3. For the record: how many people use both apps, and how many of
+    --    them have Frula activity.
+    select count(*) as both_apps,
+           count(*) filter (where exists (select 1 from public.listings l where l.user_id = c.id)
+                              or exists (select 1 from public.messages m
+                                         where m.sender_id = c.id or m.recipient_id = c.id)) as with_frula_activity
+    from chore.users c;
+    ```
+
 ## Seed data (optional, for testing)
 
-25. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
+26. **`seed_mock_listings.sql`** — 2 land parcels + 1 commercial property
     (MN). Uses the first profile as owner.
 
-26. **`seed_listings.sql`** — Larger seed set if it exists.
+27. **`seed_listings.sql`** — Larger seed set if it exists.
 
 ## Post-migration: Zillow ZHVI ingestion (optional)
 
