@@ -124,7 +124,9 @@
                     You can request a copy of your data, edit your profile, or delete your account
                     at any time. Deleting your account removes your profile, listings, saved homes,
                     and message history. Some records may be retained for legal or anti-abuse
-                    reasons (e.g. messages reported as harassment).
+                    reasons (e.g. messages reported as harassment). If you also use ChoreQuest,
+                    which shares Frula's sign-in, deleting your Frula account keeps your sign-in
+                    (email and password) so ChoreQuest keeps working; contact us to remove it.
                 </p>
 
                 <h2 class="font-display mt-8 text-2xl font-bold text-slate-900">Contact</h2>
