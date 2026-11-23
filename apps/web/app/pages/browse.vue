@@ -123,7 +123,7 @@
                                 </div>
                                 <div v-else>
                                     <button
-                                        v-if="focusedFromMap"
+                                        v-if="pinnedId"
                                         type="button"
                                         class="hover:border-brand hover:text-brand mb-3 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-600"
                                         @click="clearMapHover"
@@ -136,7 +136,7 @@
                                             :key="listing.id"
                                             :listing="listing"
                                             :highlighted="focusedId === listing.id"
-                                            :expanded="focusedFromMap"
+                                            :expanded="!!pinnedId"
                                             @hover="onCardHover(listing.id, $event)"
                                         />
                                     </div>
@@ -183,7 +183,6 @@ const view = ref<'list' | 'map'>('list')
 // user move their mouse off the marker (e.g. to scroll the expanded card)
 // without losing the popup or the filtered list.
 const hoveredId = ref<string | null>(null)
-const hoverSource = ref<'map' | 'card' | null>(null)
 const pinnedId = ref<string | null>(null)
 
 const { data, pending, error } = useListings(filters)
@@ -219,28 +218,24 @@ const hasActiveFilters = computed(() => {
     )
 })
 
-// Treat pinned as the source of truth when set; otherwise honor map-originated hover
+// Pinned wins over hover for which card is highlighted.
 const focusedId = computed(() => pinnedId.value ?? hoveredId.value)
-const focusedFromMap = computed(
-    () => !!pinnedId.value || (hoverSource.value === 'map' && !!hoveredId.value),
-)
 
+// Only a click narrows the list to one listing. Hover must not change the page's height:
+// a shorter page scrolls the map out from under the cursor, which ends the hover, which
+// restores the list and scrolls the map back, and the page shakes.
 const visibleListings = computed(() => {
     if (!data.value) return []
-    if (focusedFromMap.value && focusedId.value) {
-        return data.value.filter((l) => l.id === focusedId.value)
-    }
+    if (pinnedId.value) return data.value.filter((l) => l.id === pinnedId.value)
     return data.value
 })
 
 function onMapHover(id: string | null) {
     hoveredId.value = id
-    hoverSource.value = id ? 'map' : null
 }
 
 function onCardHover(_listingId: string, id: string | null) {
     hoveredId.value = id
-    hoverSource.value = id ? 'card' : null
 }
 
 function onMapPin(id: string | null) {
@@ -249,7 +244,6 @@ function onMapPin(id: string | null) {
 
 function clearMapHover() {
     hoveredId.value = null
-    hoverSource.value = null
     pinnedId.value = null
 }
 

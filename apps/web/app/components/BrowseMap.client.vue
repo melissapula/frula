@@ -37,6 +37,13 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import type { Listing, GeoCenter } from '~/types/listing'
 import { colorForType, CATEGORY_COLORS } from '~/composables/useMapColors'
+import {
+    createListingClusters,
+    type ClusterItem,
+    type ListingClusters,
+    type MapItem,
+    type MapPoint,
+} from '~/utils/mapClusters'
 
 const props = defineProps<{
     listings: Listing[]
@@ -58,10 +65,12 @@ const COLORS = CATEGORY_COLORS
 
 const mapEl = ref<HTMLDivElement | null>(null)
 let map: mapboxgl.Map | null = null
-const markers: mapboxgl.Marker[] = []
-// Per-listing references so hover-sync can update them
-const markerById = new Map<string, mapboxgl.Marker>()
+// Pins and cluster bubbles on screen, keyed by itemKey(), so a map move only adds and
+// removes the ones that changed.
+const markerByKey = new Map<string, mapboxgl.Marker>()
+// Every listing with coordinates, whether it is drawn as its own pin or inside a cluster.
 const listingById = new Map<string, Listing>()
+let clusters: ListingClusters | null = null
 let activePopup: mapboxgl.Popup | null = null
 // Mapbox's map.on('click') still fires when you click an HTML marker (HTML
 // stopPropagation doesn't reach the canvas event), so we use a short-lived
@@ -70,10 +79,10 @@ let activePopup: mapboxgl.Popup | null = null
 let lastMarkerInteractionAt = 0
 
 function clearMarkers() {
-    for (const m of markers) m.remove()
-    markers.length = 0
-    markerById.clear()
+    for (const m of markerByKey.values()) m.remove()
+    markerByKey.clear()
     listingById.clear()
+    clusters = null
     if (activePopup) {
         activePopup.remove()
         activePopup = null
@@ -147,9 +156,10 @@ function showPopupFor(id: string | null | undefined) {
         activePopup = null
     }
     if (!id || !map) return
-    const marker = markerById.get(id)
+    // Anchored to the listing itself, so hovering its card still shows where it is even
+    // while it's grouped into a cluster.
     const listing = listingById.get(id)
-    if (!marker || !listing) return
+    if (!listing || listing.lat == null || listing.lng == null) return
 
     const popup = new mapboxgl.Popup({
         closeButton: false,
@@ -157,7 +167,7 @@ function showPopupFor(id: string | null | undefined) {
         offset: 18,
         className: 'frula-marker-popup',
     })
-        .setLngLat(marker.getLngLat())
+        .setLngLat([listing.lng, listing.lat])
         .setHTML(buildPopupHTML(listing))
         .addTo(map)
 
@@ -229,41 +239,104 @@ function syncCircle() {
     }
 }
 
+function itemKey(item: MapItem): string {
+    return item.kind === 'listing' ? `listing:${item.id}` : `cluster:${item.clusterId}`
+}
+
+function createListingPinElement(l: Listing): HTMLButtonElement {
+    const el = document.createElement('button')
+    el.type = 'button'
+    el.className =
+        'rounded-full px-2 py-1 text-xs font-semibold text-white shadow-md ring-2 ring-white'
+    el.style.backgroundColor = colorForType(l.property_type)
+    el.textContent = formatPriceShort(l.price)
+    el.addEventListener('click', (e) => {
+        e.stopPropagation()
+        lastMarkerInteractionAt = Date.now()
+        // Toggle pin: clicking the same pinned marker again unpins it.
+        emit('pin', props.pinnedId === l.id ? null : l.id)
+    })
+    el.addEventListener('mouseenter', () => emit('hover', l.id))
+    el.addEventListener('mouseleave', () => emit('hover', null))
+    return el
+}
+
+/** A count bubble for listings too close to draw apart. Clicking zooms in until they split. */
+function createClusterElement(item: ClusterItem): HTMLButtonElement {
+    const el = document.createElement('button')
+    el.type = 'button'
+    el.className =
+        'flex h-11 w-11 items-center justify-center rounded-full bg-slate-800 text-sm font-bold text-white shadow-md ring-2 ring-white'
+    el.textContent = String(item.count)
+    el.setAttribute('aria-label', `${item.count} listings here. Zoom in to see them.`)
+    el.addEventListener('click', (e) => {
+        e.stopPropagation()
+        lastMarkerInteractionAt = Date.now()
+        map?.easeTo({ center: [item.lng, item.lat], zoom: item.expansionZoom })
+    })
+    return el
+}
+
+/** Draws the pins and clusters for the current view, keeping the ones already on screen. */
+function renderVisibleMarkers() {
+    if (!map || !clusters) return
+    const bounds = map.getBounds()
+    if (!bounds) return
+    const items = clusters.itemsInView(
+        [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()],
+        map.getZoom(),
+    )
+    const wantedKeys = new Set(items.map(itemKey))
+
+    for (const [key, marker] of markerByKey) {
+        if (wantedKeys.has(key)) continue
+        marker.remove()
+        markerByKey.delete(key)
+        // A removed element never fires mouseleave, so clear a hover it was holding.
+        if (key === `listing:${props.hoveredId}`) emit('hover', null)
+    }
+
+    for (const item of items) {
+        const key = itemKey(item)
+        if (markerByKey.has(key)) continue
+        let el: HTMLButtonElement
+        if (item.kind === 'cluster') {
+            el = createClusterElement(item)
+        } else {
+            const listing = listingById.get(item.id)
+            if (!listing) continue
+            el = createListingPinElement(listing)
+        }
+        const marker = new mapboxgl.Marker({ element: el })
+            .setLngLat([item.lng, item.lat])
+            .addTo(map)
+        markerByKey.set(key, marker)
+    }
+}
+
 function syncMarkers() {
     if (!map) return
     clearMarkers()
     const bounds = new mapboxgl.LngLatBounds()
     let any = false
+    const points: MapPoint[] = []
 
     for (const l of props.listings) {
         if (l.lat == null || l.lng == null) continue
-        const el = document.createElement('button')
-        el.type = 'button'
-        el.className =
-            'rounded-full px-2 py-1 text-xs font-semibold text-white shadow-md ring-2 ring-white'
-        el.style.backgroundColor = colorForType(l.property_type)
-        el.textContent = formatPriceShort(l.price)
-        el.addEventListener('click', (e) => {
-            e.stopPropagation()
-            lastMarkerInteractionAt = Date.now()
-            // Toggle pin: clicking the same pinned marker again unpins it.
-            emit('pin', props.pinnedId === l.id ? null : l.id)
-        })
-        el.addEventListener('mouseenter', () => emit('hover', l.id))
-        el.addEventListener('mouseleave', () => emit('hover', null))
-        const marker = new mapboxgl.Marker({ element: el }).setLngLat([l.lng, l.lat]).addTo(map)
-        markers.push(marker)
-        markerById.set(l.id, marker)
         listingById.set(l.id, l)
+        points.push({ id: l.id, lat: l.lat, lng: l.lng })
         bounds.extend([l.lng, l.lat])
         any = true
     }
+    clusters = createListingClusters(points)
 
     if (props.center) {
         bounds.extend([props.center.lng, props.center.lat])
         any = true
     }
 
+    // Draw for the current view now; the moveend after fitBounds redraws for the new one.
+    renderVisibleMarkers()
     if (any && !bounds.isEmpty()) {
         map.fitBounds(bounds, { padding: 60, maxZoom: 13, duration: 400 })
     }
@@ -321,6 +394,8 @@ onMounted(async () => {
         // case the observer hasn't fired yet on first paint.
         map?.resize()
     })
+    // Clusters depend on zoom and the visible area, so redraw after every pan or zoom.
+    map.on('moveend', renderVisibleMarkers)
     // Click anywhere on the map background (not a marker, not the popup) → unpin.
     // Markers/popups bump `lastMarkerInteractionAt` so we ignore the synthetic
     // map click that fires from the same gesture.
