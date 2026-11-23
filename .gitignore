@@ -38,3 +38,6 @@ coverage/
 # Misc
 *.tsbuildinfo
 .eslintcache
+
+# Personal Claude Code context, kept out of this public repo
+CLAUDE.local.md
