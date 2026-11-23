@@ -87,20 +87,17 @@ on the informational side.
 
 ## The Person Building This
 
-**Missa** (Melissa Freundschuh-Pula) — Software Engineer at TransImpact,
-Bemidji MN. Stack: Angular, TypeScript, StencilJS, NestJS, Webpack, Sass.
-Owns a company-wide design system with 50+ Storybook components.
-M.S. Software Engineering, B.S. Mathematics. U.S. Marine Corps veteran.
-
-She is also pursuing a Minnesota real estate license through Edina Realty's
-LaunchER program. Her real estate knowledge informs the product — but the
-platform itself requires no license to operate.
+**Missa** — software engineer. Stack: Angular, TypeScript, StencilJS, NestJS, Webpack, Sass.
+Her real estate knowledge informs the product — but the platform itself requires no license to
+operate.
 
 **This is a solo project — just Missa and Claude building it together.**
 
-**Her partner is Chrissy** — visual artist and band director. The name
-"Frula" comes from the first two and last two letters of Missa's last name
+The name "Frula" comes from the first two and last two letters of Missa's last name
 (Freundschuh-Pula → Fr + ula).
+
+Personal context (background, location, and the like) lives in `CLAUDE.local.md`, which is
+gitignored, because this repo is public.
 
 ---
 
@@ -126,7 +123,7 @@ platform itself requires no license to operate.
 - **Email:** Resend (3k free/month) + Cloudflare Email Routing (free)
 - **Market data:** Zillow Research ZHVI (free public CSV, attribution req'd)
 - **Payments:** Stripe (Phase 2 — not yet wired)
-- **Repo:** Private GitHub repo (melissapula/frula)
+- **Repo:** Public GitHub repo (melissapula/frula)
 
 ### Market Snapshot Strategy (replaces old CMA plan)
 
@@ -185,7 +182,6 @@ agent, NOT a legal advisor. The differentiators vs. competitors:
 - Market Snapshot labeled: "Informational market context — not an appraisal"
 - Paperwork section links to official sources — never hosts or fills forms
 - Offers are "expressions of interest, not binding contracts"
-- Missa's Edina Realty LaunchER agreement has NO outside business restrictions
 - Built on personal laptop with free tools — IP belongs to Missa
 - Privacy Policy + Terms of Service drafted (placeholder, needs attorney review)
 
@@ -314,7 +310,6 @@ Documented in .env.example + apps/web/.env:
   but flag structural problems clearly when she proposes new ideas
 - She does NOT want walkthrough-style content or MN-privileged features
 - This is a real business — treat every session as productive work time
-- She builds on evenings/weekends around full-time job + family
 - Every session should produce something real and shippable
 - She uses "we" when talking about the project — lean into that
 - Build first, polish styling later — feature breadth before visual polish
